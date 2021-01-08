@@ -1,0 +1,20 @@
+{
+  "include": [
+    "src/**/*"
+  ],
+  "compilerOptions": {
+    "jsx": "react",
+    "target": "ES2016",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowUnreachableCode": false,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  }
+}
