@@ -29,7 +29,7 @@ export interface GraphQlError {
  */
 export async function queryOrMutate(request: GraphQlRequest, accessToken?: string): Promise<GraphQlResponse> {
     const headers: Record<string, string> = {'Content-Type': 'application/json'};
-    if (accessToken !== undefined) headers['Authorization'] = `Bearer ${accessToken}`;
+    if (accessToken !== undefined) headers.Authorization = `Bearer ${accessToken}`;
     const response = await fetch(`${process.env.HTTP}${process.env.API_URL}/query-or-mutation`, {
         method: 'POST',
         headers,

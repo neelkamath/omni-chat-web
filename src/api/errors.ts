@@ -2,18 +2,14 @@ import {message} from 'antd';
 
 export const NONEXISTENT_USER_ID_ERROR = 'NONEXISTENT_USER_ID_ERROR';
 
-/**
- * Pic wasn't a PNG or JPEG not exceeding 25 MiB.
- */
+/** Pic wasn't a PNG or JPEG not exceeding 25 MiB. */
 export const INVALID_PIC_ERROR = 'INVALID_PIC_ERROR';
 
 export async function displayInvalidPicError(): Promise<void> {
     message.error('The picture must be a PNG or JPEG file not exceeding 25 MB.');
 }
 
-/**
- * Occurs when an operation requiring an access token was either not passed a token or was passed an invalid one.
- */
+/** Occurs when an operation requiring an access token was either not passed a token or was passed an invalid one. */
 export const UNAUTHORIZED_ERROR = 'UNAUTHORIZED_ERROR';
 
 /**
@@ -40,9 +36,7 @@ export async function displayInvalidDomainError(): Promise<void> {
     );
 }
 
-/**
- * The email address isn't registered with an account.
- */
+/** The email address isn't registered with an account. */
 export const UNREGISTERED_EMAIL_ADDRESS_ERROR = 'UNREGISTERED_EMAIL_ADDRESS_ERROR';
 
 export async function displayUnregisteredEmailAddressError(): Promise<void> {
@@ -67,9 +61,7 @@ export async function displayEmailAddressVerifiedError(): Promise<void> {
     message.error('This email address has already been verified.');
 }
 
-/**
- * No such username.
- */
+/** No such username. */
 export const NONEXISTENT_USER_ERROR = 'NONEXISTENT_USER_ERROR';
 
 export async function displayNonExistentUserError(): Promise<void> {

@@ -1,11 +1,10 @@
-import {AccountInput} from './models';
+import {AccountInput, AccountUpdate, Placeholder} from './models';
 import {queryOrMutate} from './operator';
 import {
     CONNECTION_ERROR,
     EMAIL_ADDRESS_TAKEN_ERROR,
     EMAIL_ADDRESS_VERIFIED_ERROR,
     INVALID_DOMAIN_ERROR,
-    UNAUTHORIZED_ERROR,
     UNREGISTERED_EMAIL_ADDRESS_ERROR,
     USERNAME_TAKEN_ERROR
 } from '../errors';
@@ -19,7 +18,7 @@ import {
  * @throws EMAIL_ADDRESS_TAKEN_ERROR
  * @throws INVALID_DOMAIN_ERROR
  */
-export async function createAccount(account: AccountInput): Promise<void> {
+export async function createAccount(account: AccountInput): Promise<Placeholder> {
     const response = await queryOrMutate({
         query: `
             mutation CreateAccount($account: AccountInput!) {
@@ -28,7 +27,7 @@ export async function createAccount(account: AccountInput): Promise<void> {
         `,
         variables: {account},
     });
-    if ('errors' in response)
+    if (response.errors !== undefined)
         switch (response.errors![0]!.message) {
             case 'USERNAME_TAKEN':
                 throw USERNAME_TAKEN_ERROR;
@@ -39,6 +38,7 @@ export async function createAccount(account: AccountInput): Promise<void> {
             default:
                 throw CONNECTION_ERROR;
         }
+    return response.data!.createAccount;
 }
 
 /**
@@ -59,10 +59,10 @@ export async function verifyEmailAddress(emailAddress: string, verificationCode:
         `,
         variables: {emailAddress, verificationCode},
     });
-    if ('errors' in response)
+    if (response.errors !== undefined)
         if (response.errors![0]!.message === 'UNREGISTERED_EMAIL_ADDRESS') throw UNREGISTERED_EMAIL_ADDRESS_ERROR;
         else throw CONNECTION_ERROR;
-    return response.data!['verifyEmailAddress'];
+    return response.data!.verifyEmailAddress;
 }
 
 /**
@@ -74,7 +74,7 @@ export async function verifyEmailAddress(emailAddress: string, verificationCode:
  * @throws UNREGISTERED_EMAIL_ADDRESS_ERROR
  * @throws EMAIL_ADDRESS_VERIFIED_ERROR
  */
-export async function emailEmailAddressVerification(emailAddress: string): Promise<void> {
+export async function emailEmailAddressVerification(emailAddress: string): Promise<Placeholder> {
     const response = await queryOrMutate({
         query: `
             mutation EmailEmailAddressVerification($emailAddress: String!) {
@@ -83,7 +83,7 @@ export async function emailEmailAddressVerification(emailAddress: string): Promi
         `,
         variables: {emailAddress},
     });
-    if ('errors' in response)
+    if (response.errors !== undefined)
         switch (response.errors![0]!.message) {
             case 'UNREGISTERED_EMAIL_ADDRESS':
                 throw UNREGISTERED_EMAIL_ADDRESS_ERROR;
@@ -92,6 +92,7 @@ export async function emailEmailAddressVerification(emailAddress: string): Promi
             default:
                 throw CONNECTION_ERROR;
         }
+    return response.data!.emailEmailAddressVerification;
 }
 
 /**
@@ -104,7 +105,7 @@ export async function emailEmailAddressVerification(emailAddress: string): Promi
  * @see updateAccount Use this if the user is logged in (i.e., you have an access token), and wants to update their
  * password.
  */
-export async function emailPasswordResetCode(emailAddress: string): Promise<void> {
+export async function emailPasswordResetCode(emailAddress: string): Promise<Placeholder> {
     const response = await queryOrMutate({
         query: `
             mutation EmailPasswordResetCode($emailAddress: String!) {
@@ -113,9 +114,50 @@ export async function emailPasswordResetCode(emailAddress: string): Promise<void
         `,
         variables: {emailAddress},
     });
-    if ('errors' in response)
+    if (response.errors !== undefined)
         if (response.errors![0]!.message === 'UNREGISTERED_EMAIL_ADDRESS') throw UNREGISTERED_EMAIL_ADDRESS_ERROR;
         else throw CONNECTION_ERROR;
+    return response.data!.emailPasswordResetCode;
+}
+
+/**
+ * Updates the user's account. Only the non-`null` fields will be updated. None of the updates will take place if even
+ * one of the fields were invalid. If the user updates their email address to something other than their current
+ * address, you must log them out because the current access token will be invalid until they verify their new email
+ * address.
+ *
+ * If the user updates their email address, they'll be required to verify it before their next login via an email which
+ * is sent to it. This means they'll be locked out of their account if they provide an invalid address, and will have to
+ * contact the service's admin to correctly update their address. You could prevent this mistake by asking them to
+ * confirm their address. For example, a UI could require the user to enter their email address twice if they're
+ * updating it, and only allow the update to take place if both the entered addresses match.
+ * @param accessToken
+ * @param update
+ * @throws UNAUTHORIZED_ERROR
+ * @throws USERNAME_TAKEN_ERROR
+ * @throws EMAIL_ADDRESS_TAKEN_ERROR
+ * @throws CONNECTION_ERROR
+ */
+export async function updateAccount(accessToken: string, update: AccountUpdate): Promise<Placeholder> {
+    const response = await queryOrMutate({
+        query: `
+            mutation UpdateAccount($update: AccountUpdate!) {
+                updateAccount(update: $update)
+            }
+        `,
+        variables: {update},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        switch (response.errors[0]!.message) {
+            case 'USERNAME_TAKEN':
+                throw USERNAME_TAKEN_ERROR;
+            case 'EMAIL_ADDRESS_TAKEN':
+                throw EMAIL_ADDRESS_TAKEN_ERROR;
+            default:
+                throw CONNECTION_ERROR;
+        }
+    }
+    return response.data!.updateAccount;
 }
 
 /**
@@ -144,10 +186,10 @@ export async function resetPassword(
         `,
         variables: {emailAddress, passwordResetCode, newPassword},
     });
-    if ('errors' in response)
+    if (response.errors !== undefined)
         if (response.errors![0]!.message === 'UNREGISTERED_EMAIL_ADDRESS') throw UNREGISTERED_EMAIL_ADDRESS_ERROR;
         else throw CONNECTION_ERROR;
-    return response.data!['resetPassword'];
+    return response.data!.resetPassword;
 }
 
 /**
@@ -155,7 +197,7 @@ export async function resetPassword(
  * @throws UNAUTHORIZED_ERROR
  * @throws CONNECTION_ERROR
  */
-export async function deleteProfilePic(accessToken: string): Promise<void> {
+export async function deleteProfilePic(accessToken: string): Promise<Placeholder> {
     const response = await queryOrMutate({
         query: `
             mutation DeleteProfilePic {
@@ -163,5 +205,6 @@ export async function deleteProfilePic(accessToken: string): Promise<void> {
             }
         `,
     }, accessToken);
-    if ('errors' in response) throw CONNECTION_ERROR;
+    if (response.errors !== undefined) throw CONNECTION_ERROR;
+    return response.data!.deleteProfilePic;
 }

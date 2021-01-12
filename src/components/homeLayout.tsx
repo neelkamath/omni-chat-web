@@ -2,7 +2,7 @@ import React, {ReactElement} from 'react';
 import {Layout, Menu, Typography} from 'antd';
 import {Link} from 'react-router-dom';
 import {HomeOutlined, LoginOutlined, UserAddOutlined} from '@ant-design/icons';
-import {readTokenSet} from '../storage';
+import * as storage from '../storage';
 
 export interface HomeLayoutProps {
     readonly children: React.ReactNode;
@@ -24,7 +24,9 @@ export default function HomeLayout(props: HomeLayoutProps): ReactElement {
                         </Link>
                     </Menu.Item>
                     <Menu.Item key='/sign-in'>
-                        <Typography.Link onClick={() => location.href = readTokenSet() === null ? '/sign-in' : '/chat'}>
+                        <Typography.Link
+                            onClick={() => location.href = storage.readTokenSet() === null ? '/sign-in' : '/chat'}
+                        >
                             <LoginOutlined/> Sign In
                         </Typography.Link>
                     </Menu.Item>

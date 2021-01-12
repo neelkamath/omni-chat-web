@@ -15,7 +15,7 @@ import {
     UNREGISTERED_EMAIL_ADDRESS_ERROR,
     USERNAME_TAKEN_ERROR
 } from '../api/errors';
-import {createAccount, emailEmailAddressVerification, verifyEmailAddress} from '../api/graphQl/mutations';
+import * as mutations from '../api/graphQlApi/mutations';
 
 export default function RegistrationPage(): ReactElement {
     return (
@@ -23,8 +23,6 @@ export default function RegistrationPage(): ReactElement {
             <SignUpForm/>
             <Divider/>
             <ResendVerificationCodeForm/>
-            <Divider/>
-            <EmailAddressVerificationForm/>
         </HomeLayout>
     );
 }
@@ -42,7 +40,7 @@ function SignUpForm(): ReactElement {
     const [loading, setLoading] = useState(false);
     const onFinish = async (formData: SignUpData) => {
         setLoading(true);
-        await signUp(formData);
+        await createAccount(formData);
         setLoading(false);
     };
     return (
@@ -79,15 +77,15 @@ function SignUpForm(): ReactElement {
     );
 }
 
-async function signUp(data: SignUpData): Promise<void> {
+async function createAccount(data: SignUpData): Promise<void> {
     try {
-        await createAccount({
-            username: data['username'],
-            password: data['password'],
+        await mutations.createAccount({
+            username: data.username,
+            password: data.password,
             emailAddress: data['email-address'],
             firstName: data['first-name'],
             lastName: data['last-name'],
-            bio: data['bio'],
+            bio: data.bio,
         });
     } catch (error) {
         switch (error) {
@@ -116,7 +114,7 @@ function ResendVerificationCodeForm(): ReactElement {
     const [loading, setLoading] = useState(false);
     const onFinish = async (formData: VerificationCodeData) => {
         setLoading(true);
-        await resendVerificationCode(formData);
+        await emailEmailAddressVerification(formData);
         setLoading(false);
     };
     return (
@@ -141,9 +139,9 @@ function ResendVerificationCodeForm(): ReactElement {
     );
 }
 
-async function resendVerificationCode(data: VerificationCodeData): Promise<void> {
+async function emailEmailAddressVerification(data: VerificationCodeData): Promise<void> {
     try {
-        await emailEmailAddressVerification(data['email-address']);
+        await mutations.emailEmailAddressVerification(data['email-address']);
     } catch (error) {
         switch (error) {
             case CONNECTION_ERROR:
@@ -159,52 +157,4 @@ async function resendVerificationCode(data: VerificationCodeData): Promise<void>
         return;
     }
     message.success('Resent verification code.');
-}
-
-interface EmailAddressVerificationData {
-    readonly 'email-address': string;
-    readonly 'verification-code': number;
-}
-
-function EmailAddressVerificationForm(): ReactElement {
-    const [loading, setLoading] = useState(false);
-    const onFinish = async (formData: EmailAddressVerificationData) => {
-        setLoading(true);
-        await verifyAddressWithCode(formData);
-        setLoading(false);
-    };
-    return (
-        <>
-            <Typography.Title level={2}>Verify Your Email Address</Typography.Title>
-            <Form onFinish={onFinish} name='verify-email-address' layout='vertical'>
-                <Form.Item
-                    name='email-address'
-                    label='Email address'
-                    rules={[{required: true, message: 'Enter your email address.'}]}
-                >
-                    <Input type='email'/>
-                </Form.Item>
-                <Form.Item
-                    name='verification-code'
-                    label='Verification code'
-                    rules={[{required: true, message: 'Enter your verification code.'}]}
-                >
-                    <Input type='number'/>
-                </Form.Item>
-                <Form.Item>
-                    <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
-                </Form.Item>
-            </Form>
-        </>
-    );
-}
-
-async function verifyAddressWithCode(data: EmailAddressVerificationData): Promise<void> {
-    try {
-        const isVerified = await verifyEmailAddress(data['email-address'], data['verification-code']);
-        if (isVerified) message.success('Email address verified.'); else message.error('Incorrect verification code.');
-    } catch (error) {
-        if (error === CONNECTION_ERROR) await displayConnectionError();
-        else if (error === UNREGISTERED_EMAIL_ADDRESS_ERROR) await displayUnregisteredEmailAddressError();
-    }
 }

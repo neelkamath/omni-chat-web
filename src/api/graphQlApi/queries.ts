@@ -1,4 +1,4 @@
-import {Login, TokenSet} from './models';
+import {Account, Login, TokenSet} from './models';
 import {
     CONNECTION_ERROR,
     INCORRECT_PASSWORD_ERROR,
@@ -6,7 +6,7 @@ import {
     UNVERIFIED_EMAIL_ADDRESS_ERROR
 } from '../errors';
 import {queryOrMutate} from './operator';
-import {TOKEN_SET_FRAGMENT} from './fragments';
+import {ACCOUNT_FRAGMENT, TOKEN_SET_FRAGMENT} from './fragments';
 
 /**
  * Certain operations require authentication via an access token. You can acquire one to authenticate the user by
@@ -29,7 +29,7 @@ export async function requestTokenSet(login: Login): Promise<TokenSet> {
         `,
         variables: {login},
     });
-    if ('errors' in response) {
+    if (response.errors !== undefined) {
         switch (response.errors![0]!.message) {
             case 'NONEXISTENT_USER':
                 throw NONEXISTENT_USER_ERROR;
@@ -41,7 +41,7 @@ export async function requestTokenSet(login: Login): Promise<TokenSet> {
                 throw CONNECTION_ERROR;
         }
     }
-    return response.data!['requestTokenSet'];
+    return response.data!.requestTokenSet;
 }
 
 /**
@@ -62,6 +62,26 @@ export async function refreshTokenSet(refreshToken: string): Promise<TokenSet> {
         `,
         variables: {refreshToken},
     });
-    if ('errors' in response) throw CONNECTION_ERROR;
-    return response.data!['refreshTokenSet'];
+    if (response.errors !== undefined) throw CONNECTION_ERROR;
+    return response.data!.refreshTokenSet;
+}
+
+/**
+ * @param accessToken
+ * @return The user's account info.
+ * @throws UNAUTHORIZED_ERROR
+ * @throws CONNECTION_ERROR
+ */
+export async function readAccount(accessToken: string): Promise<Account> {
+    const response = await queryOrMutate({
+        query: `
+            query ReadAccount {
+                readAccount {
+                    ${ACCOUNT_FRAGMENT}
+                }
+            }
+        `,
+    }, accessToken);
+    if (response.errors !== undefined) throw CONNECTION_ERROR;
+    return response.data!.readAccount;
 }

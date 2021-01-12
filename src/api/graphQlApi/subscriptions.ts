@@ -48,9 +48,7 @@ export interface GraphQlSubscriptionData {
     readonly [key: string]: any;
 }
 
-/**
- * Call this function to close the connection.
- */
+/** Call this function to close the connection. */
 export interface OnSocketClose {
     (): void;
 }
@@ -81,7 +79,7 @@ function subscribe(
         if (response.errors !== undefined) {
             onError();
             socket.close();
-        } else onMessage(response.data!['subscribeToAccounts']);
+        } else onMessage(response.data!.subscribeToAccounts);
     });
     socket.addEventListener('error', onError);
     return () => socket.close();

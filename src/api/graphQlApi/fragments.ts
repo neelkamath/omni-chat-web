@@ -21,9 +21,7 @@ export const NEW_CONTACT_FRAGMENT = `
     }
 `;
 
-/**
- * `null` fields correspond to the field not existing.
- */
+/** `null` fields correspond to the field not existing. */
 export const UPDATED_ACCOUNT_FRAGMENT = `
     ... on UpdatedAccount {
         __typename
@@ -54,3 +52,15 @@ export const TOKEN_SET_FRAGMENT = `
         refreshToken
     }
 `;
+
+export const ACCOUNT_FRAGMENT = `
+    ... on Account {
+        __typename
+        id
+        username
+        emailAddress
+        firstName
+        lastName
+        bio
+    }
+`
