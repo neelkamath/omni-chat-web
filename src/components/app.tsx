@@ -3,7 +3,6 @@ import HomePage from './homePage';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import SignInPage from './signInPage';
 import RegistrationPage from './registrationPage';
-import ContactPage from './contactPage';
 import ChatPage from './chatPage';
 
 export default function App(): ReactElement {
@@ -18,9 +17,6 @@ export default function App(): ReactElement {
                 </Route>
                 <Route exact path='/sign-in'>
                     <SignInPage/>
-                </Route>
-                <Route exact path='/contact'>
-                    <ContactPage/>
                 </Route>
                 <Route exact path='/chat'>
                     <ChatPage/>

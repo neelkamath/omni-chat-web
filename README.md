@@ -4,7 +4,8 @@ _Trusted, Extensible, Better Chat_
 
 ![Cover](docs/cover.png)
 
-A web app for [Omni Chat's API](https://github.com/neelkamath/omni-chat). Here are the features implemented so far:
+A web app for [Omni Chat's API](https://github.com/neelkamath/omni-chat). This UI isn't mobile-friendly since native
+apps should give a superior experience for chat apps. Here are the features implemented so far:
 
 - [ ] Automatic online status. You don't manually set whether you're "away", or some other error-prone status that you
   have to constantly update, and no one takes seriously.
@@ -78,35 +79,44 @@ Here are the [branding assets](https://github.com/neelkamath/omni-chat/tree/mast
 
 ## Usage
 
-1. Either run the Omni Chat 0.8.2
-   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.8.2/docs/docker-compose.md) or in
-   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.8.2/docs/cloud.md).
+1. Either run the Omni Chat 0.8.3
+   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/docker-compose.md) or in
+   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/cloud.md).
 1. Serve the website which has been saved to `dist/`.
 
 ## Contributing
 
-Note that "JWT" refers to [JSON Web Tokens](https://jwt.io/).
+- "JWT" refers to [JSON Web Tokens](https://jwt.io/).
+- Padding from the edges of the screen, and between elements is `16px`.
+- When the user is signed in, the access token is guaranteed to be valid because it is automatically refreshed
+  periodically in the background. This means that if an API call results in an unauthorized error, the user has deleted
+  their account, and the user must be logged out (i.e., the token set must be deleted, and the user must be redirected
+  to the home page).
 
 ### Installation
 
 1. Install the [app](docs/install.md).
-1. Copy the [`.env`](docs/.env) file to the project's root directory. If you're not running the Omni Chat API
-   on http://localhost during development, change the value of the `API_URL` key.
+1. Configure the development environment:
+1. Copy the [`.env`](docs/.env) file to the project's root directory.
+1. If you're not running the Omni Chat API on `localhost` during development, change the value of the `API_URL` key (
+   e.g., `localhost:8080`, `example.com/api`).
+1. If the API server has an SSL certificate, change the values of the `HTTP` and `WS` keys to `https://` and `wss://`
+   respectively.
 
 ### Development
 
-1. Either run the Omni Chat 0.8.2
-   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.8.2/docs/docker-compose.md) or in
-   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.8.2/docs/cloud.md).
+1. Either run the Omni Chat 0.8.3
+   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/docker-compose.md) or in
+   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/cloud.md).
 1. Run on http://localhost:1234: `npm run dev`
 
 ### Production
 
 Here's how to test the production build:
 
-1. Either run the Omni Chat 0.8.2
-   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.8.2/docs/docker-compose.md) or in
-   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.8.2/docs/cloud.md).
+1. Either run the Omni Chat 0.8.3
+   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/docker-compose.md) or in
+   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/cloud.md).
 1. Save a production build to `dist/`: `npm run build`
 1. Serve the website which has been saved to `dist/`.
 

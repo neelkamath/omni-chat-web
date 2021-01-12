@@ -1,29 +1,70 @@
 import React, {ReactElement} from 'react';
-import {Card, Image, List, Space, Typography} from 'antd';
+import {Card, Col, Image, List, Row, Space, Typography} from 'antd';
 // @ts-ignore: Cannot find module '../cover.png' or its corresponding type declarations.
-import cover from '../cover.png';
+import cover from '../static/cover.png';
 import HomeLayout from './homeLayout';
+import {
+    CommentOutlined,
+    GroupOutlined,
+    MessageOutlined,
+    PhoneOutlined,
+    RobotOutlined,
+    TeamOutlined
+} from '@ant-design/icons';
+import ContactSection from './contactSection';
 
 export default function HomePage(): ReactElement {
     return (
         <HomeLayout>
             <Space direction='vertical'>
                 <Image preview={false} src={cover} alt='Cover'/>
-                <Typography.Title level={2}>Features</Typography.Title>
-                <UsersCard/>
-                <ChatsCard/>
-                <GroupChatsCard/>
-                <FreeCallsCard/>
-                <PowerfulMessagesCard/>
-                <ExtensibleCard/>
+                <FeaturesSection/>
+                <Typography.Title level={2}>Contact</Typography.Title>
+                <ContactSection/>
             </Space>
         </HomeLayout>
     );
 }
 
+function FeaturesSection(): ReactElement {
+    return (
+        <>
+            <Typography.Title level={2}>Features</Typography.Title>
+            <Space direction='vertical'>
+                <Row gutter={16}>
+                    <Col span={6}>
+                        <UsersCard/>
+                    </Col>
+                    <Col span={10}>
+                        <ChatsCard/>
+                    </Col>
+                    <Col span={8}>
+                        <GroupChatsCard/>
+                    </Col>
+                </Row>
+                <Row gutter={16}>
+                    <Col span={6}>
+                        <FreeCallsCard/>
+                    </Col>
+                    <Col span={8}>
+                        <PowerfulMessagesCard/>
+                    </Col>
+                    <Col span={10}>
+                        <ExtensibleCard/>
+                    </Col>
+                </Row>
+            </Space>
+        </>
+    );
+}
+
 function UsersCard(): ReactElement {
     return (
-        <Card title='Users'>
+        <Card title={
+            <Space>
+                <TeamOutlined/> Users
+            </Space>
+        }>
             <List>
                 <List.Item>Search for your friends and family.</List.Item>
                 <List.Item>Use on any device - no phone required.</List.Item>
@@ -35,7 +76,11 @@ function UsersCard(): ReactElement {
 
 function ChatsCard(): ReactElement {
     return (
-        <Card title='Chats'>
+        <Card title={
+            <Space>
+                <CommentOutlined/> Chats
+            </Space>
+        }>
             <List>
                 <List.Item>Private chats.</List.Item>
                 <List.Item>Group chats.</List.Item>
@@ -56,7 +101,11 @@ function ChatsCard(): ReactElement {
 
 function GroupChatsCard(): ReactElement {
     return (
-        <Card title='Group Chats'>
+        <Card title={
+            <Space>
+                <GroupOutlined/> Group Chats
+            </Space>
+        }>
             <List>
                 <List.Item>Chat description and icon.</List.Item>
                 <List.Item>Multiple admins.</List.Item>
@@ -70,7 +119,11 @@ function GroupChatsCard(): ReactElement {
 
 function FreeCallsCard(): ReactElement {
     return (
-        <Card title='Free Calls'>
+        <Card title={
+            <Space>
+                <PhoneOutlined/> Free Calls
+            </Space>
+        }>
             <List>
                 <List.Item>Group audio calls.</List.Item>
                 <List.Item>Group video calls.</List.Item>
@@ -84,7 +137,11 @@ function FreeCallsCard(): ReactElement {
 
 function PowerfulMessagesCard(): ReactElement {
     return (
-        <Card title='Powerful Messages'>
+        <Card title={
+            <Space>
+                <MessageOutlined/> Powerful Messages
+            </Space>
+        }>
             <List>
                 <List.Item>
                     Send texts, audio, pictures, videos, polls, documents, group chat invites, and actions (buttons
@@ -104,7 +161,11 @@ function PowerfulMessagesCard(): ReactElement {
 
 function ExtensibleCard(): ReactElement {
     return (
-        <Card title='Extensible'>
+        <Card title={
+            <Space>
+                <RobotOutlined/> Extensible
+            </Space>
+        }>
             <List>
                 <List.Item>
                     Omni Chat can be deployed for private use as well. For example, a company may only want to use it as

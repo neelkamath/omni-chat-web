@@ -1,8 +1,8 @@
 import React, {ReactElement} from 'react';
-import {Content, Header} from 'antd/lib/layout/layout';
-import {Dropdown, Layout, Menu, Typography} from 'antd';
+import {Layout, Menu, Typography} from 'antd';
 import {Link} from 'react-router-dom';
-import {MenuOutlined} from '@ant-design/icons';
+import {HomeOutlined, LoginOutlined, UserAddOutlined} from '@ant-design/icons';
+import {readTokenSet} from '../storage';
 
 export interface HomeLayoutProps {
     readonly children: React.ReactNode;
@@ -11,33 +11,28 @@ export interface HomeLayoutProps {
 export default function HomeLayout(props: HomeLayoutProps): ReactElement {
     return (
         <Layout>
-            <Header>
-                <Dropdown overlay={<HeaderMenu/>}>
-                    <MenuOutlined/>
-                </Dropdown>
-            </Header>
-            <Content style={{padding: 16}}>
+            <Layout.Header>
+                <Menu theme='dark' mode='horizontal' defaultSelectedKeys={[location.pathname]}>
+                    <Menu.Item key='/'>
+                        <Link component={Typography.Link} to='/'>
+                            <HomeOutlined/> Home
+                        </Link>
+                    </Menu.Item>
+                    <Menu.Item key='/register'>
+                        <Link component={Typography.Link} to='/register'>
+                            <UserAddOutlined/> Register
+                        </Link>
+                    </Menu.Item>
+                    <Menu.Item key='/sign-in'>
+                        <Typography.Link onClick={() => location.href = readTokenSet() === null ? '/sign-in' : '/chat'}>
+                            <LoginOutlined/> Sign In
+                        </Typography.Link>
+                    </Menu.Item>
+                </Menu>
+            </Layout.Header>
+            <Layout.Content style={{padding: 16}}>
                 {props.children}
-            </Content>
+            </Layout.Content>
         </Layout>
-    );
-}
-
-function HeaderMenu(): ReactElement {
-    return (
-        <Menu>
-            <Menu.Item>
-                <Link component={Typography.Link} to='/'>Home</Link>
-            </Menu.Item>
-            <Menu.Item>
-                <Link component={Typography.Link} to='/register'>Register</Link>
-            </Menu.Item>
-            <Menu.Item>
-                <Link component={Typography.Link} to='/sign-in'>Sign In</Link>
-            </Menu.Item>
-            <Menu.Item>
-                <Link component={Typography.Link} to='/contact'>Contact</Link>
-            </Menu.Item>
-        </Menu>
     );
 }

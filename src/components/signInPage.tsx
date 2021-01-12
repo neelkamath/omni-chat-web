@@ -1,7 +1,7 @@
 import React, {ReactElement, useState} from 'react';
 import HomeLayout from './homeLayout';
 import {Button, Divider, Form, Input, message, Space, Typography} from 'antd';
-import {emailPasswordResetCode, requestTokenSet, resetPassword} from '../api/operations';
+import {requestTokenSet} from '../api/graphQl/queries';
 import {
     CONNECTION_ERROR,
     displayConnectionError,
@@ -14,6 +14,8 @@ import {
     UNREGISTERED_EMAIL_ADDRESS_ERROR,
     UNVERIFIED_EMAIL_ADDRESS_ERROR
 } from '../api/errors';
+import {saveTokenSet} from '../storage';
+import {emailPasswordResetCode, resetPassword} from '../api/graphQl/mutations';
 
 export default function SignInPage(): ReactElement {
     return (
@@ -77,8 +79,7 @@ async function signIn(data: SignInData): Promise<void> {
         }
         return;
     }
-    localStorage.setItem('accessToken', tokenSet.accessToken);
-    localStorage.setItem('refreshToken', tokenSet.refreshToken);
+    saveTokenSet(tokenSet);
     location.href = '/chat';
 }
 

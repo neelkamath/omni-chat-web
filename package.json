@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "dev": "parcel src/index.html",
-    "build": "NODE_ENV=prod parcel build src/index.html"
+    "dev": "parcel src/static/index.html",
+    "build": "NODE_ENV=prod parcel build src/static/index.html"
   },
   "devDependencies": {
     "@types/node": "^14.14.20",
@@ -15,6 +15,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.3.0",
     "antd": "^4.9.4",
+    "jwt-decode": "^3.1.2",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-router-dom": "^5.1.7"

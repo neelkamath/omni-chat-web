@@ -1,5 +1,21 @@
 import {message} from 'antd';
 
+export const NONEXISTENT_USER_ID_ERROR = 'NONEXISTENT_USER_ID_ERROR';
+
+/**
+ * Pic wasn't a PNG or JPEG not exceeding 25 MiB.
+ */
+export const INVALID_PIC_ERROR = 'INVALID_PIC_ERROR';
+
+export async function displayInvalidPicError(): Promise<void> {
+    message.error('The picture must be a PNG or JPEG file not exceeding 25 MB.');
+}
+
+/**
+ * Occurs when an operation requiring an access token was either not passed a token or was passed an invalid one.
+ */
+export const UNAUTHORIZED_ERROR = 'UNAUTHORIZED_ERROR';
+
 /**
  * This error is thrown when the server is unreachable. For example, the server may have crashed due to a server-side
  * bug, the client sent the server a malformed request, or the client's internet connection is down.

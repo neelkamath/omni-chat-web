@@ -1,7 +1,6 @@
 import React, {ReactElement, useState} from 'react';
 import {Button, Divider, Form, Input, message, Space, Typography} from 'antd';
 import HomeLayout from './homeLayout';
-import {createAccount, emailEmailAddressVerification, verifyEmailAddress} from '../api/operations';
 import {
     CONNECTION_ERROR,
     displayConnectionError,
@@ -16,6 +15,7 @@ import {
     UNREGISTERED_EMAIL_ADDRESS_ERROR,
     USERNAME_TAKEN_ERROR
 } from '../api/errors';
+import {createAccount, emailEmailAddressVerification, verifyEmailAddress} from '../api/graphQl/mutations';
 
 export default function RegistrationPage(): ReactElement {
     return (
