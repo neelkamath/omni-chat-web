@@ -44,16 +44,17 @@ import * as queries from '../api/graphQlApi/queries';
 import {Account} from '../api/graphQlApi/models';
 
 export default function ChatPage(): ReactElement {
-    refreshTokenSet().catch(displayConnectionError);
+    refreshTokenSet().then();
+    Notification.requestPermission().then();
     return (
         <Layout>
             <Layout.Sider>
                 <Menu theme='dark'>
                     <AccountMenuItem/>
+                    <ContactMenuItem/>
                     <Menu.Item>
                         <Button icon={<LogoutOutlined/>} onClick={logOut}>Log Out</Button>
                     </Menu.Item>
-                    <ContactMenuItem/>
                 </Menu>
             </Layout.Sider>
             <Layout.Content style={{padding: 16}}>
@@ -127,6 +128,47 @@ function AccountMenuItem(props: object): ReactElement {
     );
 }
 
+async function getProfilePic(): Promise<ReactElement | null> {
+    let pic = null;
+    try {
+        pic = await restApi.getProfilePic(storage.readUserId()!);
+    } catch (error) {
+        error === NONEXISTENT_USER_ID_ERROR ? logOut() : await displayConnectionError();
+        return null;
+    }
+    if (pic === null) return <Typography.Text>No profile picture set.</Typography.Text>;
+    return <Image preview={false} src={URL.createObjectURL(pic)}/>;
+}
+
+async function patchProfilePic(data: RcCustomRequestOptions): Promise<void> {
+    try {
+        await restApi.patchProfilePic(storage.readTokenSet()!.accessToken!, data.file);
+    } catch (error) {
+        switch (error) {
+            case INVALID_PIC_ERROR:
+                await displayInvalidPicError();
+                break;
+            case UNAUTHORIZED_ERROR:
+                logOut();
+                break;
+            default:
+                await displayConnectionError();
+        }
+        return;
+    }
+    message.success('Profile picture updated.');
+}
+
+async function deleteProfilePic(): Promise<void> {
+    try {
+        await mutations.deleteProfilePic(storage.readTokenSet()!.accessToken);
+    } catch (error) {
+        error === UNAUTHORIZED_ERROR ? logOut() : await displayConnectionError();
+        return;
+    }
+    message.success('Profile picture deleted.');
+}
+
 interface AccountUpdateData {
     readonly username: string;
     /** An empty string indicates the password mustn't be updated. */
@@ -158,7 +200,7 @@ function UpdateAccountForm(): ReactElement {
                     >
                         <Input/>
                     </Form.Item>
-                    <Form.Item name='password' label='Password (optional)' initialValue=''>
+                    <Form.Item name='password' label='Password' initialValue=''>
                         <Input.Password/>
                     </Form.Item>
                     <Form.Item
@@ -187,7 +229,6 @@ function UpdateAccountForm(): ReactElement {
     }, [loading]);
     return (
         <>
-            <Typography.Paragraph>Only nonempty fields will be updated.</Typography.Paragraph>
             <Typography.Paragraph>
                 If you update your email address, you'll be logged out since you'll have to verify your new email
                 address.
@@ -237,48 +278,7 @@ async function updateAccount(data: AccountUpdateData): Promise<void> {
         return;
     }
     message.success('Account updated.');
-    if (oldAccount.emailAddress !== '' && oldAccount.emailAddress !== data['email-address']) logOut();
-}
-
-async function getProfilePic(): Promise<ReactElement | null> {
-    let pic = null;
-    try {
-        pic = await restApi.getProfilePic(storage.readUserId()!);
-    } catch (error) {
-        error === NONEXISTENT_USER_ID_ERROR ? logOut() : await displayConnectionError();
-        return null;
-    }
-    if (pic === null) return <Typography.Text>No profile picture set.</Typography.Text>;
-    return <Image preview={false} src={URL.createObjectURL(pic)}/>;
-}
-
-async function patchProfilePic(data: RcCustomRequestOptions): Promise<void> {
-    try {
-        await restApi.patchProfilePic(storage.readTokenSet()!.accessToken!, data.file);
-    } catch (error) {
-        switch (error) {
-            case INVALID_PIC_ERROR:
-                await displayInvalidPicError();
-                break;
-            case UNAUTHORIZED_ERROR:
-                logOut();
-                break;
-            default:
-                await displayConnectionError();
-        }
-        return;
-    }
-    message.success('Profile picture updated.');
-}
-
-async function deleteProfilePic(): Promise<void> {
-    try {
-        await mutations.deleteProfilePic(storage.readTokenSet()!.accessToken);
-    } catch (error) {
-        error === UNAUTHORIZED_ERROR ? logOut() : await displayConnectionError();
-        return;
-    }
-    message.success('Profile picture deleted.');
+    if (oldAccount.emailAddress !== data['email-address']) logOut();
 }
 
 function ContactMenuItem(props: object): ReactElement {
