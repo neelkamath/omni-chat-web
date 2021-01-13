@@ -1,6 +1,6 @@
 import React, {ReactElement, useState} from 'react';
 import HomeLayout from './homeLayout';
-import {Button, Divider, Form, Input, message, Space, Typography} from 'antd';
+import {Button, Col, Divider, Form, Image, Input, message, Row, Space, Typography} from 'antd';
 import * as queries from '../api/graphQlApi/queries';
 import {
     CONNECTION_ERROR,
@@ -16,24 +16,48 @@ import {
 } from '../api/errors';
 import * as storage from '../storage';
 import * as mutations from '../api/graphQlApi/mutations';
+// @ts-ignore: Cannot find module '../../static/illustrations/sign_in.svg' or its corresponding type declarations.
+import signInImage from '../../static/illustrations/sign_in.svg';
+// @ts-ignore: Cannot find module '../../static/illustrations/mail_sent.svg' or its corresponding type declarations.
+import mailSentImage from '../../static/illustrations/mail_sent.svg';
+// @ts-ignore: Cannot find module '../../static/illustrations/forgot_password.svg' or its corresponding type declarations.
+import forgotPasswordImage from '../../static/illustrations/forgot_password.svg';
+// @ts-ignore: Cannot find module '../../static/illustrations/authentication.svg' or its corresponding type declarations.
+import authenticationImage from '../../static/illustrations/authentication.svg';
 
 export default function SignInPage(): ReactElement {
     return (
         <HomeLayout>
-            <SignInForm/>
-            <Divider/>
-            <EmailAddressVerificationForm/>
-            <Divider/>
-            <EmailPasswordResetCodeForm/>
-            <Divider/>
-            <ResetPasswordForm/>
+            <Row style={{padding: 16}}>
+                <SignInSection/>
+                <Divider/>
+                <VerifyYourEmailAddressSection/>
+                <Divider/>
+                <EmailPasswordResetCodeSection/>
+                <Divider/>
+                <ResetPasswordSection/>
+            </Row>
         </HomeLayout>
     );
 }
 
 interface SignInData {
     readonly username: string;
-    readonly password: string;
+    readonly string;
+}
+
+function SignInSection(): ReactElement {
+    return (
+        <Row gutter={16} justify='space-around' align='middle'>
+            <Col span={12}>
+                <Typography.Title level={2}>Sign In</Typography.Title>
+                <SignInForm/>
+            </Col>
+            <Col span={7}>
+                <Image preview={false} alt='Sign In' src={signInImage}/>
+            </Col>
+        </Row>
+    );
 }
 
 function SignInForm(): ReactElement {
@@ -44,20 +68,17 @@ function SignInForm(): ReactElement {
         setLoading(false);
     };
     return (
-        <>
-            <Typography.Title level={2}>Sign In</Typography.Title>
-            <Form onFinish={onFinish} name='sign-in' layout='vertical'>
-                <Form.Item name='username' label='Username' rules={[{required: true, message: 'Enter your username.'}]}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item name='password' label='Password' rules={[{required: true, message: 'Enter your password.'}]}>
-                    <Input.Password/>
-                </Form.Item>
-                <Form.Item>
-                    <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
-                </Form.Item>
-            </Form>
-        </>
+        <Form onFinish={onFinish} name='sign-in' layout='vertical'>
+            <Form.Item name='username' label='Username' rules={[{required: true, message: 'Enter your username.'}]}>
+                <Input/>
+            </Form.Item>
+            <Form.Item name='password' label='Password' rules={[{required: true, message: 'Enter your password.'}]}>
+                <Input.Password/>
+            </Form.Item>
+            <Form.Item>
+                <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+            </Form.Item>
+        </Form>
     );
 }
 
@@ -90,7 +111,21 @@ interface EmailAddressVerificationData {
     readonly 'verification-code': number;
 }
 
-function EmailAddressVerificationForm(): ReactElement {
+function VerifyYourEmailAddressSection(): ReactElement {
+    return (
+        <Row gutter={16} justify='space-around' align='middle'>
+            <Col span={4}>
+                <Image preview={false} alt='Mail sent' src={mailSentImage}/>
+            </Col>
+            <Col span={12}>
+                <Typography.Title level={2}>Verify Your Email Address</Typography.Title>
+                <VerifyYourEmailAddressForm/>
+            </Col>
+        </Row>
+    );
+}
+
+function VerifyYourEmailAddressForm(): ReactElement {
     const [loading, setLoading] = useState(false);
     const onFinish = async (formData: EmailAddressVerificationData) => {
         setLoading(true);
@@ -98,28 +133,25 @@ function EmailAddressVerificationForm(): ReactElement {
         setLoading(false);
     };
     return (
-        <>
-            <Typography.Title level={2}>Verify Your Email Address</Typography.Title>
-            <Form onFinish={onFinish} name='verify-email-address' layout='vertical'>
-                <Form.Item
-                    name='email-address'
-                    label='Email address'
-                    rules={[{required: true, message: 'Enter your email address.'}]}
-                >
-                    <Input type='email'/>
-                </Form.Item>
-                <Form.Item
-                    name='verification-code'
-                    label='Verification code'
-                    rules={[{required: true, message: 'Enter your verification code.'}]}
-                >
-                    <Input type='number'/>
-                </Form.Item>
-                <Form.Item>
-                    <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
-                </Form.Item>
-            </Form>
-        </>
+        <Form onFinish={onFinish} name='verify-email-address' layout='vertical'>
+            <Form.Item
+                name='email-address'
+                label='Email address'
+                rules={[{required: true, message: 'Enter your email address.'}]}
+            >
+                <Input type='email'/>
+            </Form.Item>
+            <Form.Item
+                name='verification-code'
+                label='Verification code'
+                rules={[{required: true, message: 'Enter your verification code.'}]}
+            >
+                <Input type='number'/>
+            </Form.Item>
+            <Form.Item>
+                <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+            </Form.Item>
+        </Form>
     );
 }
 
@@ -138,6 +170,26 @@ interface PasswordResetCodeData {
     readonly 'email-address': string;
 }
 
+function EmailPasswordResetCodeSection(): ReactElement {
+    return (
+        <Row gutter={16} justify='space-around' align='middle'>
+            <Col span={12}>
+                <Typography.Title level={2}>Email Password Reset Code</Typography.Title>
+                <Space direction='vertical'>
+                    <Typography.Text>
+                        If you forgot your password, submit this form to receive an email containing a password reset
+                        code.
+                    </Typography.Text>
+                    <EmailPasswordResetCodeForm/>
+                </Space>
+            </Col>
+            <Col span={4}>
+                <Image preview={false} alt='Forgot password' src={forgotPasswordImage}/>
+            </Col>
+        </Row>
+    );
+}
+
 function EmailPasswordResetCodeForm(): ReactElement {
     const [loading, setLoading] = useState(false);
     const onFinish = async (formData: PasswordResetCodeData) => {
@@ -146,26 +198,18 @@ function EmailPasswordResetCodeForm(): ReactElement {
         setLoading(false);
     };
     return (
-        <>
-            <Typography.Title level={2}>Email Password Reset Code</Typography.Title>
-            <Space direction='vertical'>
-                <Typography.Text>
-                    If you forgot your password, submit this form to receive an email containing a password reset code.
-                </Typography.Text>
-                <Form onFinish={onFinish} name='email-password-reset-code' layout='vertical'>
-                    <Form.Item
-                        name='email-address'
-                        label='Email address'
-                        rules={[{required: true, message: 'Enter your email address.'}]}
-                    >
-                        <Input type='email'/>
-                    </Form.Item>
-                    <Form.Item>
-                        <Button loading={loading} type='primary' htmlType='submit'>Submit</Button>
-                    </Form.Item>
-                </Form>
-            </Space>
-        </>
+        <Form onFinish={onFinish} name='email-password-reset-code' layout='vertical'>
+            <Form.Item
+                name='email-address'
+                label='Email address'
+                rules={[{required: true, message: 'Enter your email address.'}]}
+            >
+                <Input type='email'/>
+            </Form.Item>
+            <Form.Item>
+                <Button loading={loading} type='primary' htmlType='submit'>Submit</Button>
+            </Form.Item>
+        </Form>
     );
 }
 
@@ -186,6 +230,25 @@ interface PasswordResetData {
     readonly 'new-password': string;
 }
 
+function ResetPasswordSection(): ReactElement {
+    return (
+        <Row gutter={16} justify='space-around' align='middle'>
+            <Col span={9}>
+                <Image preview={false} alt='Authentication' src={authenticationImage}/>
+            </Col>
+            <Col span={12}>
+                <Typography.Title level={2}>Reset Password</Typography.Title>
+                <Space direction='vertical'>
+                    <Typography.Text>
+                        If you received an email with a password reset code, submit this form to reset your password.
+                    </Typography.Text>
+                    <ResetPasswordForm/>
+                </Space>
+            </Col>
+        </Row>
+    );
+}
+
 function ResetPasswordForm(): ReactElement {
     const [loading, setLoading] = useState(false);
     const onFinish = async (formData: PasswordResetData) => {
@@ -194,40 +257,32 @@ function ResetPasswordForm(): ReactElement {
         setLoading(false);
     };
     return (
-        <>
-            <Typography.Title level={2}>Reset Password</Typography.Title>
-            <Space direction='vertical'>
-                <Typography.Text>
-                    If you received an email with a password reset code, submit this form to reset your password.
-                </Typography.Text>
-                <Form onFinish={onFinish} name='reset-password' layout='vertical'>
-                    <Form.Item
-                        name='email-address'
-                        label='Email address'
-                        rules={[{required: true, message: 'Enter your email address.'}]}
-                    >
-                        <Input type='email'/>
-                    </Form.Item>
-                    <Form.Item
-                        name='password-reset-code'
-                        label='Password reset code'
-                        rules={[{required: true, message: 'Enter the password reset code.'}]}
-                    >
-                        <Input type='number'/>
-                    </Form.Item>
-                    <Form.Item
-                        name='new-password'
-                        label='New password'
-                        rules={[{required: true, message: 'Enter a new password.'}]}
-                    >
-                        <Input.Password/>
-                    </Form.Item>
-                    <Form.Item>
-                        <Button loading={loading} type='primary' htmlType='submit'>Submit</Button>
-                    </Form.Item>
-                </Form>
-            </Space>
-        </>
+        <Form onFinish={onFinish} name='reset-password' layout='vertical'>
+            <Form.Item
+                name='email-address'
+                label='Email address'
+                rules={[{required: true, message: 'Enter your email address.'}]}
+            >
+                <Input type='email'/>
+            </Form.Item>
+            <Form.Item
+                name='password-reset-code'
+                label='Password reset code'
+                rules={[{required: true, message: 'Enter the password reset code.'}]}
+            >
+                <Input type='number'/>
+            </Form.Item>
+            <Form.Item
+                name='new-password'
+                label='New password'
+                rules={[{required: true, message: 'Enter a new password.'}]}
+            >
+                <Input.Password/>
+            </Form.Item>
+            <Form.Item>
+                <Button loading={loading} type='primary' htmlType='submit'>Submit</Button>
+            </Form.Item>
+        </Form>
     )
 }
 

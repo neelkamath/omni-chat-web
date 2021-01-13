@@ -1,5 +1,5 @@
 import React, {ReactElement, useState} from 'react';
-import {Button, Divider, Form, Input, message, Space, Typography} from 'antd';
+import {Button, Col, Divider, Form, Image, Input, message, Row, Space, Typography} from 'antd';
 import HomeLayout from './homeLayout';
 import {
     CONNECTION_ERROR,
@@ -16,13 +16,19 @@ import {
     USERNAME_TAKEN_ERROR
 } from '../api/errors';
 import * as mutations from '../api/graphQlApi/mutations';
+// @ts-ignore: Cannot find module '../../static/illustrations/completing.svg' or its corresponding type declarations.
+import completingImage from '../../static/illustrations/completing.svg';
+// @ts-ignore: Cannot find module '../../static/illustrations/happy_news.svg' or its corresponding type declarations.
+import happyNewsImage from '../../static/illustrations/happy_news.svg';
 
 export default function RegistrationPage(): ReactElement {
     return (
         <HomeLayout>
-            <SignUpForm/>
-            <Divider/>
-            <ResendVerificationCodeForm/>
+            <Row style={{padding: 16}}>
+                <SignUpSection/>
+                <Divider/>
+                <ResendEmailAddressVerificationCodeSection/>
+            </Row>
         </HomeLayout>
     );
 }
@@ -36,6 +42,20 @@ interface SignUpData {
     readonly 'bio'?: string;
 }
 
+function SignUpSection(): ReactElement {
+    return (
+        <Row gutter={16} justify='space-around' align='middle'>
+            <Col span={12}>
+                <Typography.Title level={2}>Sign Up</Typography.Title>
+                <SignUpForm/>
+            </Col>
+            <Col span={12}>
+                <Image preview={false} alt='Completing' src={completingImage}/>
+            </Col>
+        </Row>
+    );
+}
+
 function SignUpForm(): ReactElement {
     const [loading, setLoading] = useState(false);
     const onFinish = async (formData: SignUpData) => {
@@ -44,36 +64,33 @@ function SignUpForm(): ReactElement {
         setLoading(false);
     };
     return (
-        <>
-            <Typography.Title level={2}>Sign Up</Typography.Title>
-            <Form onFinish={onFinish} name='sign-up' layout='vertical'>
-                <Form.Item name='username' label='Username' rules={[{required: true, message: 'Enter a username.'}]}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item name='password' label='Password' rules={[{required: true, message: 'Enter a password.'}]}>
-                    <Input.Password/>
-                </Form.Item>
-                <Form.Item
-                    name='email-address'
-                    label='Email address'
-                    rules={[{required: true, message: 'Enter an email address.'}]}
-                >
-                    <Input type='email'/>
-                </Form.Item>
-                <Form.Item name='first-name' label='First name' initialValue=''>
-                    <Input/>
-                </Form.Item>
-                <Form.Item name='last-name' label='Last name' initialValue=''>
-                    <Input/>
-                </Form.Item>
-                <Form.Item name='bio' label='Bio' initialValue=''>
-                    <Input.TextArea/>
-                </Form.Item>
-                <Form.Item>
-                    <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
-                </Form.Item>
-            </Form>
-        </>
+        <Form onFinish={onFinish} name='sign-up' layout='vertical'>
+            <Form.Item name='username' label='Username' rules={[{required: true, message: 'Enter a username.'}]}>
+                <Input/>
+            </Form.Item>
+            <Form.Item name='password' label='Password' rules={[{required: true, message: 'Enter a password.'}]}>
+                <Input.Password/>
+            </Form.Item>
+            <Form.Item
+                name='email-address'
+                label='Email address'
+                rules={[{required: true, message: 'Enter an email address.'}]}
+            >
+                <Input type='email'/>
+            </Form.Item>
+            <Form.Item name='first-name' label='First name' initialValue=''>
+                <Input/>
+            </Form.Item>
+            <Form.Item name='last-name' label='Last name' initialValue=''>
+                <Input/>
+            </Form.Item>
+            <Form.Item name='bio' label='Bio' initialValue=''>
+                <Input.TextArea/>
+            </Form.Item>
+            <Form.Item>
+                <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+            </Form.Item>
+        </Form>
     );
 }
 
@@ -110,7 +127,24 @@ interface VerificationCodeData {
     readonly 'email-address': string;
 }
 
-function ResendVerificationCodeForm(): ReactElement {
+function ResendEmailAddressVerificationCodeSection(): ReactElement {
+    return (
+        <Row gutter={16} justify='space-around' align='middle'>
+            <Col span={5}>
+                <Image preview={false} alt='Happy news' src={happyNewsImage}/>
+            </Col>
+            <Col span={12}>
+                <Typography.Title level={2}>Resend Email Address Verification Code</Typography.Title>
+                <Space direction='vertical'>
+                    <Typography.Text>Submit this form in case you lost your verification code email.</Typography.Text>
+                    <ResendEmailAddressVerificationCodeForm/>
+                </Space>
+            </Col>
+        </Row>
+    );
+}
+
+function ResendEmailAddressVerificationCodeForm(): ReactElement {
     const [loading, setLoading] = useState(false);
     const onFinish = async (formData: VerificationCodeData) => {
         setLoading(true);
@@ -118,24 +152,18 @@ function ResendVerificationCodeForm(): ReactElement {
         setLoading(false);
     };
     return (
-        <>
-            <Typography.Title level={2}>Resend Email Address Verification Code</Typography.Title>
-            <Space direction='vertical'>
-                <Typography.Text>Submit this form in case you lost your verification code email.</Typography.Text>
-                <Form onFinish={onFinish} name='resend-verification-code' layout='vertical'>
-                    <Form.Item
-                        name='email-address'
-                        label='Email address'
-                        rules={[{required: true, message: 'Enter your email address.'}]}
-                    >
-                        <Input type='email'/>
-                    </Form.Item>
-                    <Form.Item>
-                        <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
-                    </Form.Item>
-                </Form>
-            </Space>
-        </>
+        <Form onFinish={onFinish} name='resend-verification-code' layout='vertical'>
+            <Form.Item
+                name='email-address'
+                label='Email address'
+                rules={[{required: true, message: 'Enter your email address.'}]}
+            >
+                <Input type='email'/>
+            </Form.Item>
+            <Form.Item>
+                <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+            </Form.Item>
+        </Form>
     );
 }
 
