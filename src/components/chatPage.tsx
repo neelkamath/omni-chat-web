@@ -4,7 +4,7 @@ import * as storage from '../storage';
 import {displayConnectionError, UNAUTHORIZED_ERROR} from '../api/errors';
 import * as queries from '../api/graphQlApi/queries';
 import {logOut} from '../logOut';
-import ChatPageSiderMenu from './chatPageSiderMenu';
+import ChatPageMenu from './chatPageMenu';
 
 export default function ChatPage(): ReactElement {
     refreshTokenSet().then();
@@ -12,7 +12,7 @@ export default function ChatPage(): ReactElement {
     return (
         <Layout>
             <Layout.Sider>
-                <ChatPageSiderMenu/>
+                <ChatPageMenu/>
             </Layout.Sider>
             <Layout.Content style={{padding: 16}}>
                 <Empty/>

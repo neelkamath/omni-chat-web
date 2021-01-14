@@ -63,4 +63,36 @@ export const ACCOUNT_FRAGMENT = `
         lastName
         bio
     }
-`
+`;
+
+export const ACCOUNT_EDGE_FRAGMENT = `
+    ... on AccountEdge {
+        __typename
+        node {
+            ${ACCOUNT_FRAGMENT}
+        }
+        cursor
+    }
+`;
+
+export const PAGE_INFO_FRAGMENT = `
+    ... on PageInfo {
+        __typename
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+    }
+`;
+
+export const ACCOUNTS_CONNECTION_FRAGMENT = `
+    ... on AccountsConnection {
+        __typename
+        edges {
+            ${ACCOUNT_EDGE_FRAGMENT}
+        }
+        pageInfo {
+            ${PAGE_INFO_FRAGMENT}
+        }
+    }
+`;

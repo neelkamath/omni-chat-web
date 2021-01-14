@@ -1,4 +1,4 @@
-import {Account, Login, TokenSet} from './models';
+import {Account, AccountsConnection, Cursor, Login, TokenSet} from './models';
 import {
     CONNECTION_ERROR,
     INCORRECT_PASSWORD_ERROR,
@@ -6,7 +6,7 @@ import {
     UNVERIFIED_EMAIL_ADDRESS_ERROR
 } from '../errors';
 import {queryOrMutate} from './operator';
-import {ACCOUNT_FRAGMENT, TOKEN_SET_FRAGMENT} from './fragments';
+import {ACCOUNT_FRAGMENT, ACCOUNTS_CONNECTION_FRAGMENT, TOKEN_SET_FRAGMENT} from './fragments';
 
 /**
  * Certain operations require authentication via an access token. You can acquire one to authenticate the user by
@@ -84,4 +84,25 @@ export async function readAccount(accessToken: string): Promise<Account> {
     }, accessToken);
     if (response.errors !== undefined) throw CONNECTION_ERROR;
     return response.data!.readAccount;
+}
+
+/**
+ * @param query Case-insensitively matched against users' usernames, email addresses, first names, and last names.
+ * @param first
+ * @param after
+ * @throws CONNECTION_ERROR
+ */
+export async function searchUsers(query: string, first?: number, after?: Cursor): Promise<AccountsConnection> {
+    const response = await queryOrMutate({
+        query: `
+            query SearchUsers($query: String!, $first: Int, $after: Cursor) {
+                searchUsers(query: $query, first: $first, after: $after) {
+                    ${ACCOUNTS_CONNECTION_FRAGMENT}
+                }
+            }
+        `,
+        variables: {query, first, after},
+    });
+    if (response.errors !== undefined) throw CONNECTION_ERROR;
+    return response.data!.searchUsers;
 }

@@ -41,11 +41,6 @@ export default function SignInPage(): ReactElement {
     );
 }
 
-interface SignInData {
-    readonly username: string;
-    readonly string;
-}
-
 function SignInSection(): ReactElement {
     return (
         <Row gutter={16} justify='space-around' align='middle'>
@@ -58,6 +53,11 @@ function SignInSection(): ReactElement {
             </Col>
         </Row>
     );
+}
+
+interface SignInData {
+    readonly username: string;
+    readonly password: string;
 }
 
 function SignInForm(): ReactElement {
@@ -114,7 +114,7 @@ interface EmailAddressVerificationData {
 function VerifyYourEmailAddressSection(): ReactElement {
     return (
         <Row gutter={16} justify='space-around' align='middle'>
-            <Col span={4}>
+            <Col span={7}>
                 <Image preview={false} alt='Mail sent' src={mailSentImage}/>
             </Col>
             <Col span={12}>
@@ -176,10 +176,7 @@ function EmailPasswordResetCodeSection(): ReactElement {
             <Col span={12}>
                 <Typography.Title level={2}>Email Password Reset Code</Typography.Title>
                 <Space direction='vertical'>
-                    <Typography.Text>
-                        If you forgot your password, submit this form to receive an email containing a password reset
-                        code.
-                    </Typography.Text>
+                    If you forgot your password, submit this form to receive an email containing a password reset code.
                     <EmailPasswordResetCodeForm/>
                 </Space>
             </Col>
@@ -239,9 +236,7 @@ function ResetPasswordSection(): ReactElement {
             <Col span={12}>
                 <Typography.Title level={2}>Reset Password</Typography.Title>
                 <Space direction='vertical'>
-                    <Typography.Text>
-                        If you received an email with a password reset code, submit this form to reset your password.
-                    </Typography.Text>
+                    If you received an email with a password reset code, submit this form to reset your password.
                     <ResetPasswordForm/>
                 </Space>
             </Col>

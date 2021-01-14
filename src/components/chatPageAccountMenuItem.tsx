@@ -1,13 +1,6 @@
 import React, {ReactElement, useEffect, useState} from 'react';
 import {Button, Divider, Form, Image, Input, Menu, message, Modal, Space, Spin, Typography, Upload} from 'antd';
-import {
-    CustomerServiceOutlined,
-    DeleteOutlined,
-    LoadingOutlined,
-    LogoutOutlined,
-    UploadOutlined,
-    UserOutlined
-} from '@ant-design/icons';
+import {DeleteOutlined, LoadingOutlined, UploadOutlined, UserOutlined} from '@ant-design/icons';
 import * as mutations from '../api/graphQlApi/mutations';
 import * as storage from '../storage';
 import {
@@ -21,30 +14,15 @@ import {
     UNAUTHORIZED_ERROR,
     USERNAME_TAKEN_ERROR
 } from '../api/errors';
+import {logOut} from '../logOut';
 import * as subscriptions from '../api/graphQlApi/subscriptions';
 import * as restApi from '../api/restApi';
 import {ShowUploadListInterface} from 'antd/lib/upload/interface';
 import {UploadRequestOption as RcCustomRequestOptions} from 'rc-upload/lib/interface';
 import {Account} from '../api/graphQlApi/models';
 import * as queries from '../api/graphQlApi/queries';
-import ContactSection from './contactSection';
-import {logOut} from '../logOut';
-// @ts-ignore: Cannot find module '../../static/illustrations/contact_us.svg' or its corresponding type declarations.
-import contactUsImage from '../../static/illustrations/contact_us.svg';
 
-export default function ChatPageSiderMenu(): ReactElement {
-    return (
-        <Menu theme='dark'>
-            <AccountMenuItem/>
-            <ContactMenuItem/>
-            <Menu.Item>
-                <Button icon={<LogoutOutlined/>} onClick={logOut}>Log Out</Button>
-            </Menu.Item>
-        </Menu>
-    );
-}
-
-function AccountMenuItem(props: object): ReactElement {
+export default function ChatPageAccountMenuItem(props: object): ReactElement {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const onCancel = () => setIsModalVisible(false);
     return (
@@ -243,19 +221,4 @@ async function updateAccount(data: AccountUpdateData): Promise<void> {
     }
     message.success('Account updated.');
     if (oldAccount.emailAddress !== data['email-address']) logOut();
-}
-
-function ContactMenuItem(props: object): ReactElement {
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    return (
-        <Menu.Item {...props}>
-            <Button icon={<CustomerServiceOutlined/>} onClick={() => setIsModalVisible(true)}>Contact</Button>
-            <Modal title='Contact' visible={isModalVisible} footer={null} onCancel={() => setIsModalVisible(false)}>
-                <Space direction='vertical'>
-                    <Image preview={false} alt='Contact us' src={contactUsImage}/>
-                    <ContactSection/>
-                </Space>
-            </Modal>
-        </Menu.Item>
-    );
 }

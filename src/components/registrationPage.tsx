@@ -33,15 +33,6 @@ export default function RegistrationPage(): ReactElement {
     );
 }
 
-interface SignUpData {
-    readonly username: string;
-    readonly password: string;
-    readonly 'email-address': string;
-    readonly 'first-name'?: string;
-    readonly 'last-name'?: string;
-    readonly 'bio'?: string;
-}
-
 function SignUpSection(): ReactElement {
     return (
         <Row gutter={16} justify='space-around' align='middle'>
@@ -54,6 +45,15 @@ function SignUpSection(): ReactElement {
             </Col>
         </Row>
     );
+}
+
+interface SignUpData {
+    readonly username: string;
+    readonly password: string;
+    readonly 'email-address': string;
+    readonly 'first-name'?: string;
+    readonly 'last-name'?: string;
+    readonly 'bio'?: string;
 }
 
 function SignUpForm(): ReactElement {
@@ -123,10 +123,6 @@ async function createAccount(data: SignUpData): Promise<void> {
     message.success('Account created. Check your email for an account verification code.', 5);
 }
 
-interface VerificationCodeData {
-    readonly 'email-address': string;
-}
-
 function ResendEmailAddressVerificationCodeSection(): ReactElement {
     return (
         <Row gutter={16} justify='space-around' align='middle'>
@@ -136,12 +132,16 @@ function ResendEmailAddressVerificationCodeSection(): ReactElement {
             <Col span={12}>
                 <Typography.Title level={2}>Resend Email Address Verification Code</Typography.Title>
                 <Space direction='vertical'>
-                    <Typography.Text>Submit this form in case you lost your verification code email.</Typography.Text>
+                    Submit this form in case you lost your verification code email.
                     <ResendEmailAddressVerificationCodeForm/>
                 </Space>
             </Col>
         </Row>
     );
+}
+
+interface VerificationCodeData {
+    readonly 'email-address': string;
 }
 
 function ResendEmailAddressVerificationCodeForm(): ReactElement {

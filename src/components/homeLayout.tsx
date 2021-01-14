@@ -3,7 +3,7 @@ import {Layout, Menu, Typography} from 'antd';
 import {Link} from 'react-router-dom';
 import {HomeOutlined, LoginOutlined, UserAddOutlined} from '@ant-design/icons';
 import * as storage from '../storage';
-import ContactSection from './contactSection';
+import SupportSection from './supportSection';
 
 export interface HomeLayoutProps {
     readonly children: ReactNode;
@@ -19,7 +19,7 @@ export default function HomeLayout(props: HomeLayoutProps): ReactElement {
                 {props.children}
             </Layout.Content>
             <Layout.Footer>
-                <ContactSection/>
+                <SupportSection/>
             </Layout.Footer>
         </Layout>
     );

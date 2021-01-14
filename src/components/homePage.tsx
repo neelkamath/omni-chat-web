@@ -67,7 +67,7 @@ function UsersRow(): ReactElement {
                     <List.Item>Automatic online status.</List.Item>
                 </List>
             </Col>
-            <Col span={3}>
+            <Col span={4}>
                 <Image preview={false} src={femaleAvatarImage} alt='Female avatar'/>
             </Col>
         </Row>

@@ -7,6 +7,9 @@
   deleted their account, or an edge case which couldn't be handled occurred (e.g., the access token was deleted
   from `localStorage` because the browser's history was deleted). In such a case, the user must be logged out (i.e., the
   token set must be deleted, and the user must be redirected to the homepage).
+- Operations in the [`graphQlApi`](src/api/graphQlApi) directory don't document the `first`, `after`, `last`,
+  and `before` function parameters because it'd be repetitive. Refer to
+  the [pagination docs](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/api.md#pagination) instead.
 
 ## Installation
 

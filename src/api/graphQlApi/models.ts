@@ -148,6 +148,23 @@ export interface Account extends AccountData {
     readonly bio: Bio;
 }
 
+export interface AccountsConnection {
+    readonly edges: AccountEdge[];
+    readonly pageInfo: PageInfo;
+}
+
+export interface AccountEdge {
+    readonly node: Account;
+    readonly cursor: Cursor;
+}
+
+export interface PageInfo {
+    readonly hasNextPage: Boolean;
+    readonly hasPreviousPage: Boolean;
+    readonly startCursor?: Cursor;
+    readonly endCursor?: Cursor;
+}
+
 export interface AccountData {
     readonly id: number;
     readonly username: Username;
