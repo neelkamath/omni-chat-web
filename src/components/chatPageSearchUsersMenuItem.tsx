@@ -15,7 +15,7 @@ export default function ChatPageSearchUsersMenuItem(props: object): ReactElement
             <Button icon={<SearchOutlined/>} onClick={() => setIsModalVisible(true)}>Search Users</Button>
             <Modal title='Search Users' visible={isModalVisible} footer={null} onCancel={onCancel}>
                 <Space direction='vertical'>
-                    Search users by their username, email address, or name.
+                    Search users by their name, username, or email address.
                     <SearchUsersForm callback={setAccounts}/>
                     <UsersFound accounts={accounts}/>
                 </Space>
@@ -53,7 +53,6 @@ function SearchUsersForm(props: SearchUsersProps): ReactElement {
     );
 }
 
-/** @return `null` if there was an error. */
 async function searchUsers(data: UsersSearchData): Promise<Account[] | null> {
     let connection;
     try {
@@ -75,13 +74,11 @@ interface UsersFoundProps {
 
 function UsersFound(props: UsersFoundProps): ReactElement {
     if (props.accounts === undefined) return <></>;
-    const cards = props.accounts.map((account) => {
-        return (
-            <Card key={account.id}>
-                <UserFound account={account}/>
-            </Card>
-        );
-    });
+    const cards = props.accounts.map((account) =>
+        <Card key={account.id}>
+            <UserFound account={account}/>
+        </Card>
+    );
     return cards.length === 0 ? <Empty/> : <>{cards}</>;
 }
 

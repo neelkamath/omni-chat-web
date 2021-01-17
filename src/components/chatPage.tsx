@@ -1,5 +1,5 @@
-import {Empty, Layout} from 'antd';
-import React, {ReactElement} from 'react';
+import {Empty, Layout, Row, Spin} from 'antd';
+import React, {ReactElement, useEffect, useState} from 'react';
 import * as storage from '../storage';
 import {displayConnectionError, UNAUTHORIZED_ERROR} from '../api/errors';
 import * as queries from '../api/graphQlApi/queries';
@@ -7,8 +7,24 @@ import {logOut} from '../logOut';
 import ChatPageMenu from './chatPageMenu';
 
 export default function ChatPage(): ReactElement {
-    refreshTokenSet().then();
-    Notification.requestPermission().then();
+    const [page, setPage] = useState(<LoadingPage/>);
+    useEffect(() => {
+        refreshTokenSet().then(() => setPage(<ChatPageLayout/>));
+        // noinspection JSIgnoredPromiseFromCall
+        Notification.requestPermission();
+    }, []);
+    return page;
+}
+
+function LoadingPage(): ReactElement {
+    return (
+        <Row style={{position: 'absolute', top: '50%', left: '50%'}}>
+            <Spin size='large'/>
+        </Row>
+    );
+}
+
+function ChatPageLayout(): ReactElement {
     return (
         <Layout>
             <Layout.Sider>

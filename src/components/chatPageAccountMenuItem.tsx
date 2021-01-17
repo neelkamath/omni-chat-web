@@ -92,7 +92,7 @@ function NewProfilePicButton(): ReactElement {
     const customRequest = async (data: RcCustomRequestOptions) => {
         await patchProfilePic(data);
         setShowUploadList(false);
-    }
+    };
     return (
         <Upload showUploadList={showUploadList} customRequest={customRequest} accept='image/png,image/jpeg'>
             <Button icon={<UploadOutlined/>}>New Profile Picture</Button>
