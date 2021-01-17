@@ -50,6 +50,11 @@ access tokens. The following data may be saved:
 
 ## Conventions
 
+- Each directory in [`src/routes/`](src/routes) contains the components used solely in its route. Directories are named
+  after the routes using the camelCase naming convention. For example, the `/sign-in` route has its components in
+  the `sign-in` directory. Components used across multiple routes (e.g., [`supportSection.tsx`](src/supportSection.tsx))
+  , contexts (e.g., [`searchUsersContext.tsx`](src/searchUsersContext.tsx)), etc. must be placed
+  outside [`src/routes/`](src/routes).
 - Here's an example of how to name images when importing them in TypeScript: To import `happy_news.svg`, write:
     ```ts
     import happyNewsImage from './happy_news.svg';
