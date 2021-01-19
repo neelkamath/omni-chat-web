@@ -1,13 +1,12 @@
 # Contributing
 
 - This app supports the latest version of Chrome, Firefox, Safari, and Edge on desktops.
-- "JWT" refers to [JSON Web Tokens](https://jwt.io/).
 - When the user is signed in, the access token can be assumed to be valid because it's automatically refreshed
   periodically in the background. This means that if an API call results in an unauthorized error, either the user
   deleted their account, or an edge case which couldn't be handled occurred (e.g., the access token was deleted
   from `localStorage` because the browser's history was deleted). In such a case, the user must be logged out (i.e., the
   token set must be deleted, and the user must be redirected to the homepage).
-- Operations in the [`graphQlApi`](src/api/graphQlApi) directory don't document the `first`, `after`, `last`,
+- Operations in the [`graphQlApi`](main/api/graphQlApi) directory don't document the `first`, `after`, `last`,
   and `before` function parameters because it'd be repetitive. Refer to
   the [pagination docs](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/api.md#pagination) instead.
 
@@ -27,6 +26,18 @@
    API [locally](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/docker-compose.md) or in
    the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/cloud.md).
 1. Run on http://localhost:1234: `npm run dev`
+
+## Testing
+
+```
+npm t
+```
+
+- Tests mirror the [`main`](main) directory. For example, the tests
+  for [`main/api/graphQlApi/validators.ts`](main/api/graphQlApi/validators.ts) are
+  in [`test/api/graphQlApi/validators.test.ts`](test/api/graphQlApi/validators.test.ts).
+- Each function's tests are grouped with the name of the function passed to `describe()`. For example, the tests
+  for `validateUsernameScalar()` are placed in `describe('validateUsernameScalar()')`.
 
 ## Production
 
@@ -50,25 +61,18 @@ access tokens. The following data may be saved:
 
 ## Conventions
 
-- Each directory in [`src/routes/`](src/routes) contains the components used solely in its route. Directories are named
-  after the routes using the camelCase naming convention. For example, the `/sign-in` route has its components in
-  the `sign-in` directory. Components used across multiple routes (e.g., [`supportSection.tsx`](src/supportSection.tsx))
-  , contexts (e.g., [`searchUsersContext.tsx`](src/searchUsersContext.tsx)), etc. must be placed
-  outside [`src/routes/`](src/routes).
+- Each directory in [`main/routes/`](main/routes) contains the components used solely in its route. Directories are
+  named after the routes using the camelCase naming convention. For example, the `/sign-in` route has its components in
+  the `sign-in` directory. Components used across multiple routes (
+  e.g., [`supportSection.tsx`](main/supportSection.tsx))
+  , contexts (e.g., [`searchUsersContext.tsx`](main/searchUsersContext.tsx)), etc. must be placed
+  outside [`main/routes/`](main/routes).
 - Here's an example of how to name images when importing them in TypeScript: To import `happy_news.svg`, write:
     ```ts
     import happyNewsImage from './happy_news.svg';
     ```
-- When importing from [`storage.ts`](src/storage.ts), [`restApi.ts`](src/api/restApi.ts)
-  , [`queries.ts`](src/api/graphQlApi/queries.ts), [`mutations.ts`](src/api/graphQlApi/mutations.ts),
-  and [`subscriptions.ts`](src/api/graphQlApi/subscriptions.ts), import the entire file under the file's name. This
-  gives clarity, and prevents naming conflicts. For example, to use a function from [`restApi.ts`](src/api/restApi.ts),
-  import it like this:
-    ```ts
-    import * as restApi from '../api/restApi';
-    ```
 
-## Styling
+## Design
 
 - The theme color is `#177DDC`.
 - Only use icons from [antd icons](https://ant.design/components/icon/).
