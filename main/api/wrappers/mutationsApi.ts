@@ -4,6 +4,7 @@ import * as storage from '../../storage';
 import * as queriesApi from '../networking/graphql/queriesApi';
 import {
     BioScalarError,
+    CannotDeleteAccountError,
     ConnectionError,
     EmailAddressTakenError,
     EmailAddressVerifiedError,
@@ -132,4 +133,18 @@ export async function deleteProfilePic(): Promise<void> {
         return;
     }
     message.success('Profile picture deleted.');
+}
+
+export async function deleteAccount(): Promise<void> {
+    try {
+        await mutationsApi.deleteAccount(storage.readTokenSet()!.accessToken);
+    } catch (error) {
+        if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof ConnectionError) await ConnectionError.display();
+        else if (error instanceof CannotDeleteAccountError) await CannotDeleteAccountError.display();
+        else throw error;
+        return;
+    }
+    logOut();
 }

@@ -2,44 +2,44 @@ import {AccountsConnection} from './api/networking/graphql/models';
 import {createContext, useState} from 'react';
 
 /** The query users were searched by. `undefined` if users haven't been searched yet. */
-export type UserSearchQuery = string | undefined;
+export type SearchUsersContextQuery = string | undefined;
 
-export interface UserSearchQuerySetter {
+export interface SearchUsersContextQuerySetter {
     (query: string): void;
 }
 
 /** `undefined` indicates no users have been searched for yet. An empty array indicates there were no search results. */
-export type UserSearchData = undefined | AccountsConnection;
+export type SearchUsersContextResults = AccountsConnection | undefined;
 
-/** Replaces any previous search results with `accounts`. */
-export interface UserSearchResultsReplacer {
+/** Replaces previous search results (if there are any) with `accounts`. */
+export interface SearchUsersContextResultsReplacer {
     (accounts: AccountsConnection): void;
 }
 
-/** Adds the `accounts` to the existing search results. */
-export interface UserSearchAccountsAdder {
+/** Adds the `accounts` to the existing search results (there must be preexisting results). */
+export interface SearchUsersContextResultsAppender {
     (accounts: AccountsConnection): void;
 }
 
-export interface UserSearchContextData {
-    readonly query: UserSearchQuery;
-    readonly setQuery: UserSearchQuerySetter;
-    readonly accounts: UserSearchData;
-    readonly replaceAccounts: UserSearchResultsReplacer;
-    readonly addAccounts: UserSearchAccountsAdder;
+export interface SearchUsersContextData {
+    readonly query: SearchUsersContextQuery;
+    readonly setQuery: SearchUsersContextQuerySetter;
+    readonly accounts: SearchUsersContextResults;
+    readonly replaceAccounts: SearchUsersContextResultsReplacer;
+    readonly addAccounts: SearchUsersContextResultsAppender;
 }
 
 /**
  * Context for the search results of users. It's `undefined` when it's used outside of it's
  * {@link SearchUsersContext.Provider}.
  */
-export const SearchUsersContext = createContext<undefined | UserSearchContextData>(undefined);
+export const SearchUsersContext = createContext<SearchUsersContextData | undefined>(undefined);
 
-export function useSearchUsersContext(): UserSearchContextData {
+export function useSearchUsersContext(): SearchUsersContextData {
     const [query, setQuery] = useState<string | undefined>(undefined);
-    const [accounts, setAccounts] = useState<UserSearchData>(undefined);
-    const replaceAccounts: UserSearchResultsReplacer = (newAccounts) => setAccounts(newAccounts);
-    const addAccounts: UserSearchAccountsAdder = (newAccounts) => {
+    const [accounts, setAccounts] = useState<SearchUsersContextResults>(undefined);
+    const replaceAccounts: SearchUsersContextResultsReplacer = (newAccounts) => setAccounts(newAccounts);
+    const addAccounts: SearchUsersContextResultsAppender = (newAccounts) => {
         setAccounts({
             edges: [...accounts!.edges, ...newAccounts.edges],
             pageInfo: {

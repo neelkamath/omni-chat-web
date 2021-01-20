@@ -12,12 +12,11 @@ import {UploadRequestOption as RcCustomRequestOptions} from 'rc-upload/lib/inter
 import * as queriesApi from '../../api/wrappers/queriesApi';
 
 export function AccountMenuItem(props: object): ReactElement {
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const onCancel = () => setIsModalVisible(false);
+    const [visible, setVisible] = useState(false);
     return (
         <Menu.Item {...props}>
-            <Button icon={<UserOutlined/>} onClick={() => setIsModalVisible(true)}>Account</Button>
-            <Modal title='Update Account' visible={isModalVisible} footer={null} onCancel={onCancel}>
+            <Button icon={<UserOutlined/>} onClick={() => setVisible(true)}>Account</Button>
+            <Modal title='Update Account' visible={visible} footer={null} onCancel={() => setVisible(false)}>
                 <Space direction='vertical'>
                     <ProfilePic userId={storage.readUserId()!}/>
                     <NewProfilePicButton/>

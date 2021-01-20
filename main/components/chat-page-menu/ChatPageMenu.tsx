@@ -4,6 +4,7 @@ import {AccountMenuItem} from './AccountMenuItem';
 import {SearchUsersMenuItem} from './SearchUsersMenuItem';
 import {SupportMenuItem} from './SupportMenuItem';
 import {LogOutMenuItem} from './LogOutMenuItem';
+import DeleteAccountMenuItem from './DeleteAccountMenuItem';
 
 export default function ChatPageMenu(): ReactElement {
     return (
@@ -12,6 +13,7 @@ export default function ChatPageMenu(): ReactElement {
             <SearchUsersMenuItem/>
             <SupportMenuItem/>
             <LogOutMenuItem/>
+            <DeleteAccountMenuItem/>
         </Menu>
     );
 }

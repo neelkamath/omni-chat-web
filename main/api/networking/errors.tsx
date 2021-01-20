@@ -49,6 +49,20 @@ export class InternalServerError extends Error {
 }
 
 /**
+ * The user's account cannot be deleted because the user is the only admin of a group chat containing users other than
+ * themselves. They must appoint a different user as the admin in order to be able to delete their account.
+ */
+export class CannotDeleteAccountError extends Error {
+    static async display(): Promise<void> {
+        message.error(
+            "You are the only admin of a group chat containing users other than yourself. You'll need to first appoint "
+            + 'a different user as the admin in order to be able to delete your account.',
+            10,
+        );
+    }
+}
+
+/**
  * The Omni Chat instance being used disallows the given email address's domain. For example,
  * `"john.doe@private.company.com"` may be allowed but not `"john.doe@gmail.com"`.
  */

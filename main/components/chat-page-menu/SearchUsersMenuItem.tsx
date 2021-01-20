@@ -11,12 +11,11 @@ import {NonexistentUserIdError} from '../../api/networking/errors';
 const QUERY_COUNT = 10;
 
 export function SearchUsersMenuItem(props: object): ReactElement {
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const onCancel = () => setIsModalVisible(false);
+    const [visible, setVisible] = useState(false);
     return (
         <Menu.Item {...props}>
-            <Button icon={<SearchOutlined/>} onClick={() => setIsModalVisible(true)}>Search Users</Button>
-            <Modal title='Search Users' visible={isModalVisible} footer={null} onCancel={onCancel}>
+            <Button icon={<SearchOutlined/>} onClick={() => setVisible(true)}>Search Users</Button>
+            <Modal title='Search Users' visible={visible} footer={null} onCancel={() => setVisible(false)}>
                 <SearchUsersSection/>
             </Modal>
         </Menu.Item>

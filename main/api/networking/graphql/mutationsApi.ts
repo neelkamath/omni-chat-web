@@ -1,6 +1,7 @@
 import {AccountInput, AccountUpdate, Placeholder} from './models';
 import {queryOrMutate} from './operator';
 import {
+    CannotDeleteAccountError,
     ConnectionError,
     EmailAddressTakenError,
     EmailAddressVerifiedError,
@@ -245,4 +246,32 @@ export async function deleteProfilePic(accessToken: string): Promise<Placeholder
         throw new ConnectionError();
     }
     return response.data!.deleteProfilePic;
+}
+
+/**
+ * Deletes the user's account. All the user's data will be wiped from the system. This means that users in private chats
+ * with the user will have their chats deleted, etc.
+ * @throws {CannotDeleteAccountError}
+ * @throws {InternalServerError}
+ * @throws {ConnectionError}
+ */
+export async function deleteAccount(accessToken: string): Promise<Placeholder> {
+    const response = await queryOrMutate({
+        query: `
+            mutation DeleteAccount {
+                deleteAccount
+            }
+        `,
+    }, accessToken);
+    if (response.errors !== undefined) {
+        switch (response.errors[0]!.message) {
+            case 'INTERNAL_SERVER_ERROR':
+                throw new InternalServerError();
+            case 'CANNOT_DELETE_ACCOUNT':
+                throw new CannotDeleteAccountError();
+            default:
+                throw new ConnectionError();
+        }
+    }
+    return response.data!.deleteAccount;
 }
