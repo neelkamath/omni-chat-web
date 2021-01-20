@@ -7,7 +7,7 @@ import {
     validateNameScalar,
     validatePasswordScalar,
     validateUsernameScalar
-} from '../../../main/api/graphQlApi/validators';
+} from '../../../main/api/networking/graphql/validators';
 import {
     BioScalarError,
     DateTimeScalarError,
@@ -17,7 +17,7 @@ import {
     NameScalarError,
     PasswordScalarError,
     UsernameScalarError
-} from '../../../main/api/errors';
+} from '../../../main/api/networking/errors';
 
 describe('validateUsernameScalar', () => {
     test('username must be valid', () => expect(() => validateUsernameScalar('username')).not.toThrowError());

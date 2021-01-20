@@ -1,13 +1,13 @@
 import React, {ReactElement} from 'react';
 import {Col, Divider, Image, List, Row, Space, Typography} from 'antd';
-import femaleAvatarImage from '../../static/illustrations/female_avatar.svg';
-import onlineDiscussionImage from '../../static/illustrations/online_discussion.svg';
-import groupChatImage from '../../static/illustrations/group_chat.svg';
-import videoCallImage from '../../static/illustrations/video_call.svg';
-import messagingFunImage from '../../static/illustrations/messaging_fun.svg';
-import chatBotImage from '../../static/illustrations/chat_bot.svg';
-import coverImage from '../../static/cover.png';
-import HomeLayout from './homeLayout';
+import femaleAvatarImage from '../static/illustrations/female_avatar.svg';
+import onlineDiscussionImage from '../static/illustrations/online_discussion.svg';
+import groupChatImage from '../static/illustrations/group_chat.svg';
+import videoCallImage from '../static/illustrations/video_call.svg';
+import messagingFunImage from '../static/illustrations/messaging_fun.svg';
+import chatBotImage from '../static/illustrations/chat_bot.svg';
+import coverImage from '../static/cover.png';
+import HomeLayout from './HomeLayout';
 import {
     CommentOutlined,
     GroupOutlined,

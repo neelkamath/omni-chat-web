@@ -1,7 +1,7 @@
-import {Storage} from './storage';
+import * as storage from './storage';
 
 /** Deletes the token set from storage, and opens the login page. */
 export function logOut(): void {
-    Storage.deleteTokenSet();
+    storage.deleteTokenSet();
     location.href = '/sign-in';
 }

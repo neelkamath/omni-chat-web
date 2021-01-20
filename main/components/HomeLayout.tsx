@@ -2,8 +2,8 @@ import React, {ReactElement, ReactNode} from 'react';
 import {Layout, Menu, Typography} from 'antd';
 import {Link} from 'react-router-dom';
 import {HomeOutlined, LoginOutlined, UserAddOutlined} from '@ant-design/icons';
-import {Storage} from '../../storage';
-import SupportSection from '../../supportSection';
+import * as storage from '../storage';
+import SupportSection from './SupportSection';
 
 export interface HomeLayoutProps {
     readonly children: ReactNode;
@@ -38,7 +38,7 @@ function HeaderMenu(): ReactElement {
             </Menu.Item>
             <Menu.Item key='/sign-in'>
                 <Typography.Link
-                    onClick={() => location.href = Storage.readTokenSet() === null ? '/sign-in' : '/chat'}
+                    onClick={() => location.href = storage.readTokenSet() === null ? '/sign-in' : '/chat'}
                 >
                     <LoginOutlined/> Sign In
                 </Typography.Link>
