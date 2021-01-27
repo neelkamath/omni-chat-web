@@ -6,16 +6,18 @@ import {
     UnauthorizedError,
 } from './errors';
 
+export type PicType = 'ORIGINAL' | 'THUMBNAIL';
+
 /**
  * @return `Blob` is the user has a profile pic, and `null` if they don't.
  * @throws {NonexistentUserIdError}
  * @throws {ConnectionError}
- * @throws InternalServerError
+ * @throws {InternalServerError}
  */
-export async function getProfilePic(userId: number): Promise<Blob | null> {
-    const params = new URLSearchParams({'user-id': userId.toString()});
+export async function getProfilePic(userId: number, picType: PicType): Promise<Blob | null> {
+    const params = new URLSearchParams({'user-id': userId.toString(), 'pic-type': picType});
     const response = await fetch(`${process.env.HTTP}${process.env.API_URL}/profile-pic?${params.toString()}`);
-    if (response.status >= 500 && response.status < 600) throw new InternalServerError();
+    if (response.status >= 500 && response.status <= 599) throw new InternalServerError();
     switch (response.status) {
         case 200:
             return await response.blob();
@@ -43,7 +45,7 @@ export async function patchProfilePic(accessToken: string, pic: File): Promise<v
         headers: {'Authorization': `Bearer ${accessToken}`},
         body: formData,
     });
-    if (response.status >= 500 && response.status < 600) throw new InternalServerError();
+    if (response.status >= 500 && response.status <= 599) throw new InternalServerError();
     switch (response.status) {
         case 204:
             return;

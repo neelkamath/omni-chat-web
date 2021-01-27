@@ -96,7 +96,7 @@ function UserFound({account}: UserFoundProps): ReactElement {
 async function getProfilePic(userId: number): Promise<ReactElement | null> {
     let pic;
     try {
-        pic = await restApi.getProfilePic(userId);
+        pic = await restApi.getProfilePic(userId, 'THUMBNAIL');
     } catch (error) {
         /*
          A <NonexistentUserIdError> will be caught here if a user who was to be displayed in the search results

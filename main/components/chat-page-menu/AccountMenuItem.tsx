@@ -52,7 +52,7 @@ function ProfilePic({userId}: ProfilePicProps): ReactElement {
 async function getProfilePic(): Promise<ReactElement | null> {
     let pic = null;
     try {
-        pic = await restApi.getProfilePic(storage.readUserId()!);
+        pic = await restApi.getProfilePic(storage.readUserId()!, 'ORIGINAL');
     } catch (error) {
         if (error instanceof NonexistentUserIdError) logOut(); // The user deleted their account.
         else throw error;

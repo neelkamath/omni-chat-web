@@ -22,6 +22,7 @@ apps should give a superior experience for chat apps. Here are the features impl
 - [ ] Star messages.
 - [ ] Markdown support.
 - [ ] Reply to a message to prevent context loss.
+- [ ] Block and unblock users without them knowing.
 - Message types:
     - [ ] Text
     - [ ] Actions (i.e., buttons which trigger third-party server-side code such as ordering food via a bot)
@@ -77,9 +78,9 @@ Here are the [branding assets](https://github.com/neelkamath/omni-chat/tree/mast
 
 ## Usage
 
-1. Either run the Omni Chat 0.8.3
-   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/docker-compose.md) or in
-   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/cloud.md).
+1. Either run the Omni Chat 0.9.0
+   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.9.0/docs/docker-compose.md) or in
+   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.9.0/docs/cloud.md).
 1. Serve the website which has been saved to `dist/`.
 
 ## [Contributing](docs/CONTRIBUTING.md)

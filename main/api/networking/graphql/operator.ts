@@ -35,7 +35,7 @@ export async function queryOrMutate(request: GraphQlRequest, accessToken?: strin
         body: JSON.stringify(request),
     });
     if (response.status === 401) throw new UnauthorizedError();
-    if (response.status >= 500 && response.status < 600) throw new InternalServerError();
+    if (response.status >= 500 && response.status <= 599) throw new InternalServerError();
     if (response.status !== 200) throw new ConnectionError();
     return await response.json();
 }

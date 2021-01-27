@@ -1,4 +1,5 @@
 import * as restApi from '../networking/restApi';
+import {PicType} from '../networking/restApi';
 import * as storage from '../../storage';
 import {ConnectionError, InternalServerError, InvalidPicError, UnauthorizedError} from '../networking/errors';
 import {logOut} from '../../logOut';
@@ -19,10 +20,10 @@ export async function patchProfilePic(file: File): Promise<void> {
 }
 
 /** @throws {NonexistentUserIdError} */
-export async function getProfilePic(userId: number): Promise<Blob | null> {
+export async function getProfilePic(userId: number, picType: PicType): Promise<Blob | null> {
     let pic = null;
     try {
-        pic = await restApi.getProfilePic(userId);
+        pic = await restApi.getProfilePic(userId, picType);
     } catch (error) {
         if (error instanceof InternalServerError) InternalServerError.display();
         else if (error instanceof ConnectionError) await ConnectionError.display();

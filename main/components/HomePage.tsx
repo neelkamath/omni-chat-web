@@ -207,11 +207,16 @@ function ExtensibleRow(): ReactElement {
                         button, which when clicked, automatically reruns the CI/CD pipeline.
                     </List.Item>
                     <List.Item>
-                        This project is open source on {' '}
+                        The {' '}
                         <Typography.Link target='_blank' href='https://github.com/neelkamath/omni-chat-web'>
-                            GitHub
+                            frontend
                         </Typography.Link>
-                        .
+                        {' '} and {' '}
+                        <Typography.Link target='_blank' href='https://github.com/neelkamath/omni-chat'>
+                            backend
+                        </Typography.Link>
+                        {' '} are open source on GitHub. You can inspect the code, build on top of the existing app, or
+                        use the standalone backend to build your own frontend.
                     </List.Item>
                 </List>
             </Col>
