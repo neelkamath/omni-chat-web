@@ -1,31 +1,20 @@
 import React, {ReactElement, useContext, useEffect, useState} from 'react';
-import {Avatar, Button, Card, Empty, Form, Input, List, Menu, message, Modal, Space, Typography} from 'antd';
+import {Avatar, Button, Card, Empty, Form, Input, List, message, Space, Typography} from 'antd';
 import {LoadingOutlined, SearchOutlined, UserOutlined} from '@ant-design/icons';
-import {SearchUsersContext, useSearchUsersContext} from '../../searchUsersContext';
-import * as queriesApi from '../../api/wrappers/queriesApi';
-import {Account} from '../../api/networking/graphql/models';
-import * as restApi from '../../api/wrappers/restApi';
-import {NonexistentUserIdError} from '../../api/networking/errors';
+import {SearchUsersContext, useSearchUsersContext} from '../contexts/searchUsersContext';
+import * as queriesApi from '../api/wrappers/queriesApi';
+import {Account} from '../api/networking/graphql/models';
+import * as restApi from '../api/wrappers/restApi';
+import {NonexistentUserIdError} from '../api/networking/errors';
 
 /** The number of users to query for at a time. */
 const QUERY_COUNT = 10;
 
-export function SearchUsersMenuItem(props: object): ReactElement {
-    const [visible, setVisible] = useState(false);
-    return (
-        <Menu.Item {...props}>
-            <Button icon={<SearchOutlined/>} onClick={() => setVisible(true)}>Search Users</Button>
-            <Modal title='Search Users' visible={visible} footer={null} onCancel={() => setVisible(false)}>
-                <SearchUsersSection/>
-            </Modal>
-        </Menu.Item>
-    );
-}
-
-function SearchUsersSection(): ReactElement {
+export default function SearchUsersSection(): ReactElement {
     const context = useSearchUsersContext();
     return (
         <>
+            <Typography.Title>Search Users</Typography.Title>
             <Typography.Paragraph>Search users by their name, username, or email address.</Typography.Paragraph>
             <SearchUsersContext.Provider value={context}>
                 <Space direction='vertical'>
@@ -103,8 +92,7 @@ async function getProfilePic(userId: number): Promise<ReactElement | null> {
          deleted their account in between being searched, and having the profile pic displayed. Since this rarely
          ever happens, and no harm comes from leaving the search result up, we ignore this possibility.
          */
-        if (error instanceof NonexistentUserIdError) return null;
-        throw error;
+        if (!(error instanceof NonexistentUserIdError)) throw error;
     }
     return <Avatar size='large' src={pic === null ? <UserOutlined/> : URL.createObjectURL(pic)}/>;
 }

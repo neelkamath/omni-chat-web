@@ -25,7 +25,7 @@ export default function HomeLayout({children}: HomeLayoutProps): ReactElement {
 
 function HeaderMenu(): ReactElement {
     return (
-        <Menu theme='dark' mode='horizontal' defaultSelectedKeys={[location.pathname]}>
+        <Menu mode='horizontal' defaultSelectedKeys={[location.pathname]}>
             <Menu.Item key='/'>
                 <Link component={Typography.Link} to='/'>
                     <HomeOutlined/> Home

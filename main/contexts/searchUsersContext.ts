@@ -1,4 +1,4 @@
-import {AccountsConnection} from './api/networking/graphql/models';
+import {AccountsConnection} from '../api/networking/graphql/models';
 import {createContext, useState} from 'react';
 
 /** The query users were searched by. `undefined` if users haven't been searched yet. */
@@ -35,6 +35,7 @@ export interface SearchUsersContextData {
  */
 export const SearchUsersContext = createContext<SearchUsersContextData | undefined>(undefined);
 
+/** Hook for {@link SearchUsersContext}. */
 export function useSearchUsersContext(): SearchUsersContextData {
     const [query, setQuery] = useState<string | undefined>(undefined);
     const [accounts, setAccounts] = useState<SearchUsersContextResults>(undefined);

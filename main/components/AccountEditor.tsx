@@ -1,31 +1,28 @@
 import React, {ReactElement, useEffect, useState} from 'react';
-import {DeleteOutlined, LoadingOutlined, UploadOutlined, UserOutlined} from '@ant-design/icons';
-import * as subscriptionsApi from '../../api/wrappers/subscriptionsApi';
-import * as restApi from '../../api/wrappers/restApi';
-import * as storage from '../../storage';
-import {NonexistentUserIdError} from '../../api/networking/errors';
-import {logOut} from '../../logOut';
-import {Button, Divider, Form, Image, Input, Menu, Modal, Space, Spin, Typography, Upload} from 'antd';
-import * as mutationsApi from '../../api/wrappers/mutationsApi';
+import {DeleteOutlined, LoadingOutlined, UploadOutlined} from '@ant-design/icons';
+import * as subscriptionsApi from '../api/wrappers/subscriptionsApi';
+import * as restApi from '../api/wrappers/restApi';
+import * as storage from '../storage';
+import {NonexistentUserIdError} from '../api/networking/errors';
+import {logOut} from '../logOut';
+import {Button, Divider, Form, Image, Input, Space, Spin, Typography, Upload} from 'antd';
+import * as mutationsApi from '../api/wrappers/mutationsApi';
 import {ShowUploadListInterface} from 'antd/lib/upload/interface';
 import {UploadRequestOption as RcCustomRequestOptions} from 'rc-upload/lib/interface';
-import * as queriesApi from '../../api/wrappers/queriesApi';
+import * as queriesApi from '../api/wrappers/queriesApi';
 
-export function AccountMenuItem(props: object): ReactElement {
-    const [visible, setVisible] = useState(false);
+export default function AccountEditor(): ReactElement {
     return (
-        <Menu.Item {...props}>
-            <Button icon={<UserOutlined/>} onClick={() => setVisible(true)}>Account</Button>
-            <Modal title='Update Account' visible={visible} footer={null} onCancel={() => setVisible(false)}>
-                <Space direction='vertical'>
-                    <ProfilePic userId={storage.readUserId()!}/>
-                    <NewProfilePicButton/>
-                    <DeleteProfilePicButton/>
-                </Space>
-                <Divider/>
-                <UpdateAccountSection/>
-            </Modal>
-        </Menu.Item>
+        <>
+            <Typography.Title>Update Account</Typography.Title>
+            <Space direction='vertical'>
+                <ProfilePic userId={storage.readUserId()!}/>
+                <NewProfilePicButton/>
+                <DeleteProfilePicButton/>
+            </Space>
+            <Divider/>
+            <UpdateAccountSection/>
+        </>
     );
 }
 
@@ -58,7 +55,7 @@ async function getProfilePic(): Promise<ReactElement | null> {
         else throw error;
     }
     if (pic === null) return <Typography.Text>No profile picture set.</Typography.Text>;
-    return <Image alt='Profile picture' preview={false} src={URL.createObjectURL(pic)}/>;
+    return <Image width={500} alt='Profile picture' preview={false} src={URL.createObjectURL(pic)}/>;
 }
 
 function DeleteProfilePicButton(): ReactElement {

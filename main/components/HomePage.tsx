@@ -58,6 +58,7 @@ function UsersRow(): ReactElement {
                     <List.Item>Search for your friends and family.</List.Item>
                     <List.Item>Use on any device - no phone required.</List.Item>
                     <List.Item>Automatic online status.</List.Item>
+                    <List.Item>Block and unblock users without them knowing.</List.Item>
                 </List>
             </Col>
             <Col span={4}>

@@ -1,23 +1,19 @@
 import React, {ReactElement, useEffect, useState} from 'react';
-import {Button, Form, Input, Menu, message, Modal, Spin, Typography} from 'antd';
-import {UserDeleteOutlined} from '@ant-design/icons';
-import * as mutationsApi from '../../api/wrappers/mutationsApi';
-import * as queriesApi from '../../api/wrappers/queriesApi';
+import {Button, Form, Input, message, Spin, Typography} from 'antd';
+import * as mutationsApi from '../api/wrappers/mutationsApi';
+import * as queriesApi from '../api/wrappers/queriesApi';
 
-export default function DeleteAccountMenuItem(props: object): ReactElement {
-    const [visible, setVisible] = useState(false);
+export default function DeleteAccountSection(): ReactElement {
     return (
-        <Menu.Item {...props}>
-            <Button icon={<UserDeleteOutlined/>} onClick={() => setVisible(true)}>Delete Account</Button>
-            <Modal title='Delete Account' visible={visible} footer={null} onCancel={() => setVisible(false)}>
-                <Typography.Paragraph>
-                    If you delete your account, all of your data will be wiped. This means that your private chats with
-                    other users will be deleted, etc. Since this is an irreversible action, the support team will be
-                    unable to retrieve your data if you change your mind later on.
-                </Typography.Paragraph>
-                <DeleteAccountForm/>
-            </Modal>
-        </Menu.Item>
+        <>
+            <Typography.Title>Delete Account</Typography.Title>
+            <Typography.Paragraph>
+                If you delete your account, all of your data will be wiped. This means that your private chats with
+                other users will be deleted, etc. Since this is an irreversible action, the support team will be
+                unable to retrieve your data if you change your mind later on.
+            </Typography.Paragraph>
+            <DeleteAccountForm/>
+        </>
     );
 }
 

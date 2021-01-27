@@ -1,7 +1,8 @@
-import {Empty, Layout, Row, Spin} from 'antd';
+import {Layout, Row, Spin} from 'antd';
 import React, {ReactElement, useEffect, useState} from 'react';
 import * as queriesApi from '../api/wrappers/queriesApi';
-import ChatPageMenu from './chat-page-menu/ChatPageMenu';
+import ChatPageMenu from './ChatPageMenu';
+import {ChatPageLayoutContext, useChatPageLayoutContext} from '../contexts/chatPageLayoutContext';
 
 export default function ChatPage(): ReactElement {
     const [page, setPage] = useState(<LoadingPage/>);
@@ -22,14 +23,17 @@ function LoadingPage(): ReactElement {
 }
 
 function ChatPageLayout(): ReactElement {
+    const context = useChatPageLayoutContext();
     return (
         <Layout>
-            <Layout.Sider>
-                <ChatPageMenu/>
-            </Layout.Sider>
-            <Layout.Content style={{padding: 16}}>
-                <Empty/>
-            </Layout.Content>
+            <ChatPageLayoutContext.Provider value={context}>
+                <Layout.Sider>
+                    <ChatPageMenu/>
+                </Layout.Sider>
+                <Layout.Content style={{padding: 16}}>
+                    {context.content}
+                </Layout.Content>
+            </ChatPageLayoutContext.Provider>
         </Layout>
     );
 }
