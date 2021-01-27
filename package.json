@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "dev": "parcel main/static/index.html",
-    "build": "NODE_ENV=prod parcel build main/static/index.html",
+    "dev": "parcel main/index.html",
+    "build": "NODE_ENV=prod parcel build main/index.html",
     "test": "jest"
   },
   "devDependencies": {

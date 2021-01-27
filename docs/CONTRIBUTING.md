@@ -8,18 +8,15 @@
   token set must be deleted, and the user must be redirected to the homepage).
 - The `first`, `after`, `last`, and `before` function parameters aren't documented throughout the codebase because it'd
   be repetitive. Refer to
-  the [pagination docs](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/api.md#pagination) instead.
-- Here's an example of how to name images when importing them in TypeScript: To import `happy_news.svg`, write:
-    ```ts
-    import happyNewsImage from './happy_news.svg';
-    ```
-- Name directories using _kebab-case_, React component files using _PascalCase_, and other files using _camelCase_.
+  the [pagination docs](https://github.com/neelkamath/omni-chat/blob/v0.9.0/docs/api.md#pagination) instead.
+- When changing the version of the Omni Chat API being used (e.g., updating the frontend to use v0.9.0 instead of
+  v0.8.3), update the `API_VERSION` key in [`.env`](/docs/.env)
 
 ## Installation
 
-1. Install the [app](docs/install.md).
+1. Install the [app](install.md).
 1. Configure the development environment:
-    1. Copy the [`.env`](docs/.env) file to the project's root directory.
+    1. Copy the [`.env`](/docs/.env) file to the project's root directory.
     1. If you're not running the Omni Chat API on `localhost`, change the value of the `API_URL` key (
        e.g., `localhost:8080`, `example.com/api`).
     1. If the API server has an SSL certificate, change the values of the `HTTP` and `WS` keys to `https://`
@@ -38,9 +35,9 @@
 npm t
 ```
 
-- Tests mirror the [`main`](main) directory. For example, the tests
-  for [`main/api/graphQlApi/validators.ts`](main/api/networking/graphql/validators.ts) are
-  in [`test/api/graphQlApi/validators.test.ts`](test/api/graphQlApi/validators.test.ts).
+- Tests mirror the [`main`](/main) directory. For example, the tests
+  for [`main/api/graphQlApi/validators.ts`](/main/api/networking/graphql/validators.ts) are
+  in [`test/api/graphQlApi/validators.test.ts`](/test/api/graphQlApi/validators.test.ts).
 - Each function's tests are grouped with the name of the function passed to `describe()`. For example, the tests
   for `validateUsernameScalar()` are placed in `describe('validateUsernameScalar()')`.
 
@@ -48,9 +45,9 @@ npm t
 
 Here's how to test the production build:
 
-1. Either run the Omni Chat 0.8.3
-   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/docker-compose.md) or in
-   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.8.3/docs/cloud.md).
+1. Either run the Omni Chat 0.9.0
+   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.9.0/docs/docker-compose.md) or in
+   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.9.0/docs/cloud.md).
 1. Save a production build to `dist/`: `npm run build`
 1. Serve the website which has been saved to `dist/`.
 
@@ -69,4 +66,14 @@ access tokens. The following data may be saved:
 - The theme color is `#177DDC`.
 - Only use icons from [antd icons](https://ant.design/components/icon/).
 - Only use illustrations from [unDraw](https://undraw.co/). The illustration's theme color must match that of the app's.
+  Name the image the same as the caption given on unDraw.
 - Padding from the edges of the screen, and between elements is `16px`.
+
+## Style Guide
+
+- Here's an example of how to name images when importing them in TypeScript: To import `happy-news.svg`, write:
+    ```ts
+    import happyNewsImage from './happy-news.svg';
+    ```
+- Name TypeScript files having an `export default` using _PascalCase_. Name other TypeScript files using _camelCase_.
+- Name directories and non-TypeScript files using _kebab-case_.

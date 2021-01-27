@@ -14,7 +14,6 @@ export default function SearchUsersSection(): ReactElement {
     const context = useSearchUsersContext();
     return (
         <>
-            <Typography.Title>Search Users</Typography.Title>
             <Typography.Paragraph>Search users by their name, username, or email address.</Typography.Paragraph>
             <SearchUsersContext.Provider value={context}>
                 <Space direction='vertical'>

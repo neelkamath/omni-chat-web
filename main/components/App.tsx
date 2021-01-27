@@ -4,6 +4,7 @@ import HomePage from './HomePage';
 import RegistrationPage from './RegistrationPage';
 import SignInPage from './SignInPage';
 import ChatPage from './ChatPage';
+import DevelopersPage from './DevelopersPage';
 
 export default function App(): ReactElement {
     return (
@@ -20,6 +21,9 @@ export default function App(): ReactElement {
                 </Route>
                 <Route exact path='/chat'>
                     <ChatPage/>
+                </Route>
+                <Route exact path='/developers'>
+                    <DevelopersPage/>
                 </Route>
             </Switch>
         </BrowserRouter>

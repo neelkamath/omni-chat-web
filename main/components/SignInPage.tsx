@@ -1,24 +1,26 @@
 import React, {ReactElement, useState} from 'react';
 import HomeLayout from './HomeLayout';
 import {Button, Col, Divider, Form, Image, Input, Row, Space, Typography} from 'antd';
-import signInImage from '../static/illustrations/sign_in.svg';
+import signInImage from '../images/sign-in.svg';
 import * as queriesApi from '../api/wrappers/queriesApi';
-import mailSentImage from '../static/illustrations/mail_sent.svg';
+import mailSentImage from '../images/mail-sent.svg';
 import * as mutationsApi from '../api/wrappers/mutationsApi';
-import forgotPasswordImage from '../static/illustrations/forgot_password.svg';
-import authenticationImage from '../static/illustrations/authentication.svg';
+import forgotPasswordImage from '../images/forgot-password.svg';
+import authenticationImage from '../images/authentication.svg';
 
 export default function SignInPage(): ReactElement {
     return (
         <HomeLayout>
             <Row gutter={16} style={{padding: 16}}>
-                <SignInSection/>
-                <Divider/>
-                <VerifyYourEmailAddressSection/>
-                <Divider/>
-                <EmailPasswordResetCodeSection/>
-                <Divider/>
-                <ResetPasswordSection/>
+                <Row>
+                    <SignInSection/>
+                    <Divider/>
+                    <VerifyYourEmailAddressSection/>
+                    <Divider/>
+                    <EmailPasswordResetCodeSection/>
+                    <Divider/>
+                    <ResetPasswordSection/>
+                </Row>
             </Row>
         </HomeLayout>
     );

@@ -1,9 +1,9 @@
 import React, {ReactElement, useState} from 'react';
 import {Button, Col, Divider, Form, Image, Input, Row, Space, Typography} from 'antd';
 import HomeLayout from './HomeLayout';
-import happyNewsImage from '../static/illustrations/happy_news.svg';
+import happyNewsImage from '../images/happy-news.svg';
 import * as mutationsApi from '../api/wrappers/mutationsApi';
-import completingImage from '../static/illustrations/completing.svg';
+import completingImage from '../images/completing.svg';
 
 export default function RegistrationPage(): ReactElement {
     return (

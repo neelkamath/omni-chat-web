@@ -14,7 +14,6 @@ import * as queriesApi from '../api/wrappers/queriesApi';
 export default function AccountEditor(): ReactElement {
     return (
         <>
-            <Typography.Title>Update Account</Typography.Title>
             <Space direction='vertical'>
                 <ProfilePic userId={storage.readUserId()!}/>
                 <NewProfilePicButton/>

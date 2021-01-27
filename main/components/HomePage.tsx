@@ -1,12 +1,12 @@
 import React, {ReactElement} from 'react';
 import {Col, Divider, Image, List, Row, Space, Typography} from 'antd';
-import femaleAvatarImage from '../static/illustrations/female_avatar.svg';
-import onlineDiscussionImage from '../static/illustrations/online_discussion.svg';
-import groupChatImage from '../static/illustrations/group_chat.svg';
-import videoCallImage from '../static/illustrations/video_call.svg';
-import messagingFunImage from '../static/illustrations/messaging_fun.svg';
-import chatBotImage from '../static/illustrations/chat_bot.svg';
-import coverImage from '../static/cover.png';
+import femaleAvatarImage from '../images/female-avatar.svg';
+import onlineDiscussionImage from '../images/online-discussion.svg';
+import groupChatImage from '../images/group-chat.svg';
+import videoCallImage from '../images/video-call.svg';
+import messagingFunImage from '../images/messaging-fun.svg';
+import securityImage from '../images/security.svg';
+import coverImage from '../images/cover.png';
 import HomeLayout from './HomeLayout';
 import {
     CommentOutlined,
@@ -181,7 +181,7 @@ function ExtensibleRow(): ReactElement {
     return (
         <Row gutter={16} justify='space-around' align='middle'>
             <Col span={9}>
-                <Image preview={false} src={chatBotImage} alt='Chatbot'/>
+                <Image preview={false} src={securityImage} alt='Security'/>
             </Col>
             <Col span={12}>
                 <Typography.Title level={3}>
@@ -207,18 +207,7 @@ function ExtensibleRow(): ReactElement {
                         example, if a Travis CI build fails, a bot could message the specifics on the group with a
                         button, which when clicked, automatically reruns the CI/CD pipeline.
                     </List.Item>
-                    <List.Item>
-                        The {' '}
-                        <Typography.Link target='_blank' href='https://github.com/neelkamath/omni-chat-web'>
-                            frontend
-                        </Typography.Link>
-                        {' '} and {' '}
-                        <Typography.Link target='_blank' href='https://github.com/neelkamath/omni-chat'>
-                            backend
-                        </Typography.Link>
-                        {' '} are open source on GitHub. You can inspect the code, build on top of the existing app, or
-                        use the standalone backend to build your own frontend.
-                    </List.Item>
+                    <List.Item>This project is open-source, and allows bots and UI integrations to be built.</List.Item>
                 </List>
             </Col>
         </Row>

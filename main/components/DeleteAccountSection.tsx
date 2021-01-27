@@ -6,7 +6,6 @@ import * as queriesApi from '../api/wrappers/queriesApi';
 export default function DeleteAccountSection(): ReactElement {
     return (
         <>
-            <Typography.Title>Delete Account</Typography.Title>
             <Typography.Paragraph>
                 If you delete your account, all of your data will be wiped. This means that your private chats with
                 other users will be deleted, etc. Since this is an irreversible action, the support team will be
