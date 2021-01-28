@@ -83,3 +83,17 @@ export async function searchUsers(query: string, first?: number, after?: Cursor)
     }
     return connection;
 }
+
+export async function readContacts(first?: number, after?: Cursor): Promise<AccountsConnection | null> {
+    let connection;
+    try {
+        connection = await queriesApi.readContacts(storage.readTokenSet()!.accessToken, first, after);
+    } catch (error) {
+        if (error instanceof ConnectionError) await ConnectionError.display();
+        else if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) logOut();
+        else throw error;
+        return null;
+    }
+    return connection;
+}

@@ -1,12 +1,6 @@
 import {AccountsConnection} from '../api/networking/graphql/models';
-import {createContext, useState} from 'react';
-
-/** The query users were searched by. `undefined` if users haven't been searched yet. */
-export type SearchUsersContextQuery = string | undefined;
-
-export interface SearchUsersContextQuerySetter {
-    (query: string): void;
-}
+import {createContext, useEffect, useState} from 'react';
+import * as queriesApi from '../api/wrappers/queriesApi';
 
 /** `undefined` indicates no users have been searched for yet. An empty array indicates there were no search results. */
 export type SearchUsersContextResults = AccountsConnection | undefined;
@@ -22,11 +16,16 @@ export interface SearchUsersContextResultsAppender {
 }
 
 export interface SearchUsersContextData {
-    readonly query: SearchUsersContextQuery;
-    readonly setQuery: SearchUsersContextQuerySetter;
+    /** The query users were searched by. `undefined` if users haven't been searched yet. */
+    readonly query: string | undefined;
+    readonly setQuery: (query: string) => void;
     readonly accounts: SearchUsersContextResults;
     readonly replaceAccounts: SearchUsersContextResultsReplacer;
     readonly addAccounts: SearchUsersContextResultsAppender;
+    /** The user ID of every contact the user has. */
+    readonly contacts: number[];
+    /** Fetches the contacts to overwrite `contactsPromise`. */
+    readonly updateContacts: () => void;
 }
 
 /**
@@ -39,6 +38,7 @@ export const SearchUsersContext = createContext<SearchUsersContextData | undefin
 export function useSearchUsersContext(): SearchUsersContextData {
     const [query, setQuery] = useState<string | undefined>(undefined);
     const [accounts, setAccounts] = useState<SearchUsersContextResults>(undefined);
+    const [contacts, setContacts] = useState<number[]>([]);
     const replaceAccounts: SearchUsersContextResultsReplacer = (newAccounts) => setAccounts(newAccounts);
     const addAccounts: SearchUsersContextResultsAppender = (newAccounts) => {
         setAccounts({
@@ -51,5 +51,11 @@ export function useSearchUsersContext(): SearchUsersContextData {
             },
         });
     };
-    return {query, setQuery, accounts, replaceAccounts, addAccounts};
+    const updateContacts = () => {
+        queriesApi.readContacts().then((response) => {
+            setContacts(response === null ? [] : response.edges.map((edge) => edge.node.id));
+        });
+    };
+    useEffect(() => updateContacts(), []);
+    return {query, setQuery, accounts, replaceAccounts, addAccounts, contacts, updateContacts};
 }

@@ -9,6 +9,7 @@ import {
     EmailAddressTakenError,
     EmailAddressVerifiedError,
     InternalServerError,
+    InvalidContactError,
     InvalidDomainError,
     NameScalarError,
     PasswordScalarError,
@@ -147,4 +148,30 @@ export async function deleteAccount(): Promise<void> {
         return;
     }
     logOut();
+}
+
+export async function createContacts(userIdList: number[]): Promise<void> {
+    try {
+        await mutationsApi.createContacts(storage.readTokenSet()!.accessToken, userIdList);
+    } catch (error) {
+        if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof ConnectionError) await ConnectionError.display();
+        // An <InvalidContactError> will be thrown if the user who was to be added just deleted their account.
+        else if (!(error instanceof InvalidContactError)) throw error;
+        return;
+    }
+    message.success('Contacts created.');
+}
+
+export async function deleteContacts(userIdList: number[]): Promise<void> {
+    try {
+        await mutationsApi.deleteContacts(storage.readTokenSet()!.accessToken, userIdList);
+    } catch (error) {
+        if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof ConnectionError) await ConnectionError.display();
+        return;
+    }
+    message.success('Contacts deleted.');
 }

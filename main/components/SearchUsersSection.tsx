@@ -6,6 +6,8 @@ import * as queriesApi from '../api/wrappers/queriesApi';
 import {Account} from '../api/networking/graphql/models';
 import * as restApi from '../api/wrappers/restApi';
 import {NonexistentUserIdError} from '../api/networking/errors';
+import * as mutationsApi from '../api/wrappers/mutationsApi';
+import * as storage from '../storage';
 
 /** The number of users to query for at a time. */
 const QUERY_COUNT = 10;
@@ -53,7 +55,7 @@ function SearchUsersForm(): ReactElement {
 function UsersFound(): ReactElement {
     const {accounts} = useContext(SearchUsersContext)!;
     if (accounts === undefined) return <></>;
-    const cards = accounts.edges.map(({node}) =>
+    const cards = accounts.edges.filter(({node}) => node.id !== storage.readUserId()!).map(({node}) =>
         <Card key={node.id}>
             <UserFound account={node}/>
         </Card>
@@ -121,6 +123,9 @@ function UserFoundDescription({account}: UserFoundDescriptionProps): ReactElemen
                     </List.Item>
                 )
             }
+            <List.Item>
+                <ContactManagementButton userId={account.id}/>
+            </List.Item>
         </List>
     );
 }
@@ -138,4 +143,25 @@ function LoadMoreUsersButton(): ReactElement {
         } else message.info('No more users found.');
     };
     return <Button loading={loading} onClick={onClick}>Load more users</Button>;
+}
+
+interface ContactManagementButtonProps {
+    readonly userId: number;
+}
+
+function ContactManagementButton({userId}: ContactManagementButtonProps): ReactElement {
+    const {contacts, updateContacts} = useContext(SearchUsersContext)!;
+    const [loading, setLoading] = useState(false);
+    const onClick = async () => {
+        setLoading(true);
+        if (contacts.includes(userId)) await mutationsApi.deleteContacts([userId]);
+        else await mutationsApi.createContacts([userId]);
+        updateContacts();
+        setLoading(false);
+    };
+    return (
+        <Button danger={contacts.includes(userId)} loading={loading} onClick={onClick}>
+            {contacts.includes(userId) ? 'Delete Contact' : 'Create Contact'}
+        </Button>
+    );
 }

@@ -123,3 +123,27 @@ export async function searchUsers(query: string, first?: number, after?: Cursor)
     }
     return response.data!.searchUsers;
 }
+
+/**
+ * Retrieves saved contacts.
+ * @throws {UnauthorizedError}
+ * @throws {ConnectionError}
+ * @throws {InternalServerError}
+ */
+export async function readContacts(accessToken: string, first?: number, after?: Cursor): Promise<AccountsConnection> {
+    const response = await queryOrMutate({
+        query: `
+            query ReadContacts($first: Int, $after: Cursor) {
+                readContacts(first: $first, after: $after) {
+                    ${ACCOUNTS_CONNECTION_FRAGMENT}
+                }
+            }
+        `,
+        variables: {first, after},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
+        throw new ConnectionError();
+    }
+    return response.data!.readContacts;
+}

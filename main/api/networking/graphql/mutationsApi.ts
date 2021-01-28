@@ -6,6 +6,7 @@ import {
     EmailAddressTakenError,
     EmailAddressVerifiedError,
     InternalServerError,
+    InvalidContactError,
     InvalidDomainError,
     UnregisteredEmailAddressError,
     UsernameTakenError,
@@ -24,6 +25,7 @@ import {validateAccountInput, validateAccountUpdate} from './validators';
  * @throws {PasswordScalarError}
  * @throws {NameScalarError}
  * @throws {BioScalarError}
+ * @throws {UnauthorizedError}
  */
 export async function createAccount(account: AccountInput): Promise<Placeholder> {
     validateAccountInput(account);
@@ -60,6 +62,7 @@ export async function createAccount(account: AccountInput): Promise<Placeholder>
  * @throws {ConnectionError}
  * @throws {UnregisteredEmailAddressError}
  * @throws {InternalServerError}
+ * @throws {UnauthorizedError}
  */
 export async function verifyEmailAddress(emailAddress: string, verificationCode: number): Promise<boolean> {
     const response = await queryOrMutate({
@@ -90,6 +93,7 @@ export async function verifyEmailAddress(emailAddress: string, verificationCode:
  * @throws {UnregisteredEmailAddressError}
  * @throws {EmailAddressVerifiedError}
  * @throws {InternalServerError}
+ * @throws {UnauthorizedError}
  */
 export async function emailEmailAddressVerification(emailAddress: string): Promise<Placeholder> {
     const response = await queryOrMutate({
@@ -120,6 +124,7 @@ export async function emailEmailAddressVerification(emailAddress: string): Promi
  * @throws {ConnectionError}
  * @throws {UnregisteredEmailAddressError}
  * @throws {InternalServerError}
+ * @throws {UnauthorizedError}
  * @see resetPassword Use this other operation once
  * @see updateAccount Use this if the user is logged in (i.e., you have an access token), and wants to update their
  * password.
@@ -197,6 +202,7 @@ export async function updateAccount(accessToken: string, update: AccountUpdate):
  * @throws {ConnectionError}
  * @throws {UnregisteredEmailAddressError}
  * @throws {InternalServerError}
+ * @throws {UnauthorizedError}
  */
 export async function resetPassword(
     emailAddress: string,
@@ -253,6 +259,7 @@ export async function deleteProfilePic(accessToken: string): Promise<Placeholder
  * with the user will have their chats deleted, etc.
  * @throws {CannotDeleteAccountError}
  * @throws {InternalServerError}
+ * @throws {UnauthorizedError}
  * @throws {ConnectionError}
  */
 export async function deleteAccount(accessToken: string): Promise<Placeholder> {
@@ -274,4 +281,55 @@ export async function deleteAccount(accessToken: string): Promise<Placeholder> {
         }
     }
     return response.data!.deleteAccount;
+}
+
+/**
+ * Saves contacts. Contacts previously saved will be ignored. If the user's own contact is present, it will be ignored.
+ * @throws {InvalidContactError}
+ * @throws {InternalServerError}
+ * @throws {ConnectionError}
+ * @throws {UnauthorizedError}
+ */
+export async function createContacts(accessToken: string, userIdList: number[]): Promise<Placeholder> {
+    const response = await queryOrMutate({
+        query: `
+            mutation CreateContacts($userIdList: [Int!]!) {
+                createContacts(userIdList: $userIdList)
+            }
+        `,
+        variables: {userIdList},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        switch (response.errors[0]!.message) {
+            case 'INTERNAL_SERVER_ERROR':
+                throw new InternalServerError();
+            case 'INVALID_CONTACT':
+                throw new InvalidContactError();
+            default:
+                throw new ConnectionError();
+        }
+    }
+    return response.data!.createContacts;
+}
+
+/**
+ * Remove saved contacts. Invalid contacts (e.g., invalid user IDs, unsaved contacts) will be ignored.
+ * @throws {InternalServerError}
+ * @throws {ConnectionError}
+ * @throws {UnauthorizedError}
+ */
+export async function deleteContacts(accessToken: string, userIdList: number[]): Promise<Placeholder> {
+    const response = await queryOrMutate({
+        query: `
+            mutation DeleteContacts($userIdList: [Int!]!) {
+                deleteContacts(userIdList: $userIdList)
+            }
+        `,
+        variables: {userIdList},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
+        throw new ConnectionError();
+    }
+    return response.data!.deleteContacts;
 }

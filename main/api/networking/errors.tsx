@@ -35,6 +35,10 @@ export class ConnectionError extends Error {
     }
 }
 
+/** One of the user IDs which were trying to be saved didn't exist. */
+export class InvalidContactError extends Error {
+}
+
 /** Either the frontend sent a malformed request or the backend has a bug. */
 export class InternalServerError extends Error {
     static display(): void {
