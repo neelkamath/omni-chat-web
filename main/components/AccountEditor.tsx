@@ -44,7 +44,7 @@ function ProfilePic({userId}: ProfilePicProps): ReactElement {
         return subscriptionsApi.subscribeToAccounts((message) => {
             if (message.__typename === 'UpdatedAccount' && message.userId === userId) preparePic();
         });
-    }, []);
+    }, [userId]);
     return profilePic;
 }
 
@@ -82,8 +82,8 @@ function UpdateAccountSection(): ReactElement {
     return (
         <>
             <Typography.Paragraph>
-                If you update your email address, you'll be logged out since you'll have to verify your new email
-                address.
+                If you update your email address, you&apos;ll be logged out since you&apos;ll have to verify your new
+                email address.
             </Typography.Paragraph>
             <UpdateAccountForm/>
         </>

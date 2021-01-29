@@ -35,7 +35,7 @@ export async function requestTokenSet(login: Login): Promise<TokenSet> {
         variables: {login},
     });
     if (response.errors !== undefined) {
-        switch (response.errors![0]!.message) {
+        switch (response.errors[0]!.message) {
             case 'NONEXISTENT_USER':
                 throw new NonexistentUserError();
             case 'UNVERIFIED_EMAIL_ADDRESS':

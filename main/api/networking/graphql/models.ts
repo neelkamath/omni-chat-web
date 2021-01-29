@@ -83,8 +83,8 @@ export interface AccountEdge {
 }
 
 export interface PageInfo {
-    readonly hasNextPage: Boolean;
-    readonly hasPreviousPage: Boolean;
+    readonly hasNextPage: boolean;
+    readonly hasPreviousPage: boolean;
     readonly startCursor?: Cursor;
     readonly endCursor?: Cursor;
 }

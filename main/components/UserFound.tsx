@@ -22,7 +22,7 @@ export default function UserFound(props: UserFoundProps): ReactElement {
         getThumbnailProfilePic(props.account.id).then((pic) => {
             if (pic !== null) setAvatar(pic);
         });
-    }, []);
+    }, [props.account.id]);
     return (
         <>
             <Card onClick={() => setVisible(true)}>
@@ -67,7 +67,7 @@ function Profile({account, isContact, onContactStatusChange}: ProfileProps): Rea
     const [pic, setPic] = useState<ReactElement | null>(null);
     useEffect(() => {
         getOriginalProfilePic(account.id).then(setPic);
-    }, []);
+    }, [account.id]);
     const name = `${account.firstName} ${account.lastName}`;
     return (
         <List>

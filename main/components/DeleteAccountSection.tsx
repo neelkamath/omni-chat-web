@@ -20,12 +20,12 @@ function DeleteAccountForm(): ReactElement {
     const [form, setForm] = useState(<Spin/>);
     const [username, setUsername] = useState<string | undefined>(undefined);
     const [loading, setLoading] = useState(false);
-    const onFinish = async (data: any) => {
-        setLoading(true);
-        data.username === username ? await mutationsApi.deleteAccount() : message.error('Incorrect username.');
-        setLoading(false);
-    };
     useEffect(() => {
+        const onFinish = async (data: any) => {
+            setLoading(true);
+            data.username === username ? await mutationsApi.deleteAccount() : message.error('Incorrect username.');
+            setLoading(false);
+        };
         queriesApi.readAccount().then((account) => {
             if (account === null) return;
             setUsername(account.username);
@@ -46,6 +46,6 @@ function DeleteAccountForm(): ReactElement {
                 </Form>
             );
         });
-    }, [loading]);
+    }, [loading, username]);
     return form;
 }

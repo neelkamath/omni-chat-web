@@ -85,8 +85,8 @@ function ChatsRow(): ReactElement {
                     <List.Item>Group chats.</List.Item>
                     <List.Item>
                         Broadcast chats where only admins can message. This option can be toggled for a chat any time.
-                        This is for chats for updates, like a conference's chat where you don't want hundreds of people
-                        asking the same questions over and over again.
+                        This is for chats for updates, like a conference&apos;s chat where you don&apos;t want hundreds
+                        of people asking the same questions over and over again.
                     </List.Item>
                     <List.Item>
                         Public chats such as an official Android chat, random groups individuals have created, and a
@@ -193,10 +193,10 @@ function ExtensibleRow(): ReactElement {
                     <List.Item>
                         Omni Chat can be deployed for private use as well. For example, a company may only want to use
                         it as an internal platform, in which case they can specify that only certain email address
-                        domains can create accounts. This way, even if an intruder gets into the company's network, they
-                        won't be able to create an account since they won't have a company issued email address. This
-                        feature also prevents employees from creating an account with their personal email address. Here
-                        are the instructions to {' '}
+                        domains can create accounts. This way, even if an intruder gets into the company&apos;s network,
+                        they won&apos;t be able to create an account since they won&apos;t have a company issued email
+                        address. This feature also prevents employees from creating an account with their personal email
+                        address. Here are the instructions to {' '}
                         <Typography.Link href='https://github.com/neelkamath/omni-chat' target='_blank'>
                             run your own instance
                         </Typography.Link>.

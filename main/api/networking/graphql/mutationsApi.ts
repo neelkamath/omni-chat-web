@@ -38,7 +38,7 @@ export async function createAccount(account: AccountInput): Promise<Placeholder>
         variables: {account},
     });
     if (response.errors !== undefined)
-        switch (response.errors![0]!.message) {
+        switch (response.errors[0]!.message) {
             case 'USERNAME_TAKEN':
                 throw new UsernameTakenError();
             case 'EMAIL_ADDRESS_TAKEN':
