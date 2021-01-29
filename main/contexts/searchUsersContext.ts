@@ -28,13 +28,10 @@ export interface SearchUsersContextData {
     readonly updateContacts: () => void;
 }
 
-/**
- * Context for the search results of users. It's `undefined` when it's used outside of it's
- * {@link SearchUsersContext.Provider}.
- */
+/** Context for user search results. `undefined` when used outside of it's {@link SearchUsersContext.Provider}. */
 export const SearchUsersContext = createContext<SearchUsersContextData | undefined>(undefined);
 
-/** Hook for {@link SearchUsersContext}. */
+/** React hook for {@link SearchUsersContext}. */
 export function useSearchUsersContext(): SearchUsersContextData {
     const [query, setQuery] = useState<string | undefined>(undefined);
     const [accounts, setAccounts] = useState<SearchUsersContextResults>(undefined);

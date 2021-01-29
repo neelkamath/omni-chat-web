@@ -147,3 +147,32 @@ export async function readContacts(accessToken: string, first?: number, after?: 
     }
     return response.data!.readContacts;
 }
+
+/**
+ * Case-insensitively searches contacts using their usernames, first names, last names, and email addresses.
+ * @throws {UnauthorizedError}
+ * @throws {ConnectionError}
+ * @throws {InternalServerError}
+ */
+export async function searchContacts(
+    accessToken: string,
+    query: string,
+    first?: number,
+    after?: Cursor,
+): Promise<AccountsConnection> {
+    const response = await queryOrMutate({
+        query: `
+            query SearchContacts($query: String!, $first: Int, $after: Cursor) {
+                searchContacts(query: $query, first: $first, after: $after) {
+                    ${ACCOUNTS_CONNECTION_FRAGMENT}
+                }
+            }
+        `,
+        variables: {query, first, after},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
+        throw new ConnectionError();
+    }
+    return response.data!.searchContacts;
+}

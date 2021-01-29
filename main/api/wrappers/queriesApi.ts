@@ -97,3 +97,21 @@ export async function readContacts(first?: number, after?: Cursor): Promise<Acco
     }
     return connection;
 }
+
+export async function searchContacts(
+    query: string,
+    first?: number,
+    after?: Cursor,
+): Promise<AccountsConnection | null> {
+    let connection;
+    try {
+        connection = await queriesApi.searchContacts(storage.readTokenSet()!.accessToken, query, first, after);
+    } catch (error) {
+        if (error instanceof ConnectionError) await ConnectionError.display();
+        else if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) logOut();
+        else throw error;
+        return null;
+    }
+    return connection;
+}

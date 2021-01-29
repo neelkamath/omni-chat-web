@@ -101,7 +101,7 @@ export async function updateAccount(update: AccountUpdate): Promise<void> {
         return;
     }
     message.success('Account updated.');
-    if (oldAccount.emailAddress !== update.emailAddress) logOut();
+    if (update.emailAddress !== undefined && oldAccount.emailAddress !== update.emailAddress) logOut();
 }
 
 export async function resetPassword(

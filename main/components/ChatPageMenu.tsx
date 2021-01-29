@@ -4,6 +4,7 @@ import ChatPageSupportSection from './ChatPageSupportSection';
 import {ChatPageLayoutContext} from '../contexts/chatPageLayoutContext';
 import {
     CodeOutlined,
+    ContactsOutlined,
     CustomerServiceOutlined,
     LogoutOutlined,
     SearchOutlined,
@@ -15,6 +16,7 @@ import SearchUsersSection from './SearchUsersSection';
 import {logOut} from '../logOut';
 import DeleteAccountSection from './DeleteAccountSection';
 import DevelopersSection from './DevelopersSection';
+import ContactsSection from './ContactsSection';
 
 export default function ChatPageMenu(): ReactElement {
     const {setContent} = useContext(ChatPageLayoutContext)!;
@@ -22,6 +24,9 @@ export default function ChatPageMenu(): ReactElement {
         <Menu>
             <Menu.Item>
                 <Button icon={<UserOutlined/>} onClick={() => setContent(<AccountEditor/>)}>Account</Button>
+            </Menu.Item>
+            <Menu.Item>
+                <Button icon={<ContactsOutlined/>} onClick={() => setContent(<ContactsSection/>)}>Contacts</Button>
             </Menu.Item>
             <Menu.Item>
                 <Button icon={<SearchOutlined/>} onClick={() => setContent(<SearchUsersSection/>)}>Search Users</Button>

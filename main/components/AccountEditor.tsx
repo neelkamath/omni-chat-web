@@ -5,11 +5,12 @@ import * as restApi from '../api/wrappers/restApi';
 import * as storage from '../storage';
 import {NonexistentUserIdError} from '../api/networking/errors';
 import {logOut} from '../logOut';
-import {Button, Divider, Form, Image, Input, Space, Spin, Typography, Upload} from 'antd';
+import {Button, Divider, Form, Input, Space, Spin, Typography, Upload} from 'antd';
 import * as mutationsApi from '../api/wrappers/mutationsApi';
 import {ShowUploadListInterface} from 'antd/lib/upload/interface';
 import {UploadRequestOption as RcCustomRequestOptions} from 'rc-upload/lib/interface';
 import * as queriesApi from '../api/wrappers/queriesApi';
+import OriginalProfilePic from './OriginalProfilePic';
 
 export default function AccountEditor(): ReactElement {
     return (
@@ -21,6 +22,8 @@ export default function AccountEditor(): ReactElement {
             </Space>
             <Divider/>
             <UpdateAccountSection/>
+            <Divider/>
+            <UpdatePasswordForm/>
         </>
     );
 }
@@ -54,12 +57,12 @@ async function getProfilePic(): Promise<ReactElement | null> {
         else throw error;
     }
     if (pic === null) return <Typography.Text>No profile picture set.</Typography.Text>;
-    return <Image width={500} alt='Profile picture' preview={false} src={URL.createObjectURL(pic)}/>;
+    return <OriginalProfilePic pic={pic}/>;
 }
 
 function DeleteProfilePicButton(): ReactElement {
     const onClick = () => mutationsApi.deleteProfilePic();
-    return <Button icon={<DeleteOutlined/>} onClick={onClick}>Delete Profile Pic</Button>;
+    return <Button icon={<DeleteOutlined/>} onClick={onClick}>Delete Profile Picture</Button>;
 }
 
 function NewProfilePicButton(): ReactElement {
@@ -108,9 +111,6 @@ function UpdateAccountForm(): ReactElement {
                     >
                         <Input/>
                     </Form.Item>
-                    <Form.Item name='password' label='Password' initialValue=''>
-                        <Input.Password/>
-                    </Form.Item>
                     <Form.Item
                         name='emailAddress'
                         label='Email address'
@@ -136,4 +136,23 @@ function UpdateAccountForm(): ReactElement {
         });
     }, [loading]);
     return form;
+}
+
+function UpdatePasswordForm(): ReactElement {
+    const [loading, setLoading] = useState(false);
+    const onFinish = async (data: any) => {
+        setLoading(true);
+        await mutationsApi.updateAccount(data);
+        setLoading(false);
+    };
+    return (
+        <Form onFinish={onFinish} name='updatePassword' layout='vertical'>
+            <Form.Item name='password' label='New password' rules={[{required: true, message: 'Enter a password.'}]}>
+                <Input.Password/>
+            </Form.Item>
+            <Form.Item>
+                <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+            </Form.Item>
+        </Form>
+    );
 }
