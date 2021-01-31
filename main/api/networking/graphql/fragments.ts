@@ -45,6 +45,27 @@ export const DELETED_CONTACT_FRAGMENT = `
     }
 `;
 
+/** A blocked user. */
+export const BLOCKED_ACCOUNT_FRAGMENT = `
+    ... on BlockedAccount {
+        __typename
+        id
+        username
+        emailAddress
+        firstName
+        lastName
+        bio
+    }
+`;
+
+/** The `id` of an unblocked user. */
+export const UNBLOCKED_ACCOUNT_FRAGMENT = `
+    ... on UnblockedAccount {
+        __typename
+        id
+    }
+`;
+
 export const TOKEN_SET_FRAGMENT = `
     ... on TokenSet {
         __typename

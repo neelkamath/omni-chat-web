@@ -4,7 +4,7 @@ import {SearchOutlined} from '@ant-design/icons';
 import {SearchUsersContext, useSearchUsersContext} from '../contexts/searchUsersContext';
 import * as queriesApi from '../api/wrappers/queriesApi';
 import * as storage from '../storage';
-import UserFound from './UserFound';
+import UserCard from './UserCard';
 
 /** The number of users to query for at a time. */
 const QUERY_COUNT = 10;
@@ -17,8 +17,8 @@ export default function SearchUsersSection(): ReactElement {
             <SearchUsersContext.Provider value={context}>
                 <Space direction='vertical'>
                     <SearchUsersForm/>
-                    <UsersFound/>
-                    {context.accounts !== undefined && <LoadMoreUsersButton/>}
+                    <Users/>
+                    {context.users !== undefined && <LoadMoreUsersButton/>}
                 </Space>
             </SearchUsersContext.Provider>
         </>
@@ -26,14 +26,14 @@ export default function SearchUsersSection(): ReactElement {
 }
 
 function SearchUsersForm(): ReactElement {
-    const {setQuery, replaceAccounts} = useContext(SearchUsersContext)!;
-    const [loading, setLoading] = useState(false);
+    const {setQuery, replaceUsers} = useContext(SearchUsersContext)!;
+    const [isLoading, setLoading] = useState(false);
     const onFinish = async (data: any) => {
         setLoading(true);
         const accounts = await queriesApi.searchUsers(data.query, QUERY_COUNT);
         if (accounts !== null) {
             setQuery(data.query);
-            replaceAccounts(accounts);
+            replaceUsers(accounts);
         }
         setLoading(false);
     };
@@ -43,39 +43,32 @@ function SearchUsersForm(): ReactElement {
                 <Input/>
             </Form.Item>
             <Form.Item>
-                <Button loading={loading} type='primary' htmlType='submit' icon={<SearchOutlined/>}/>
+                <Button loading={isLoading} type='primary' htmlType='submit' icon={<SearchOutlined/>}/>
             </Form.Item>
         </Form>
     );
 }
 
-function UsersFound(): ReactElement {
-    const {accounts, contacts, updateContacts} = useContext(SearchUsersContext)!;
-    if (accounts === undefined) return <></>;
-    const cards = accounts.edges
+function Users(): ReactElement {
+    const {users} = useContext(SearchUsersContext)!;
+    if (users === undefined) return <></>;
+    const cards = users.edges
         .filter(({node}) => node.id !== storage.readUserId()!)
-        .map(({node}) =>
-            <UserFound
-                key={node.id}
-                account={node}
-                isContact={contacts.includes(node.id)}
-                onContactStatusChange={updateContacts}
-            />
-        );
+        .map(({node}) => <UserCard key={node.id} account={node}/>);
     return cards.length === 0 ? <Empty/> : <>{cards}</>;
 }
 
 function LoadMoreUsersButton(): ReactElement {
-    const {query, accounts, addAccounts} = useContext(SearchUsersContext)!;
-    const [loading, setLoading] = useState(false);
+    const {query, users, addUsers} = useContext(SearchUsersContext)!;
+    const [isLoading, setLoading] = useState(false);
     const onClick = async () => {
-        if (accounts!.pageInfo.hasNextPage) {
+        if (users!.pageInfo.hasNextPage) {
             setLoading(true);
-            const after = accounts!.edges[accounts!.edges.length - 1]!.cursor;
+            const after = users!.edges[users!.edges.length - 1]!.cursor;
             const connection = await queriesApi.searchUsers(query!, QUERY_COUNT, after);
-            if (connection !== null) addAccounts(connection);
+            if (connection !== null) addUsers(connection);
             setLoading(false);
         } else message.info('No more users found.');
     };
-    return <Button loading={loading} onClick={onClick}>Load more users</Button>;
+    return <Button loading={isLoading} onClick={onClick}>Load more users</Button>;
 }

@@ -11,7 +11,7 @@ import {
     UsernameScalarError
 } from '../networking/errors';
 import * as storage from '../../storage';
-import {logOut} from '../../logOut';
+import logOut from '../../logOut';
 
 export async function requestTokenSet(login: Login): Promise<void> {
     let tokenSet;
@@ -58,7 +58,7 @@ export async function refreshTokenSet(): Promise<void> {
 }
 
 export async function readAccount(): Promise<Account | null> {
-    let account;
+    let account = null;
     try {
         account = await queriesApi.readAccount(storage.readTokenSet()!.accessToken);
     } catch (error) {
@@ -66,26 +66,24 @@ export async function readAccount(): Promise<Account | null> {
         else if (error instanceof UnauthorizedError) logOut();
         else if (error instanceof ConnectionError) await ConnectionError.display();
         else throw error;
-        return null;
     }
     return account;
 }
 
 export async function searchUsers(query: string, first?: number, after?: Cursor): Promise<AccountsConnection | null> {
-    let connection;
+    let connection = null;
     try {
         connection = await queriesApi.searchUsers(query, first, after);
     } catch (error) {
         if (error instanceof ConnectionError) await ConnectionError.display();
         else if (error instanceof InternalServerError) InternalServerError.display();
         else throw error;
-        return null;
     }
     return connection;
 }
 
 export async function readContacts(first?: number, after?: Cursor): Promise<AccountsConnection | null> {
-    let connection;
+    let connection = null;
     try {
         connection = await queriesApi.readContacts(storage.readTokenSet()!.accessToken, first, after);
     } catch (error) {
@@ -93,7 +91,6 @@ export async function readContacts(first?: number, after?: Cursor): Promise<Acco
         else if (error instanceof InternalServerError) InternalServerError.display();
         else if (error instanceof UnauthorizedError) logOut();
         else throw error;
-        return null;
     }
     return connection;
 }
@@ -103,7 +100,7 @@ export async function searchContacts(
     first?: number,
     after?: Cursor,
 ): Promise<AccountsConnection | null> {
-    let connection;
+    let connection = null;
     try {
         connection = await queriesApi.searchContacts(storage.readTokenSet()!.accessToken, query, first, after);
     } catch (error) {
@@ -111,7 +108,43 @@ export async function searchContacts(
         else if (error instanceof InternalServerError) InternalServerError.display();
         else if (error instanceof UnauthorizedError) logOut();
         else throw error;
-        return null;
     }
     return connection;
+}
+
+export async function readBlockedUsers(first?: number, after?: Cursor): Promise<AccountsConnection | null> {
+    let connection = null;
+    try {
+        connection = await queriesApi.readBlockedUsers(storage.readTokenSet()!.accessToken, first, after);
+    } catch (error) {
+        if (error instanceof ConnectionError) await ConnectionError.display();
+        else if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) logOut();
+        else throw error;
+    }
+    return connection;
+}
+
+export async function isBlocked(userId: number): Promise<boolean | null> {
+    try {
+        return await queriesApi.isBlocked(storage.readTokenSet()!.accessToken, userId);
+    } catch (error) {
+        if (error instanceof ConnectionError) await ConnectionError.display();
+        else if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) logOut();
+        else throw error;
+    }
+    return null;
+}
+
+export async function isContact(userId: number): Promise<boolean | null> {
+    try {
+        return await queriesApi.isContact(storage.readTokenSet()!.accessToken, userId);
+    } catch (error) {
+        if (error instanceof ConnectionError) await ConnectionError.display();
+        else if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) logOut();
+        else throw error;
+    }
+    return null;
 }

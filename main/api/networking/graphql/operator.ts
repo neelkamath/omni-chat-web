@@ -66,20 +66,22 @@ export interface OnSocketError {
  * then, the following data would be passed to this function:
  * ```
  * {
- *     '__typename': 'NewTextMessage',
- *     'chatId': 3,
- *     'message': 'Hi!',
+ *     __typename: 'NewTextMessage',
+ *     data: {
+ *         chatId: 3,
+ *         message: 'Hi!',
+ *     },
  * }
  * ```
  */
-export interface OnSocketMessage {
-    (message: GraphQlSubscriptionData): void;
+export interface OnSocketMessage<T> {
+    (message: GraphQlSubscriptionData<T>): void;
 }
 
-export interface GraphQlSubscriptionData {
+/** The {@link data} (e.g., {@link NewContact}) with its {@link __typename}. */
+export interface GraphQlSubscriptionData<T> {
     readonly __typename: string;
-
-    readonly [key: string]: any;
+    readonly data: T;
 }
 
 /** Call this function to close the connection. */
@@ -101,7 +103,7 @@ export function subscribe(
     accessToken: string,
     query: string,
     onError: OnSocketError,
-    onMessage: OnSocketMessage,
+    onMessage: OnSocketMessage<any>,
 ): OnSocketClose {
     const socket = new WebSocket(process.env.WS! + process.env.API_URL! + path);
     socket.addEventListener('open', () => {
@@ -113,7 +115,10 @@ export function subscribe(
         if (response.errors !== undefined) {
             onError();
             socket.close();
-        } else onMessage(response.data!.subscribeToAccounts);
+        } else {
+            const {__typename, ...data} = response.data!.subscribeToAccounts;
+            onMessage({__typename, data});
+        }
     });
     socket.addEventListener('error', onError);
     return () => socket.close();

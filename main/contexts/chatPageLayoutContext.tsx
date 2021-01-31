@@ -2,7 +2,9 @@ import React, {createContext, ReactElement, useState} from 'react';
 import {Empty} from 'antd';
 
 export interface ChatPageLayoutContextData {
+    /** The {@link ReactElement} to display in the chat page's content section. */
     readonly content: ReactElement;
+    /** Overwrites {@link ChatPageLayoutContextData.content}. */
     readonly setContent: (content: ReactElement) => void;
 }
 

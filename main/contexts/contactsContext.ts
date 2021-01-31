@@ -1,27 +1,31 @@
-import {createContext, useEffect, useState} from 'react';
+import {createContext, useState} from 'react';
 import {Account} from '../api/networking/graphql/models';
 import * as queriesApi from '../api/wrappers/queriesApi';
 
 export interface ContactsContextData {
-    /** The user ID of every contact the user has. `undefined` initially. */
+    /** The query to search contacts by. Initially an empty `string`. */
+    readonly query: string;
+    /** Overwrites {@link ContactsContextData.query}. */
+    readonly setQuery: (query: string) => void;
+    /** Initially `undefined`. */
     readonly contacts: Account[] | undefined;
-    /** Fetches the contacts to overwrite `contactsPromise`. */
-    readonly setContacts: (contacts: Account[]) => void;
+    /**
+     * Fetches every contact found using the {@link ContactsContextData.query} (i.e., no pagination is used), and then
+     * sets {@link ContactsContextData.contacts} to it.
+     */
+    readonly updateContacts: () => Promise<void>;
 }
 
 /** Context for the user's contacts. `undefined` when used outside of it's {@link ContactsContext.Provider}. */
 export const ContactsContext = createContext<ContactsContextData | undefined>(undefined);
 
-/**
- * React hook for {@link ContactsContext}. Sets {@link ContactsContextData.contacts} to the user's contacts on the first
- * run.
- */
+/** React hook for {@link ContactsContext}. */
 export function useContactsContext(): ContactsContextData {
+    const [query, setQuery] = useState('');
     const [contacts, setContacts] = useState<Account[] | undefined>(undefined);
-    useEffect(() => {
-        queriesApi.readContacts().then((contacts) => {
-            if (contacts !== null) setContacts(contacts.edges.map((edge) => edge.node));
-        });
-    }, []);
-    return {contacts, setContacts};
+    const updateContacts = async () => {
+        const response = await queriesApi.searchContacts(query);
+        if (response !== null) setContacts(response.edges.map((edge) => edge.node));
+    };
+    return {query, setQuery, contacts, updateContacts};
 }

@@ -35,6 +35,13 @@ export class ConnectionError extends Error {
     }
 }
 
+/** The specified user ID doesn't exist. */
+export class InvalidUserIdError extends Error {
+    static async display(): Promise<void> {
+        message.warning('That user just deleted their account.');
+    }
+}
+
 /** One of the user IDs which were trying to be saved didn't exist. */
 export class InvalidContactError extends Error {
 }

@@ -176,3 +176,75 @@ export async function searchContacts(
     }
     return response.data!.searchContacts;
 }
+
+/**
+ * Returns users blocked by this user.
+ * @throws {UnauthorizedError}
+ * @throws {ConnectionError}
+ * @throws {InternalServerError}
+ */
+export async function readBlockedUsers(
+    accessToken: string,
+    first?: number,
+    after?: Cursor,
+): Promise<AccountsConnection> {
+    const response = await queryOrMutate({
+        query: `
+            query ReadBlockedUsers($first: Int, $after: Cursor) {
+                readBlockedUsers(first: $first, after: $after) {
+                    ${ACCOUNTS_CONNECTION_FRAGMENT}
+                }
+            }
+        `,
+        variables: {first, after},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
+        throw new ConnectionError();
+    }
+    return response.data!.readBlockedUsers;
+}
+
+/**
+ * Whether the user has blocked the user.
+ * @throws {UnauthorizedError}
+ * @throws {ConnectionError}
+ * @throws {InternalServerError}
+ */
+export async function isBlocked(accessToken: string, userId: number): Promise<boolean> {
+    const response = await queryOrMutate({
+        query: `
+            query IsBlocked($userId: Int!) {
+                isBlocked(userId: $userId)
+            }
+        `,
+        variables: {userId},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
+        throw new ConnectionError();
+    }
+    return response.data!.isBlocked;
+}
+
+/**
+ * Whether the specified user is in the user's contacts.
+ * @throws {UnauthorizedError}
+ * @throws {ConnectionError}
+ * @throws {InternalServerError}
+ */
+export async function isContact(accessToken: string, userId: number): Promise<boolean> {
+    const response = await queryOrMutate({
+        query: `
+            query IsContact($userId: Int!) {
+                isContact(userId: $userId)
+            }
+        `,
+        variables: {userId},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
+        throw new ConnectionError();
+    }
+    return response.data!.isContact;
+}

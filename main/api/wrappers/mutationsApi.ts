@@ -11,6 +11,7 @@ import {
     InternalServerError,
     InvalidContactError,
     InvalidDomainError,
+    InvalidUserIdError,
     NameScalarError,
     PasswordScalarError,
     UnauthorizedError,
@@ -19,7 +20,7 @@ import {
     UsernameTakenError
 } from '../networking/errors';
 import {message} from 'antd';
-import {logOut} from '../../logOut';
+import logOut from '../../logOut';
 
 export async function createAccount(account: AccountInput): Promise<void> {
     try {
@@ -161,7 +162,7 @@ export async function createContacts(userIdList: number[]): Promise<void> {
         else if (!(error instanceof InvalidContactError)) throw error;
         return;
     }
-    message.success('Contacts created.');
+    message.success(`${userIdList.length === 1 ? 'Contact' : 'Contacts'} created.`);
 }
 
 export async function deleteContacts(userIdList: number[]): Promise<void> {
@@ -173,5 +174,30 @@ export async function deleteContacts(userIdList: number[]): Promise<void> {
         else if (error instanceof ConnectionError) await ConnectionError.display();
         return;
     }
-    message.success('Contacts deleted.');
+    message.success(`${userIdList.length === 1 ? 'Contact' : 'Contacts'} deleted.`);
+}
+
+export async function blockUser(userId: number): Promise<void> {
+    try {
+        await mutationsApi.blockUser(storage.readTokenSet()!.accessToken, userId);
+    } catch (error) {
+        if (error instanceof InvalidUserIdError) await InvalidUserIdError.display();
+        else if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof ConnectionError) await ConnectionError.display();
+        return;
+    }
+    message.success('User blocked.');
+}
+
+export async function unblockUser(userId: number): Promise<void> {
+    try {
+        await mutationsApi.unblockUser(storage.readTokenSet()!.accessToken, userId);
+    } catch (error) {
+        if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof ConnectionError) await ConnectionError.display();
+        return;
+    }
+    message.success('User unblocked.');
 }

@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "parcel main/index.html",
     "build": "NODE_ENV=prod parcel build main/index.html",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint main/**/*.ts main/**/*.tsx"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",

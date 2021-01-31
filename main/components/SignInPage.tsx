@@ -41,7 +41,7 @@ function SignInSection(): ReactElement {
 }
 
 function SignInForm(): ReactElement {
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const onFinish = async (data: any) => {
         setLoading(true);
         await queriesApi.requestTokenSet(data);
@@ -56,7 +56,7 @@ function SignInForm(): ReactElement {
                 <Input.Password/>
             </Form.Item>
             <Form.Item>
-                <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+                <Button type='primary' htmlType='submit' loading={isLoading}>Submit</Button>
             </Form.Item>
         </Form>
     );
@@ -77,7 +77,7 @@ function VerifyYourEmailAddressSection(): ReactElement {
 }
 
 function VerifyYourEmailAddressForm(): ReactElement {
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const onFinish = async (data: any) => {
         setLoading(true);
         await mutationsApi.verifyEmailAddress(data.emailAddress, data.verificationCode);
@@ -100,7 +100,7 @@ function VerifyYourEmailAddressForm(): ReactElement {
                 <Input type='number'/>
             </Form.Item>
             <Form.Item>
-                <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+                <Button type='primary' htmlType='submit' loading={isLoading}>Submit</Button>
             </Form.Item>
         </Form>
     );
@@ -124,7 +124,7 @@ function EmailPasswordResetCodeSection(): ReactElement {
 }
 
 function EmailPasswordResetCodeForm(): ReactElement {
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const onFinish = async (data: any) => {
         setLoading(true);
         await mutationsApi.emailPasswordResetCode(data.emailAddress);
@@ -140,7 +140,7 @@ function EmailPasswordResetCodeForm(): ReactElement {
                 <Input type='email'/>
             </Form.Item>
             <Form.Item>
-                <Button loading={loading} type='primary' htmlType='submit'>Submit</Button>
+                <Button loading={isLoading} type='primary' htmlType='submit'>Submit</Button>
             </Form.Item>
         </Form>
     );
@@ -164,7 +164,7 @@ function ResetPasswordSection(): ReactElement {
 }
 
 function ResetPasswordForm(): ReactElement {
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const onFinish = async (data: any) => {
         setLoading(true);
         await mutationsApi.resetPassword(data.emailAddress, data.passwordResetCode, data.newPassword);
@@ -194,7 +194,7 @@ function ResetPasswordForm(): ReactElement {
                 <Input.Password/>
             </Form.Item>
             <Form.Item>
-                <Button loading={loading} type='primary' htmlType='submit'>Submit</Button>
+                <Button loading={isLoading} type='primary' htmlType='submit'>Submit</Button>
             </Form.Item>
         </Form>
     )

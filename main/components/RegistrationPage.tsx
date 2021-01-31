@@ -32,7 +32,7 @@ function SignUpSection(): ReactElement {
 }
 
 function SignUpForm(): ReactElement {
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const onFinish = async (data: any) => {
         setLoading(true);
         await mutationsApi.createAccount(data);
@@ -63,7 +63,7 @@ function SignUpForm(): ReactElement {
                 <Input.TextArea/>
             </Form.Item>
             <Form.Item>
-                <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+                <Button type='primary' htmlType='submit' loading={isLoading}>Submit</Button>
             </Form.Item>
         </Form>
     );
@@ -87,7 +87,7 @@ function ResendEmailAddressVerificationCodeSection(): ReactElement {
 }
 
 function ResendEmailAddressVerificationCodeForm(): ReactElement {
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const onFinish = async (data: any) => {
         setLoading(true);
         await mutationsApi.emailEmailAddressVerification(data.emailAddress);
@@ -103,7 +103,7 @@ function ResendEmailAddressVerificationCodeForm(): ReactElement {
                 <Input type='email'/>
             </Form.Item>
             <Form.Item>
-                <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+                <Button type='primary' htmlType='submit' loading={isLoading}>Submit</Button>
             </Form.Item>
         </Form>
     );

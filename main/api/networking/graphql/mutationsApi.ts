@@ -8,6 +8,7 @@ import {
     InternalServerError,
     InvalidContactError,
     InvalidDomainError,
+    InvalidUserIdError,
     UnregisteredEmailAddressError,
     UsernameTakenError,
 } from '../errors';
@@ -332,4 +333,55 @@ export async function deleteContacts(accessToken: string, userIdList: number[]):
         throw new ConnectionError();
     }
     return response.data!.deleteContacts;
+}
+
+/**
+ * Blocks the user. Does nothing if the user has already been blocked, or the user is blocking themselves.
+ * @throws {InvalidUserIdError}
+ * @throws {InternalServerError}
+ * @throws {ConnectionError}
+ * @throws {UnauthorizedError}
+ */
+export async function blockUser(accessToken: string, userId: number): Promise<Placeholder> {
+    const response = await queryOrMutate({
+        query: `
+            mutation BlockUser($userId: Int!) {
+                blockUser(userId: $userId)
+            }
+        `,
+        variables: {userId},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        switch (response.errors[0]!.message) {
+            case 'INTERNAL_SERVER_ERROR':
+                throw new InternalServerError();
+            case 'INVALID_USER_ID':
+                throw new InvalidUserIdError();
+            default:
+                throw new ConnectionError();
+        }
+    }
+    return response.data!.blockUser;
+}
+
+/**
+ * Unblocks the user. Does nothing if the user wasn't blocked.
+ * @throws {InternalServerError}
+ * @throws {ConnectionError}
+ * @throws {UnauthorizedError}
+ */
+export async function unblockUser(accessToken: string, userId: number): Promise<Placeholder> {
+    const response = await queryOrMutate({
+        query: `
+            mutation UnblockUser($userId: Int!) {
+                unblockUser(userId: $userId)
+            }
+        `,
+        variables: {userId},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
+        throw new ConnectionError();
+    }
+    return response.data!.unblockUser;
 }

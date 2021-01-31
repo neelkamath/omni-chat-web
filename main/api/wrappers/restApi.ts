@@ -2,7 +2,7 @@ import * as restApi from '../networking/restApi';
 import {PicType} from '../networking/restApi';
 import * as storage from '../../storage';
 import {ConnectionError, InternalServerError, InvalidPicError, UnauthorizedError} from '../networking/errors';
-import {logOut} from '../../logOut';
+import logOut from '../../logOut';
 import {message} from 'antd';
 
 export async function patchProfilePic(file: File): Promise<void> {

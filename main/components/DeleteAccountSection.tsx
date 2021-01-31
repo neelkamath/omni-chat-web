@@ -19,7 +19,7 @@ export default function DeleteAccountSection(): ReactElement {
 function DeleteAccountForm(): ReactElement {
     const [form, setForm] = useState(<Spin/>);
     const [username, setUsername] = useState<string | undefined>(undefined);
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     useEffect(() => {
         const onFinish = async (data: any) => {
             setLoading(true);
@@ -39,13 +39,13 @@ function DeleteAccountForm(): ReactElement {
                         <Input/>
                     </Form.Item>
                     <Form.Item>
-                        <Button type='primary' htmlType='submit' loading={loading} danger>
+                        <Button type='primary' htmlType='submit' loading={isLoading} danger>
                             Permanently Delete Account
                         </Button>
                     </Form.Item>
                 </Form>
             );
         });
-    }, [loading, username]);
+    }, [isLoading, username]);
     return form;
 }

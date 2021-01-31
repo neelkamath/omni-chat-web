@@ -4,7 +4,7 @@ import * as subscriptionsApi from '../api/wrappers/subscriptionsApi';
 import * as restApi from '../api/wrappers/restApi';
 import * as storage from '../storage';
 import {NonexistentUserIdError} from '../api/networking/errors';
-import {logOut} from '../logOut';
+import logOut from '../logOut';
 import {Button, Divider, Form, Input, Space, Spin, Typography, Upload} from 'antd';
 import * as mutationsApi from '../api/wrappers/mutationsApi';
 import {ShowUploadListInterface} from 'antd/lib/upload/interface';
@@ -35,14 +35,12 @@ interface ProfilePicProps {
 function ProfilePic({userId}: ProfilePicProps): ReactElement {
     const [profilePic, setProfilePic] = useState(<LoadingOutlined/>);
     useEffect(() => {
-        const preparePic = () => {
-            getProfilePic().then((pic) => {
-                if (pic !== null) setProfilePic(pic);
-            });
-        };
-        preparePic();
         return subscriptionsApi.subscribeToAccounts((message) => {
-            if (message.__typename === 'UpdatedAccount' && message.userId === userId) preparePic();
+            const isUpdatedAccount = message.__typename === 'UpdatedAccount' && message.data.userId === userId;
+            if (message.__typename === 'CreatedSubscription' || isUpdatedAccount)
+                getProfilePic().then((pic) => {
+                    if (pic !== null) setProfilePic(pic);
+                });
         });
     }, [userId]);
     return profilePic;
@@ -92,7 +90,7 @@ function UpdateAccountSection(): ReactElement {
 
 function UpdateAccountForm(): ReactElement {
     const [form, setForm] = useState(<Spin/>);
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const onFinish = async (data: any) => {
         setLoading(true);
         await mutationsApi.updateAccount(data);
@@ -129,17 +127,17 @@ function UpdateAccountForm(): ReactElement {
                         <Input.TextArea/>
                     </Form.Item>
                     <Form.Item>
-                        <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+                        <Button type='primary' htmlType='submit' loading={isLoading}>Submit</Button>
                     </Form.Item>
                 </Form>
             );
         });
-    }, [loading]);
+    }, [isLoading]);
     return form;
 }
 
 function UpdatePasswordForm(): ReactElement {
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const onFinish = async (data: any) => {
         setLoading(true);
         await mutationsApi.updateAccount(data);
@@ -151,7 +149,7 @@ function UpdatePasswordForm(): ReactElement {
                 <Input.Password/>
             </Form.Item>
             <Form.Item>
-                <Button type='primary' htmlType='submit' loading={loading}>Submit</Button>
+                <Button type='primary' htmlType='submit' loading={isLoading}>Submit</Button>
             </Form.Item>
         </Form>
     );

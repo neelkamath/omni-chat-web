@@ -8,9 +8,9 @@
   token set must be deleted, and the user must be redirected to the homepage).
 - The `first`, `after`, `last`, and `before` function parameters aren't documented throughout the codebase because it'd
   be repetitive. Refer to
-  the [pagination docs](https://github.com/neelkamath/omni-chat/blob/v0.9.0/docs/api.md#pagination) instead.
-- When changing the version of the Omni Chat API being used (e.g., updating the frontend to use v0.9.0 instead of
-  v0.8.3), update the `API_VERSION` key in [`.env`](/docs/.env)
+  the [pagination docs](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/api.md#pagination) instead.
+- When changing the version of the Omni Chat API being used (e.g., updating the frontend to use v0.12.0 instead of
+  v0.9.0), update the `API_VERSION` key in [`.env`](/docs/.env)
 
 ## Installation
 
@@ -24,10 +24,16 @@
 
 ## Development
 
-1. Either run the Omni Chat 0.9.0
-   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.9.0/docs/docker-compose.md) or in
-   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.9.0/docs/cloud.md).
+1. Either run the Omni Chat 0.12.0
+   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/docker-compose.md) or in
+   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/cloud.md).
 1. Run on http://localhost:1234: `npm run dev`
+
+## Linting
+
+```
+npm run lint
+```
 
 ## Testing
 
@@ -45,9 +51,9 @@ npm t
 
 Here's how to test the production build:
 
-1. Either run the Omni Chat 0.9.0
-   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.9.0/docs/docker-compose.md) or in
-   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.9.0/docs/cloud.md).
+1. Either run the Omni Chat 0.12.0
+   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/docker-compose.md) or in
+   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/cloud.md).
 1. Save a production build to `dist/`: `npm run build`
 1. Serve the website which has been saved to `dist/`.
 
