@@ -5,7 +5,7 @@ import openSourceImage from '../images/open-source.svg';
 
 export default function DevelopersSection(): ReactElement {
     return (
-        <Row gutter={16}>
+        <Row gutter={16} style={{padding: 16}}>
             <BotSection/>
             <OpenSourceSection/>
         </Row>

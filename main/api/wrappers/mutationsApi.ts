@@ -93,7 +93,7 @@ export async function updateAccount(update: AccountUpdate): Promise<void> {
         else if (error instanceof PasswordScalarError) await PasswordScalarError.display();
         else if (error instanceof NameScalarError) await NameScalarError.display();
         else if (error instanceof BioScalarError) await BioScalarError.display();
-        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof UnauthorizedError) await logOut();
         else if (error instanceof UsernameTakenError) await UsernameTakenError.display();
         else if (error instanceof EmailAddressTakenError) await EmailAddressTakenError.display();
         else if (error instanceof InternalServerError) InternalServerError.display();
@@ -102,7 +102,7 @@ export async function updateAccount(update: AccountUpdate): Promise<void> {
         return;
     }
     message.success('Account updated.');
-    if (update.emailAddress !== undefined && oldAccount.emailAddress !== update.emailAddress) logOut();
+    if (update.emailAddress !== undefined && oldAccount.emailAddress !== update.emailAddress) await logOut();
 }
 
 export async function resetPassword(
@@ -129,7 +129,7 @@ export async function deleteProfilePic(): Promise<void> {
         await mutationsApi.deleteProfilePic(storage.readTokenSet()!.accessToken);
     } catch (error) {
         if (error instanceof InternalServerError) InternalServerError.display();
-        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof UnauthorizedError) await logOut();
         else if (error instanceof ConnectionError) await ConnectionError.display();
         else throw error;
         return;
@@ -142,13 +142,13 @@ export async function deleteAccount(): Promise<void> {
         await mutationsApi.deleteAccount(storage.readTokenSet()!.accessToken);
     } catch (error) {
         if (error instanceof InternalServerError) InternalServerError.display();
-        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof UnauthorizedError) await logOut();
         else if (error instanceof ConnectionError) await ConnectionError.display();
         else if (error instanceof CannotDeleteAccountError) await CannotDeleteAccountError.display();
         else throw error;
         return;
     }
-    logOut();
+    await logOut();
 }
 
 export async function createContacts(userIdList: number[]): Promise<void> {
@@ -156,10 +156,10 @@ export async function createContacts(userIdList: number[]): Promise<void> {
         await mutationsApi.createContacts(storage.readTokenSet()!.accessToken, userIdList);
     } catch (error) {
         if (error instanceof InternalServerError) InternalServerError.display();
-        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof UnauthorizedError) await logOut();
         else if (error instanceof ConnectionError) await ConnectionError.display();
-        // An <InvalidContactError> will be thrown if the user who was to be added just deleted their account.
-        else if (!(error instanceof InvalidContactError)) throw error;
+        else if (error instanceof InvalidContactError) await InvalidContactError.display();
+        else throw error;
         return;
     }
     message.success(`${userIdList.length === 1 ? 'Contact' : 'Contacts'} created.`);
@@ -170,8 +170,9 @@ export async function deleteContacts(userIdList: number[]): Promise<void> {
         await mutationsApi.deleteContacts(storage.readTokenSet()!.accessToken, userIdList);
     } catch (error) {
         if (error instanceof InternalServerError) InternalServerError.display();
-        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof UnauthorizedError) await logOut();
         else if (error instanceof ConnectionError) await ConnectionError.display();
+        else throw error;
         return;
     }
     message.success(`${userIdList.length === 1 ? 'Contact' : 'Contacts'} deleted.`);
@@ -183,8 +184,9 @@ export async function blockUser(userId: number): Promise<void> {
     } catch (error) {
         if (error instanceof InvalidUserIdError) await InvalidUserIdError.display();
         else if (error instanceof InternalServerError) InternalServerError.display();
-        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof UnauthorizedError) await logOut();
         else if (error instanceof ConnectionError) await ConnectionError.display();
+        else throw error;
         return;
     }
     message.success('User blocked.');
@@ -195,9 +197,35 @@ export async function unblockUser(userId: number): Promise<void> {
         await mutationsApi.unblockUser(storage.readTokenSet()!.accessToken, userId);
     } catch (error) {
         if (error instanceof InternalServerError) InternalServerError.display();
-        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof UnauthorizedError) await logOut();
         else if (error instanceof ConnectionError) await ConnectionError.display();
+        else throw error;
         return;
     }
     message.success('User unblocked.');
+}
+
+export async function createPrivateChat(userId: number): Promise<number | undefined> {
+    try {
+        return await mutationsApi.createPrivateChat(storage.readTokenSet()!.accessToken, userId);
+    } catch (error) {
+        if (error instanceof InvalidUserIdError) await InvalidUserIdError.display();
+        else if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof UnauthorizedError) await logOut();
+        else if (error instanceof ConnectionError) await ConnectionError.display();
+        else throw error;
+        return undefined;
+    }
+}
+
+export async function setOnlineStatus(isOnline: boolean): Promise<void> {
+    if (storage.readTokenSet() === undefined) return;
+    try {
+        await mutationsApi.setOnlineStatus(storage.readTokenSet()!.accessToken, isOnline);
+    } catch (error) {
+        if (error instanceof InternalServerError) InternalServerError.display();
+        if (error instanceof UnauthorizedError) await logOut();
+        else if (error instanceof ConnectionError) await ConnectionError.display();
+        else throw error;
+    }
 }

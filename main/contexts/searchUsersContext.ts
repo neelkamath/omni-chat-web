@@ -20,7 +20,7 @@ export const SearchUsersContext = createContext<SearchUsersContextData | undefin
 /** React hook for {@link SearchUsersContext}. */
 export function useSearchUsersContext(): SearchUsersContextData {
     const [query, setQuery] = useState('');
-    const [users, setUsers] = useState<AccountsConnection | undefined>(undefined);
+    const [users, setUsers] = useState<AccountsConnection | undefined>();
     const replaceUsers = (connection: AccountsConnection) => setUsers(connection);
     const addUsers = (connection: AccountsConnection) => {
         setUsers({

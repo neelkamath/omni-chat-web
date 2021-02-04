@@ -10,7 +10,7 @@ export async function patchProfilePic(file: File): Promise<void> {
         await restApi.patchProfilePic(storage.readTokenSet()!.accessToken!, file);
     } catch (error) {
         if (error instanceof InvalidPicError) await InvalidPicError.display();
-        else if (error instanceof UnauthorizedError) logOut();
+        else if (error instanceof UnauthorizedError) await logOut();
         else if (error instanceof InternalServerError) InternalServerError.display();
         else if (error instanceof ConnectionError) await ConnectionError.display();
         else throw error;
@@ -28,7 +28,19 @@ export async function getProfilePic(userId: number, picType: PicType): Promise<B
         if (error instanceof InternalServerError) InternalServerError.display();
         else if (error instanceof ConnectionError) await ConnectionError.display();
         else throw error;
-        return null;
+    }
+    return pic;
+}
+
+/** @throws {NonexistentChatError} */
+export async function getGroupChatPic(chatId: number, picType: PicType): Promise<Blob | null> {
+    let pic = null;
+    try {
+        pic = await restApi.getGroupChatPic(chatId, picType);
+    } catch (error) {
+        if (error instanceof InternalServerError) InternalServerError.display();
+        else if (error instanceof ConnectionError) await ConnectionError.display();
+        else throw error;
     }
     return pic;
 }

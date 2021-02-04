@@ -1,14 +1,22 @@
-import {Account, AccountsConnection, Cursor, Login, TokenSet} from './models';
+import {Account, AccountsConnection, Chat, Cursor, Login, OnlineStatus, TokenSet} from './models';
 import {queryOrMutate} from './operator';
-import {ACCOUNT_FRAGMENT, ACCOUNTS_CONNECTION_FRAGMENT, TOKEN_SET_FRAGMENT} from './fragments';
+import {
+    ACCOUNT_FRAGMENT,
+    ACCOUNTS_CONNECTION_FRAGMENT,
+    CHAT_FRAGMENT,
+    ONLINE_STATUS_FRAGMENT,
+    TOKEN_SET_FRAGMENT
+} from './fragments';
 import {
     ConnectionError,
     IncorrectPasswordError,
     InternalServerError,
+    InvalidChatIdError,
     NonexistentUserError,
     UnverifiedEmailAddressError
 } from '../errors';
 import {validateLogin} from './validators';
+import {BackwardPagination, ForwardPagination} from './pagination';
 
 /**
  * Certain operations require authentication via an access token. You can acquire one to authenticate the user by
@@ -24,6 +32,7 @@ import {validateLogin} from './validators';
  */
 export async function requestTokenSet(login: Login): Promise<TokenSet> {
     validateLogin(login);
+    const {__typename, ...loginData} = login;
     const response = await queryOrMutate({
         query: `
             query RequestTokenSet($login: Login!) {
@@ -32,7 +41,7 @@ export async function requestTokenSet(login: Login): Promise<TokenSet> {
                 }
             }
         `,
-        variables: {login},
+        variables: {login: loginData},
     });
     if (response.errors !== undefined) {
         switch (response.errors[0]!.message) {
@@ -122,30 +131,6 @@ export async function searchUsers(query: string, first?: number, after?: Cursor)
         throw new ConnectionError();
     }
     return response.data!.searchUsers;
-}
-
-/**
- * Retrieves saved contacts.
- * @throws {UnauthorizedError}
- * @throws {ConnectionError}
- * @throws {InternalServerError}
- */
-export async function readContacts(accessToken: string, first?: number, after?: Cursor): Promise<AccountsConnection> {
-    const response = await queryOrMutate({
-        query: `
-            query ReadContacts($first: Int, $after: Cursor) {
-                readContacts(first: $first, after: $after) {
-                    ${ACCOUNTS_CONNECTION_FRAGMENT}
-                }
-            }
-        `,
-        variables: {first, after},
-    }, accessToken);
-    if (response.errors !== undefined) {
-        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
-        throw new ConnectionError();
-    }
-    return response.data!.readContacts;
 }
 
 /**
@@ -247,4 +232,126 @@ export async function isContact(accessToken: string, userId: number): Promise<bo
         throw new ConnectionError();
     }
     return response.data!.isContact;
+}
+
+/**
+ * @param accessToken Must be passed if the chat isn't a public chat.
+ * @param id
+ * @param privateChatMessagesPagination
+ * @param groupChatUsersPagination
+ * @param groupChatMessagesPagination
+ * @throws {InvalidChatIdError}
+ * @throws {UnauthorizedError}
+ * @throws {ConnectionError}
+ * @throws {InternalServerError}
+ */
+export async function readChat(
+    accessToken: string | undefined,
+    id: number,
+    privateChatMessagesPagination?: BackwardPagination,
+    groupChatUsersPagination?: ForwardPagination,
+    groupChatMessagesPagination?: BackwardPagination,
+): Promise<Chat> {
+    const response = await queryOrMutate({
+        query: `
+            query ReadChat(
+                $id: Int!
+                $privateChat_messages_last: Int
+                $privateChat_messages_before: Cursor
+                $groupChat_users_first: Int
+                $groupChat_users_after: Cursor
+                $groupChat_messages_last: Int
+                $groupChat_messages_before: Cursor
+            ) {
+                readChat(id: $id) {
+                    ${CHAT_FRAGMENT}
+                }
+            }
+        `,
+        variables: {
+            id,
+            privateChat_messages_last: privateChatMessagesPagination?.last,
+            privateChat_messages_before: privateChatMessagesPagination?.before,
+            groupChat_users_first: groupChatUsersPagination?.first,
+            groupChat_users_after: groupChatUsersPagination?.after,
+            groupChat_messages_last: groupChatMessagesPagination?.last,
+            groupChat_messages_before: groupChatMessagesPagination?.before,
+        },
+    }, accessToken);
+    if (response.errors !== undefined)
+        switch (response.errors[0]!.message) {
+            case 'INVALID_CHAT_ID':
+                throw new InvalidChatIdError();
+            case 'INTERNAL_SERVER_ERROR':
+                throw new InternalServerError();
+            default:
+                throw new ConnectionError();
+        }
+    return response.data!.readChat;
+}
+
+/**
+ * @return The online statuses of users the user has in their contacts, or has a chat with.
+ * @throws {InternalServerError}
+ * @throws {ConnectionError}
+ * @throws {UnauthorizedError}
+ */
+export async function readOnlineStatuses(accessToken: string): Promise<OnlineStatus[]> {
+    const response = await queryOrMutate({
+        query: `
+            query ReadOnlineStatuses {
+                readOnlineStatuses {
+                    ${ONLINE_STATUS_FRAGMENT}
+                }
+            }
+        `,
+    }, accessToken);
+    if (response.errors !== undefined) {
+        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
+        throw new ConnectionError();
+    }
+    return response.data!.readOnlineStatuses;
+}
+
+/**
+ * @return the chats the user is in.
+ * @throws {InternalServerError}
+ * @throws {ConnectionError}
+ * @throws {UnauthorizedError}
+ */
+export async function readChats(
+    accessToken: string,
+    privateChatMessagesPagination?: BackwardPagination,
+    groupChatUsersPagination?: ForwardPagination,
+    groupChatMessagesPagination?: BackwardPagination,
+): Promise<Chat[]> {
+    const response = await queryOrMutate({
+        query: `
+            query ReadChats(
+                $privateChat_messages_last: Int
+                $privateChat_messages_before: Cursor
+                $groupChat_users_first: Int
+                $groupChat_users_after: Cursor
+                $groupChat_messages_last: Int
+                $groupChat_messages_before: Cursor
+            ) {
+                readChats {
+                    ${CHAT_FRAGMENT}
+                }
+            }
+        `,
+        variables: {
+            privateChat_messages_last: privateChatMessagesPagination?.last,
+            privateChat_messages_before: privateChatMessagesPagination?.before,
+            groupChat_users_first: groupChatUsersPagination?.first,
+            groupChat_users_after: groupChatUsersPagination?.after,
+            groupChat_messages_last: groupChatMessagesPagination?.last,
+            groupChat_messages_before: groupChatMessagesPagination?.before,
+        },
+    }, accessToken);
+    if (response.errors !== undefined) {
+        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
+        throw new ConnectionError();
+    }
+    return response.data!.readChats;
 }

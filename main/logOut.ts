@@ -1,7 +1,9 @@
 import * as storage from './storage';
+import * as mutationsApi from './api/wrappers/mutationsApi';
 
-/** Deletes the token set from storage, and opens the login page. */
-export default function logOut(): void {
+/** Sets the user's status to offline, deletes the token set from storage, and opens the login page. */
+export default async function logOut(): Promise<void> {
+    await mutationsApi.setOnlineStatus(false);
     storage.deleteTokenSet();
     location.href = '/sign-in';
 }

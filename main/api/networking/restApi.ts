@@ -2,6 +2,7 @@ import {
     ConnectionError,
     InternalServerError,
     InvalidPicError,
+    NonexistentChatError,
     NonexistentUserIdError,
     UnauthorizedError,
 } from './errors';
@@ -9,7 +10,7 @@ import {
 export type PicType = 'ORIGINAL' | 'THUMBNAIL';
 
 /**
- * @return `Blob` is the user has a profile pic, and `null` if they don't.
+ * @return `Blob` if the user has a profile pic, and `null` if they don't.
  * @throws {NonexistentUserIdError}
  * @throws {ConnectionError}
  * @throws {InternalServerError}
@@ -53,6 +54,28 @@ export async function patchProfilePic(accessToken: string, pic: File): Promise<v
             throw new InvalidPicError();
         case 401:
             throw new UnauthorizedError();
+        default:
+            throw new ConnectionError();
+    }
+}
+
+/**
+ * @return `Blob` if the chat has a pic, and `null` otherwise.
+ * @throws {NonexistentChatError}
+ * @throws {ConnectionError}
+ * @throws {InternalServerError}
+ */
+export async function getGroupChatPic(chatId: number, picType: PicType): Promise<Blob | null> {
+    const params = new URLSearchParams({'chat-id': chatId.toString(), 'pic-type': picType});
+    const response = await fetch(`${process.env.HTTP}${process.env.API_URL}/group-chat-pic?${params.toString()}`);
+    if (response.status >= 500 && response.status <= 599) throw new InternalServerError();
+    switch (response.status) {
+        case 200:
+            return await response.blob();
+        case 204:
+            return null;
+        case 400:
+            throw new NonexistentChatError();
         default:
             throw new ConnectionError();
     }

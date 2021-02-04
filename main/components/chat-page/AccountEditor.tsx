@@ -1,20 +1,20 @@
-import React, {ReactElement, useEffect, useState} from 'react';
-import {DeleteOutlined, LoadingOutlined, UploadOutlined} from '@ant-design/icons';
-import * as subscriptionsApi from '../api/wrappers/subscriptionsApi';
-import * as restApi from '../api/wrappers/restApi';
-import * as storage from '../storage';
-import {NonexistentUserIdError} from '../api/networking/errors';
-import logOut from '../logOut';
-import {Button, Divider, Form, Input, Space, Spin, Typography, Upload} from 'antd';
-import * as mutationsApi from '../api/wrappers/mutationsApi';
+import React, {ReactElement, ReactNode, useEffect, useState} from 'react';
+import {DeleteOutlined, UploadOutlined} from '@ant-design/icons';
+import * as subscriptionsApi from '../../api/wrappers/subscriptionsApi';
+import * as restApi from '../../api/wrappers/restApi';
+import * as storage from '../../storage';
+import {NonexistentUserIdError} from '../../api/networking/errors';
+import logOut from '../../logOut';
+import {Button, Divider, Form, Input, Row, Space, Spin, Typography, Upload} from 'antd';
+import * as mutationsApi from '../../api/wrappers/mutationsApi';
 import {ShowUploadListInterface} from 'antd/lib/upload/interface';
 import {UploadRequestOption as RcCustomRequestOptions} from 'rc-upload/lib/interface';
-import * as queriesApi from '../api/wrappers/queriesApi';
+import * as queriesApi from '../../api/wrappers/queriesApi';
 import OriginalProfilePic from './OriginalProfilePic';
 
 export default function AccountEditor(): ReactElement {
     return (
-        <>
+        <Row style={{padding: 16}}>
             <Space direction='vertical'>
                 <ProfilePic userId={storage.readUserId()!}/>
                 <NewProfilePicButton/>
@@ -24,7 +24,7 @@ export default function AccountEditor(): ReactElement {
             <UpdateAccountSection/>
             <Divider/>
             <UpdatePasswordForm/>
-        </>
+        </Row>
     );
 }
 
@@ -33,34 +33,30 @@ interface ProfilePicProps {
 }
 
 function ProfilePic({userId}: ProfilePicProps): ReactElement {
-    const [profilePic, setProfilePic] = useState(<LoadingOutlined/>);
+    const [profilePic, setProfilePic] = useState(<Spin size='small'/>);
     useEffect(() => {
         return subscriptionsApi.subscribeToAccounts((message) => {
-            const isUpdatedAccount = message.__typename === 'UpdatedAccount' && message.data.userId === userId;
-            if (message.__typename === 'CreatedSubscription' || isUpdatedAccount)
-                getProfilePic().then((pic) => {
-                    if (pic !== null) setProfilePic(pic);
-                });
+            const isUpdatedAccount = message.__typename === 'UpdatedAccount' && message.userId === userId;
+            if (message.__typename === 'CreatedSubscription' || isUpdatedAccount) getProfilePic().then(setProfilePic);
         });
     }, [userId]);
     return profilePic;
 }
 
-async function getProfilePic(): Promise<ReactElement | null> {
+async function getProfilePic(): Promise<ReactNode> {
     let pic = null;
     try {
         pic = await restApi.getProfilePic(storage.readUserId()!, 'ORIGINAL');
     } catch (error) {
-        if (error instanceof NonexistentUserIdError) logOut(); // The user deleted their account.
+        if (error instanceof NonexistentUserIdError) await logOut(); // The user deleted their account.
         else throw error;
     }
-    if (pic === null) return <Typography.Text>No profile picture set.</Typography.Text>;
-    return <OriginalProfilePic pic={pic}/>;
+    return pic === null ? 'No profile picture set.' : <OriginalProfilePic pic={pic}/>;
 }
 
 function DeleteProfilePicButton(): ReactElement {
     const onClick = () => mutationsApi.deleteProfilePic();
-    return <Button icon={<DeleteOutlined/>} onClick={onClick}>Delete Profile Picture</Button>;
+    return <Button danger icon={<DeleteOutlined/>} onClick={onClick}>Delete Profile Picture</Button>;
 }
 
 function NewProfilePicButton(): ReactElement {
@@ -88,17 +84,25 @@ function UpdateAccountSection(): ReactElement {
     );
 }
 
+interface UpdateAccountFormData {
+    readonly username: string;
+    readonly emailAddress: string;
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly bio: string;
+}
+
 function UpdateAccountForm(): ReactElement {
     const [form, setForm] = useState(<Spin/>);
     const [isLoading, setLoading] = useState(false);
-    const onFinish = async (data: any) => {
+    const onFinish = async (data: UpdateAccountFormData) => {
         setLoading(true);
-        await mutationsApi.updateAccount(data);
+        await mutationsApi.updateAccount({__typename: 'AccountUpdate', password: null, ...data});
         setLoading(false);
     };
     useEffect(() => {
         queriesApi.readAccount().then((account) => {
-            if (account === null) return;
+            if (account === undefined) return;
             setForm(
                 <Form onFinish={onFinish} name='updateAccount' layout='vertical'>
                     <Form.Item
@@ -136,11 +140,23 @@ function UpdateAccountForm(): ReactElement {
     return form;
 }
 
+interface UpdatePasswordFormData {
+    readonly password: string;
+}
+
 function UpdatePasswordForm(): ReactElement {
     const [isLoading, setLoading] = useState(false);
-    const onFinish = async (data: any) => {
+    const onFinish = async ({password}: UpdatePasswordFormData) => {
         setLoading(true);
-        await mutationsApi.updateAccount(data);
+        await mutationsApi.updateAccount({
+            __typename: 'AccountUpdate',
+            username: null,
+            password: password,
+            emailAddress: null,
+            firstName: null,
+            lastName: null,
+            bio: null,
+        });
         setLoading(false);
     };
     return (

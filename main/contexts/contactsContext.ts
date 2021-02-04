@@ -22,10 +22,10 @@ export const ContactsContext = createContext<ContactsContextData | undefined>(un
 /** React hook for {@link ContactsContext}. */
 export function useContactsContext(): ContactsContextData {
     const [query, setQuery] = useState('');
-    const [contacts, setContacts] = useState<Account[] | undefined>(undefined);
+    const [contacts, setContacts] = useState<Account[] | undefined>();
     const updateContacts = async () => {
         const response = await queriesApi.searchContacts(query);
-        if (response !== null) setContacts(response.edges.map((edge) => edge.node));
+        if (response !== undefined) setContacts(response.edges.map((edge) => edge.node));
     };
     return {query, setQuery, contacts, updateContacts};
 }

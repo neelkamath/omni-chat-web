@@ -8,8 +8,8 @@
   token set must be deleted, and the user must be redirected to the homepage).
 - The `first`, `after`, `last`, and `before` function parameters aren't documented throughout the codebase because it'd
   be repetitive. Refer to
-  the [pagination docs](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/api.md#pagination) instead.
-- When changing the version of the Omni Chat API being used (e.g., updating the frontend to use v0.12.0 instead of
+  the [pagination docs](https://github.com/neelkamath/omni-chat/blob/v0.13.0/docs/api.md#pagination) instead.
+- When changing the version of the Omni Chat API being used (e.g., updating the frontend to use v0.13.0 instead of
   v0.9.0), update the `API_VERSION` key in [`.env`](/docs/.env)
 
 ## Installation
@@ -24,9 +24,9 @@
 
 ## Development
 
-1. Either run the Omni Chat 0.12.0
-   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/docker-compose.md) or in
-   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/cloud.md).
+1. Either run the Omni Chat 0.13.0
+   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.13.0/docs/docker-compose.md) or in
+   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.13.0/docs/cloud.md).
 1. Run on http://localhost:1234: `npm run dev`
 
 ## Linting
@@ -46,14 +46,17 @@ npm t
   in [`test/api/graphQlApi/validators.test.ts`](/test/api/graphQlApi/validators.test.ts).
 - Each function's tests are grouped with the name of the function passed to `describe()`. For example, the tests
   for `validateUsernameScalar()` are placed in `describe('validateUsernameScalar()')`.
+- Inline fragments in [`fragments.ts`](/main/api/networking/graphql/fragments.ts) use the
+  format `<FRAGMENT>_<FIELD>_<ARGUMENT>` when naming variables. For example, an argument `last` to a field `messages` in
+  a fragment `ChatMessages` would be named `chatMessages_messages_last`.
 
 ## Production
 
 Here's how to test the production build:
 
-1. Either run the Omni Chat 0.12.0
-   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/docker-compose.md) or in
-   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/cloud.md).
+1. Either run the Omni Chat 0.13.0
+   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.13.0/docs/docker-compose.md) or in
+   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.13.0/docs/cloud.md).
 1. Save a production build to `dist/`: `npm run build`
 1. Serve the website which has been saved to `dist/`.
 
@@ -70,6 +73,8 @@ access tokens. The following data may be saved:
 ## Design
 
 - The theme color is `#177DDC`.
+- Only use Ant Design components (i.e., don't use components from other design systems, or vanilla HTML components such
+  as `<span>`).
 - Only use icons from [antd icons](https://ant.design/components/icon/).
 - Only use illustrations from [unDraw](https://undraw.co/). The illustration's theme color must match that of the app's.
   Name the image the same as the caption given on unDraw.

@@ -1,13 +1,17 @@
 import {Layout, Row, Spin} from 'antd';
 import React, {ReactElement, useEffect, useState} from 'react';
-import * as queriesApi from '../api/wrappers/queriesApi';
+import * as queriesApi from '../../api/wrappers/queriesApi';
 import ChatPageMenu from './ChatPageMenu';
-import {ChatPageLayoutContext, useChatPageLayoutContext} from '../contexts/chatPageLayoutContext';
+import {ChatPageLayoutContext, useChatPageLayoutContext} from '../../contexts/chatPageLayoutContext';
+import * as mutationsApis from '../../api/wrappers/mutationsApi';
 
 export default function ChatPage(): ReactElement {
     const [page, setPage] = useState(<LoadingPage/>);
     useEffect(() => {
-        queriesApi.refreshTokenSet().then(() => setPage(<ChatPageLayout/>));
+        queriesApi.refreshTokenSet().then(async () => {
+            setPage(<ChatPageLayout/>);
+            await mutationsApis.setOnlineStatus(true);
+        });
         // noinspection JSIgnoredPromiseFromCall
         Notification.requestPermission();
     }, []);
@@ -25,14 +29,12 @@ function LoadingPage(): ReactElement {
 function ChatPageLayout(): ReactElement {
     const context = useChatPageLayoutContext();
     return (
-        <Layout>
+        <Layout style={{height: '100%'}}>
             <ChatPageLayoutContext.Provider value={context}>
-                <Layout.Sider>
+                <Layout.Sider theme='light'>
                     <ChatPageMenu/>
                 </Layout.Sider>
-                <Layout.Content style={{padding: 16}}>
-                    {context.content}
-                </Layout.Content>
+                <Layout.Content>{context.content}</Layout.Content>
             </ChatPageLayoutContext.Provider>
         </Layout>
     );

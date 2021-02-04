@@ -12,6 +12,12 @@ import React from 'react';
 import {message, notification, Typography} from 'antd';
 
 export class NonexistentUserIdError extends Error {
+    static async display(): Promise<void> {
+        message.warning('That user just deleted their account.');
+    }
+}
+
+export class NonexistentChatError extends Error {
 }
 
 /** Pic wasn't a PNG or JPEG not exceeding 25 MiB. */
@@ -44,6 +50,15 @@ export class InvalidUserIdError extends Error {
 
 /** One of the user IDs which were trying to be saved didn't exist. */
 export class InvalidContactError extends Error {
+    static async display(): Promise<void> {
+        message.warning('That user just deleted their account.');
+    }
+}
+
+export class InvalidChatIdError extends Error {
+    static async display(): Promise<void> {
+        message.warning('The user the private chat was to be had with just deleted their account.');
+    }
 }
 
 /** Either the frontend sent a malformed request or the backend has a bug. */

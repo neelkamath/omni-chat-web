@@ -30,13 +30,14 @@ import {validateAccountInput, validateAccountUpdate} from './validators';
  */
 export async function createAccount(account: AccountInput): Promise<Placeholder> {
     validateAccountInput(account);
+    const {__typename, ...accountData} = account;
     const response = await queryOrMutate({
         query: `
             mutation CreateAccount($account: AccountInput!) {
                 createAccount(account: $account)
             }
         `,
-        variables: {account},
+        variables: {account: accountData},
     });
     if (response.errors !== undefined)
         switch (response.errors[0]!.message) {
@@ -174,13 +175,14 @@ export async function emailPasswordResetCode(emailAddress: string): Promise<Plac
  */
 export async function updateAccount(accessToken: string, update: AccountUpdate): Promise<Placeholder> {
     validateAccountUpdate(update);
+    const {__typename, ...updateData} = update;
     const response = await queryOrMutate({
         query: `
             mutation UpdateAccount($update: AccountUpdate!) {
                 updateAccount(update: $update)
             }
         `,
-        variables: {update},
+        variables: {update: updateData},
     }, accessToken);
     if (response.errors !== undefined) {
         switch (response.errors[0]!.message) {
@@ -214,8 +216,8 @@ export async function resetPassword(
         query: `
             mutation ResetPassword($emailAddress: String!, $passwordResetCode: Int!, $newPassword: Password!) {
                 resetPassword(
-                    emailAddress: $emailAddress, 
-                    passwordResetCode: $passwordResetCode, 
+                    emailAddress: $emailAddress
+                    passwordResetCode: $passwordResetCode
                     newPassword: $newPassword
                 )
             }
@@ -384,4 +386,56 @@ export async function unblockUser(accessToken: string, userId: number): Promise<
         throw new ConnectionError();
     }
     return response.data!.unblockUser;
+}
+
+/**
+ * Creates a private chat with the user if the chat doesn't exist.
+ * @return the chat's ID
+ * @throws {InvalidUserIdError}
+ * @throws {InternalServerError}
+ * @throws {ConnectionError}
+ * @throws {UnauthorizedError}
+ */
+export async function createPrivateChat(accessToken: string, userId: number): Promise<number> {
+    const response = await queryOrMutate({
+        query: `
+            mutation CreatePrivateChat($userId: Int!) {
+                createPrivateChat(userId: $userId)
+            }
+        `,
+        variables: {userId},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        switch (response.errors[0]!.message) {
+            case 'INTERNAL_SERVER_ERROR':
+                throw new InternalServerError();
+            case 'INVALID_USER_ID':
+                throw new InvalidUserIdError();
+            default:
+                throw new ConnectionError();
+        }
+    }
+    return response.data!.createPrivateChat;
+}
+
+/**
+ * Sets the current user's status to {@link isOnline}.
+ * @throws {InternalServerError}
+ * @throws {ConnectionError}
+ * @throws {UnauthorizedError}
+ */
+export async function setOnlineStatus(accessToken: string, isOnline: boolean): Promise<Placeholder> {
+    const response = await queryOrMutate({
+        query: `
+            mutation SetOnlineStatus($isOnline: Boolean!) {
+                setOnlineStatus(isOnline: $isOnline)
+            }
+        `,
+        variables: {isOnline},
+    }, accessToken);
+    if (response.errors !== undefined) {
+        if (response.errors[0]!.message === 'INTERNAL_SERVER_ERROR') throw new InternalServerError();
+        throw new ConnectionError();
+    }
+    return response.data!.setOnlineStatus;
 }

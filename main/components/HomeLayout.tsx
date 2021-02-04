@@ -38,7 +38,7 @@ function HeaderMenu(): ReactElement {
             </Menu.Item>
             <Menu.Item key='/sign-in'>
                 <Typography.Link
-                    onClick={() => location.href = storage.readTokenSet() === null ? '/sign-in' : '/chat'}
+                    onClick={() => location.href = storage.readTokenSet() === undefined ? '/sign-in' : '/chat'}
                 >
                     <LoginOutlined/> Sign In
                 </Typography.Link>

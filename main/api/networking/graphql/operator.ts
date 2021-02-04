@@ -2,7 +2,7 @@ import {ConnectionError, InternalServerError, UnauthorizedError} from '../errors
 
 export interface GraphQlRequest {
     readonly query: string;
-    readonly variables?: object;
+    readonly variables?: any;
 }
 
 export interface GraphQlResponse {
@@ -29,11 +29,10 @@ export interface GraphQlError {
 export async function queryOrMutate(request: GraphQlRequest, accessToken?: string): Promise<GraphQlResponse> {
     const headers: Record<string, string> = {'Content-Type': 'application/json'};
     if (accessToken !== undefined) headers.Authorization = `Bearer ${accessToken}`;
-    const response = await fetch(`${process.env.HTTP}${process.env.API_URL}/query-or-mutation`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(request),
-    });
+    const response = await fetch(
+        `${process.env.HTTP}${process.env.API_URL}/query-or-mutation`,
+        {method: 'POST', headers, body: JSON.stringify(request)},
+    );
     if (response.status === 401) throw new UnauthorizedError();
     if (response.status >= 500 && response.status <= 599) throw new InternalServerError();
     if (response.status !== 200) throw new ConnectionError();
@@ -67,21 +66,13 @@ export interface OnSocketError {
  * ```
  * {
  *     __typename: 'NewTextMessage',
- *     data: {
- *         chatId: 3,
- *         message: 'Hi!',
- *     },
+ *     chatId: 3,
+ *     message: 'Hi!',
  * }
  * ```
  */
 export interface OnSocketMessage<T> {
-    (message: GraphQlSubscriptionData<T>): void;
-}
-
-/** The {@link data} (e.g., {@link NewContact}) with its {@link __typename}. */
-export interface GraphQlSubscriptionData<T> {
-    readonly __typename: string;
-    readonly data: T;
+    (message: T): void;
 }
 
 /** Call this function to close the connection. */
@@ -91,19 +82,21 @@ export interface OnSocketClose {
 
 /**
  * Creates a GraphQL subscription.
+ * @param accessToken
+ * @param operation Example: `'subscribeToAccounts'`.
  * @param path For example, if the subscription is hosted on http://localhost/accounts-subscription, this should be
  * `/accounts-subscription`.
- * @param accessToken
  * @param query GraphQL document (i.e., the query to send to the GraphQL server).
- * @param onError
  * @param onMessage
+ * @param onError
  */
-export function subscribe(
-    path: string,
+export function subscribe<T>(
     accessToken: string,
+    operation: string,
+    path: string,
     query: string,
+    onMessage: OnSocketMessage<T>,
     onError: OnSocketError,
-    onMessage: OnSocketMessage<any>,
 ): OnSocketClose {
     const socket = new WebSocket(process.env.WS! + process.env.API_URL! + path);
     socket.addEventListener('open', () => {
@@ -115,10 +108,7 @@ export function subscribe(
         if (response.errors !== undefined) {
             onError();
             socket.close();
-        } else {
-            const {__typename, ...data} = response.data!.subscribeToAccounts;
-            onMessage({__typename, data});
-        }
+        } else onMessage(response.data![operation]);
     });
     socket.addEventListener('error', onError);
     return () => socket.close();

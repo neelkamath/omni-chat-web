@@ -54,13 +54,15 @@ apps should give a superior experience for chat apps. Here are the features impl
       enters this code gets added to the chat. The code isn't human-readable so that hackers can't use brute force to
       join chats. Whether a chat can be joined via an invitation can be toggled by the admin; except for public chats
       where invitations are always on.
-    - [ ] Public chats (e.g., official Android chat, random groups individuals have created, Mario Kart chat). People
-      can search for, and view public chats without an account. Anyone with an account can join them. A frontend UI may
-      allow for a search engine to index the chat should the administrator allow for it.
-- [ ] Forward messages. platform, in which case they can specify that only certain email address domains can create
-  accounts. This way, even if an intruder gets into the company's network, they won't be able to create an account since
-  they won't have a company issued email address. This feature also prevents employees from creating an account with
-  their personal email address.
+  - [ ] Public chats (e.g., official Android chat, random groups individuals have created, Mario Kart chat). People can
+    search for, and view public chats without an account. Anyone with an account can join them. A frontend UI may allow
+    for a search engine to index the chat should the administrator allow for it.
+- [ ] Forward messages.
+- [ ] Omni Chat can be deployed for private use as well. For example, a company may only want to use it as an internal
+  platform, in which case they can specify that only certain email address domains can create accounts. This way, even
+  if an intruder gets into the company's network, they won't be able to create an account since they won't have a
+  company issued email address. This feature also prevents employees from creating an account with their personal email
+  address.
 - [ ] Bots can have buttons so that integrations can easily execute code. For example, if a Travis CI build fails, a bot
   could message the specifics on the group with a button, which when clicked, automatically reruns the CI/CD pipeline.
 - [ ] Group audio calls.
@@ -78,9 +80,9 @@ Here are the [branding assets](https://github.com/neelkamath/omni-chat/tree/mast
 
 ## Usage
 
-1. Either run the Omni Chat 0.12.0
-   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/docker-compose.md) or in
-   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.12.0/docs/cloud.md).
+1. Either run the Omni Chat 0.13.0
+   API [locally](https://github.com/neelkamath/omni-chat/blob/v0.13.0/docs/docker-compose.md) or in
+   the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.13.0/docs/cloud.md).
 1. Serve the website which has been saved to `dist/`.
 
 ## [Contributing](docs/CONTRIBUTING.md)

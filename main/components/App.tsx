@@ -1,9 +1,9 @@
 import React, {ReactElement} from 'react';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import HomePage from './HomePage';
-import RegistrationPage from './RegistrationPage';
-import SignInPage from './SignInPage';
-import ChatPage from './ChatPage';
+import RegistrationPage from './registration-page/RegistrationPage';
+import SignInPage from './sign-in-page/SignInPage';
+import ChatPage from './chat-page/ChatPage';
 import DevelopersPage from './DevelopersPage';
 
 export default function App(): ReactElement {

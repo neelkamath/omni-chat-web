@@ -1,77 +1,51 @@
-import {Account, BlockedAccount, DeletedContact, NewContact, UnblockedAccount} from '../api/networking/graphql/models';
-import React, {ReactElement, useEffect, useState} from 'react';
-import {LoadingOutlined, UserOutlined} from '@ant-design/icons';
-import {Avatar, Button, Card, Col, List, Modal, Row, Spin, Typography} from 'antd';
-import * as restApi from '../api/wrappers/restApi';
-import {NonexistentUserIdError} from '../api/networking/errors';
+import {
+    Account,
+    BlockedAccount,
+    DeletedContact,
+    NewContact,
+    UnblockedAccount
+} from '../../api/networking/graphql/models';
+import React, {ReactElement, ReactNode, useContext, useEffect, useState} from 'react';
+import {Button, List, Modal, Spin, Typography} from 'antd';
+import * as restApi from '../../api/wrappers/restApi';
+import {NonexistentUserIdError} from '../../api/networking/errors';
 import OriginalProfilePic from './OriginalProfilePic';
-import * as mutationsApi from '../api/wrappers/mutationsApi';
-import * as queriesApi from '../api/wrappers/queriesApi';
-import * as subscriptionsApi from '../api/wrappers/subscriptionsApi';
+import {ChatPageLayoutContext} from '../../contexts/chatPageLayoutContext';
+import * as mutationsApi from '../../api/wrappers/mutationsApi';
+import ChatSection from './ChatSection';
+import * as queriesApi from '../../api/wrappers/queriesApi';
+import * as subscriptionsApi from '../../api/wrappers/subscriptionsApi';
 
-export interface UserCardProps {
+export interface ProfileProps {
     readonly account: Account;
-    /**
-     * A modal displaying the user's profile is shown when the card is clicked. This function is called whenever the
-     * modal is closed to perform any cleanup actions you may want to perform. For example, if a list of the user's
-     * contacts are being displayed, you can update the contacts list because the user may have deleted a contact via
-     * the modal.
-     */
-    readonly onModalClose?: () => void;
+    /** Whether to display a button which opens a private chat with this {@link account}. */
+    readonly hasChatButton: boolean;
+    /** Whether the modal is visible. */
+    readonly isVisible: boolean;
+    /** Callback for when the user attempts to close the modal. You could set {@link isVisible} to `false` here. */
+    readonly onCancel: () => void;
 }
 
-export default function UserCard({account, onModalClose}: UserCardProps): ReactElement {
-    const [isVisible, setVisible] = useState(false);
-    const [avatar, setAvatar] = useState(<LoadingOutlined/>);
-    useEffect(() => {
-        getThumbnailProfilePic(account.id).then((pic) => {
-            if (pic !== null) setAvatar(pic);
-        });
-    }, [account.id]);
-    const onCancel = () => {
-        setVisible(false);
-        if (onModalClose !== undefined) onModalClose();
-    };
+/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
+export default function ProfileModal({account, hasChatButton, isVisible, onCancel}: ProfileProps): ReactElement {
     return (
-        <>
-            <Card onClick={() => setVisible(true)}>
-                <Row gutter={16} align='middle'>
-                    <Col>{avatar}</Col>
-                    <Col>
-                        <Typography.Text strong>{account.username}</Typography.Text>
-                    </Col>
-                </Row>
-            </Card>
-            <Modal footer={null} visible={isVisible} onCancel={onCancel}>
-                <Profile account={account}/>
-            </Modal>
-        </>
+        <Modal footer={null} visible={isVisible} onCancel={onCancel}>
+            <ProfileSection account={account} hasChatButton={hasChatButton}/>
+        </Modal>
     );
 }
 
-async function getThumbnailProfilePic(userId: number): Promise<ReactElement | null> {
-    let pic;
-    try {
-        pic = await restApi.getProfilePic(userId, 'THUMBNAIL');
-    } catch (error) {
-        /*
-         A <NonexistentUserIdError> will be caught here if a user who was to be displayed in the search results
-         deleted their account in between being searched, and having the profile pic displayed. Since this rarely
-         ever happens, and no harm comes from leaving the search result up, we ignore this possibility.
-         */
-        if (!(error instanceof NonexistentUserIdError)) throw error;
-    }
-    return <Avatar size='large' src={pic === null ? <UserOutlined/> : URL.createObjectURL(pic)}/>;
-}
-
-interface ProfileProps {
+interface ProfileSectionProps {
     readonly account: Account;
+    /** Whether to display a button which opens a private chat with this {@link account}. */
+    readonly hasChatButton: boolean;
 }
 
-function Profile({account}: ProfileProps): ReactElement {
-    const [pic, setPic] = useState<ReactElement | null>(null);
+/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
+function ProfileSection({account, hasChatButton}: ProfileSectionProps) {
+    const [pic, setPic] = useState<ReactNode>(null);
     useEffect(() => {
-        getOriginalProfilePic(account.id).then(setPic);
+        getProfilePic(account.id).then(setPic);
     }, [account.id]);
     const name = `${account.firstName} ${account.lastName}`;
     return (
@@ -98,6 +72,7 @@ function Profile({account}: ProfileProps): ReactElement {
                 )
             }
             <List.Item>
+                {hasChatButton && <ChatButton userId={account.id}/>}
                 <ContactButton userId={account.id}/>
                 <BlockButton userId={account.id}/>
             </List.Item>
@@ -105,7 +80,7 @@ function Profile({account}: ProfileProps): ReactElement {
     );
 }
 
-async function getOriginalProfilePic(userId: number): Promise<ReactElement | null> {
+async function getProfilePic(userId: number): Promise<ReactNode> {
     let pic = null;
     try {
         pic = await restApi.getProfilePic(userId, 'ORIGINAL');
@@ -120,6 +95,24 @@ async function getOriginalProfilePic(userId: number): Promise<ReactElement | nul
     return pic === null ? null : <OriginalProfilePic pic={pic}/>;
 }
 
+interface ChatButtonProps {
+    /** The ID of the user to create a private chat with. */
+    readonly userId: number;
+}
+
+/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
+function ChatButton({userId}: ChatButtonProps): ReactElement {
+    const {setContent} = useContext(ChatPageLayoutContext)!;
+    const [isLoading, setLoading] = useState(false);
+    const onClick = async () => {
+        setLoading(true);
+        const chatId = await mutationsApi.createPrivateChat(userId);
+        setLoading(false);
+        if (chatId !== undefined) setContent(<ChatSection chatId={chatId}/>);
+    };
+    return <Button loading={isLoading} onClick={onClick}>Chat</Button>;
+}
+
 interface ContactButtonProps {
     /** The user whose contact is to be created/deleted. */
     readonly userId: number;
@@ -128,7 +121,7 @@ interface ContactButtonProps {
 function ContactButton({userId}: ContactButtonProps): ReactElement {
     const [button, setButton] = useState(<Spin size='small'/>);
     const [isLoading, setLoading] = useState(false);
-    const [isContact, setContact] = useState<boolean | undefined>(undefined);
+    const [isContact, setContact] = useState<boolean | undefined>();
     useEffect(() => {
         if (isContact === undefined) return;
         const onClick = async () => {
@@ -143,13 +136,10 @@ function ContactButton({userId}: ContactButtonProps): ReactElement {
         );
     }, [isLoading, isContact, userId]);
     useEffect(() => {
-        const update = async () => {
-            const response = await queriesApi.isContact(userId);
-            if (response !== null) setContact(response);
-        };
+        const update = async () => setContact(await queriesApi.isContact(userId));
         return subscriptionsApi.subscribeToAccounts(async (message) => {
             const isContactUpdate = ['NewContact', 'DeletedContact'].includes(message.__typename)
-                && (message.data as NewContact | DeletedContact).id === userId;
+                && (message as NewContact | DeletedContact).id === userId;
             if (message.__typename === 'CreatedSubscription' || isContactUpdate) await update();
         });
     }, [userId]);
@@ -164,7 +154,7 @@ interface BlockButtonProps {
 function BlockButton({userId}: BlockButtonProps): ReactElement {
     const [button, setButton] = useState(<Spin size='small'/>);
     const [isLoading, setLoading] = useState(false);
-    const [isBlocked, setBlocked] = useState<boolean | undefined>(undefined);
+    const [isBlocked, setBlocked] = useState<boolean | undefined>();
     useEffect(() => {
         if (isBlocked === undefined) return;
         const onClick = async () => {
@@ -179,13 +169,10 @@ function BlockButton({userId}: BlockButtonProps): ReactElement {
         );
     }, [userId, isLoading, isBlocked]);
     useEffect(() => {
-        const update = async () => {
-            const response = await queriesApi.isBlocked(userId);
-            if (response !== null) setBlocked(response);
-        };
+        const update = async () => setBlocked(await queriesApi.isBlocked(userId));
         return subscriptionsApi.subscribeToAccounts(async (message) => {
             const isBlockedUpdate = ['BlockedAccount', 'UnblockedAccount'].includes(message.__typename)
-                && (message.data as BlockedAccount | UnblockedAccount).id === userId;
+                && (message as BlockedAccount | UnblockedAccount).id === userId;
             if (message.__typename === 'CreatedSubscription' || isBlockedUpdate) await update();
         });
     }, [userId]);
