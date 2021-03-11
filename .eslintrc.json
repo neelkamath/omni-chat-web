@@ -1,30 +1,22 @@
 {
-    "env": {
-        "browser": true
-    },
-    "extends": [
-        "plugin:react/recommended"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": 7,
-        "sourceType": "module"
-    },
-    "plugins": [
-        "react",
-        "@typescript-eslint",
-        "react-hooks"
-    ],
-    "rules": {
-        "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "error"
-    },
-    "settings": {
-        "react": {
-            "version": "detect"
-        }
+  "extends": [
+    "plugin:react/recommended",
+    "./node_modules/gts/"
+  ],
+  "plugins": [
+    "react",
+    "react-hooks"
+  ],
+  "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-namespace": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
     }
+  }
 }
