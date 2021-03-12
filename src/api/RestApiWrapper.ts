@@ -1,6 +1,6 @@
-import {Storage} from '../Storage';
-import {message} from 'antd';
-import {handleRestApiError} from './errorHandlers';
+import { Storage } from '../Storage';
+import { message } from 'antd';
+import { handleRestApiError } from './errorHandlers';
 import {
   Audio,
   ContextMessageId,
@@ -73,7 +73,7 @@ export namespace RestApiWrapper {
     pic: File,
     chatId: number,
     contextMessageId: ContextMessageId,
-    caption: MessageText
+    caption: MessageText,
   ): Promise<void> {
     try {
       await restApi.postPicMessage(Storage.readTokenSet()!.accessToken, pic, chatId, contextMessageId, caption);
@@ -95,7 +95,7 @@ export namespace RestApiWrapper {
   export async function postAudioMessage(
     audio: File,
     chatId: number,
-    contextMessageId?: ContextMessageId
+    contextMessageId?: ContextMessageId,
   ): Promise<void> {
     try {
       await restApi.postAudioMessage(Storage.readTokenSet()!.accessToken, audio, chatId, contextMessageId);
@@ -117,7 +117,7 @@ export namespace RestApiWrapper {
   export async function postVideoMessage(
     video: File,
     chatId: number,
-    contextMessageId?: ContextMessageId
+    contextMessageId?: ContextMessageId,
   ): Promise<void> {
     try {
       await restApi.postVideoMessage(Storage.readTokenSet()!.accessToken, video, chatId, contextMessageId);

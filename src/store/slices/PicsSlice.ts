@@ -7,11 +7,11 @@ import {
   EntityAdapter,
   EntityState,
 } from '@reduxjs/toolkit';
-import {NonexistentChatError, NonexistentUserIdError, PicType} from '@neelkamath/omni-chat';
-import {RestApiWrapper} from '../../api/RestApiWrapper';
-import {RootState} from '../store';
-import {useDispatch} from 'react-redux';
-import {useEffect} from 'react';
+import { NonexistentChatError, NonexistentUserIdError, PicType } from '@neelkamath/omni-chat';
+import { RestApiWrapper } from '../../api/RestApiWrapper';
+import { RootState } from '../store';
+import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 import EntityType = PicsSlice.EntityType;
 
 /** Generates the {@link Entity.id}. */
@@ -21,10 +21,7 @@ function generateId(type: EntityType, id: number): string {
 
 /** Profile and group chat pics. */
 export namespace PicsSlice {
-  /**
-   * `undefined` if it hasn't been fetched yet. `null` if the user doesn't
-   * have one.
-   */
+  /** `undefined` if it hasn't been fetched yet. `null` if the user doesn't have one. */
   export type PicUrl = string | null | undefined;
 
   export type EntityType = 'GROUP_CHAT_PIC' | 'PROFILE_PIC';
@@ -47,10 +44,7 @@ export namespace PicsSlice {
      */
     readonly id: number;
     readonly type: EntityType;
-    /**
-     * If `true`, the pic will only be fetched if it has already been
-     * fetched.
-     */
+    /** If `true`, the pic will only be fetched if it has already been fetched. */
     readonly shouldUpdateOnly?: boolean;
   }
 
@@ -65,7 +59,7 @@ export namespace PicsSlice {
 
   export const fetchPic = createAsyncThunk(
     'pics/fetchPic',
-    async ({id, type}: PicData) => {
+    async ({ id, type }: PicData) => {
       let thumbnail, original;
       switch (type) {
         case 'GROUP_CHAT_PIC':
@@ -86,36 +80,36 @@ export namespace PicsSlice {
       };
     },
     {
-      condition: ({id, type, shouldUpdateOnly}, {getState}) => {
-        const {pics} = getState() as {pics: EntityState<Entity>};
+      condition: ({ id, type, shouldUpdateOnly }, { getState }) => {
+        const { pics } = getState() as { pics: EntityState<Entity> };
         const pic = pics.entities[generateId(type, id)];
         if (pic === undefined) return shouldUpdateOnly !== true;
         return (pic.originalUrl === undefined || pic.thumbnailUrl === undefined) && !pic.isLoading;
       },
-    }
+    },
   );
 
   const slice = createSlice({
     name: 'pics',
     initialState: adapter.getInitialState(),
     reducers: {},
-    extraReducers: builder => {
+    extraReducers: (builder) => {
       builder
-        .addCase(fetchPic.rejected, ({entities}, {meta, error}) => {
+        .addCase(fetchPic.rejected, ({ entities }, { meta, error }) => {
           const entity = entities[generateId(meta.arg.type, meta.arg.id)]!;
           entity.isLoading = false;
           if (error.name === NonexistentUserIdError.name) entity.error = new NonexistentUserIdError();
           else if (error.name === NonexistentChatError.name) entity.error = new NonexistentChatError();
         })
         .addCase(fetchPic.fulfilled, adapter.upsertOne)
-        .addCase(fetchPic.pending, (state, {meta}) => {
+        .addCase(fetchPic.pending, (state, { meta }) => {
           const id = generateId(meta.arg.type, meta.arg.id);
-          if (state.entities[id] === undefined) adapter.addOne(state, {id, type: meta.arg.type, isLoading: true});
+          if (state.entities[id] === undefined) adapter.addOne(state, { id, type: meta.arg.type, isLoading: true });
         });
     },
   });
 
-  export const {reducer} = slice;
+  export const { reducer } = slice;
 
   export const selectPic = createSelector(
     [
@@ -132,13 +126,12 @@ export namespace PicsSlice {
         case 'ORIGINAL':
           return entity?.thumbnailUrl;
       }
-    }
+    },
   );
 
   /**
-   * @returns `undefined` if either the pic hasn't been fetched yet or no
-   * error occurred when the pic was being fetched. Otherwise, it'll either be
-   * a {@link NonexistentUserIdError} or {@link NonexistentChatError}.
+   * @returns `undefined` if either the pic hasn't been fetched yet or no error occurred when the pic was being fetched.
+   * Otherwise, it'll either be a {@link NonexistentUserIdError} or {@link NonexistentChatError}.
    */
   export const selectError = createSelector(
     [
@@ -146,6 +139,6 @@ export namespace PicsSlice {
       (_: RootState, type: EntityType) => type,
       (_state: RootState, _type: EntityType, id: number) => id,
     ],
-    (entities: Dictionary<Entity>, type: EntityType, id: number) => entities[generateId(type, id)]?.error
+    (entities: Dictionary<Entity>, type: EntityType, id: number) => entities[generateId(type, id)]?.error,
   );
 }

@@ -1,16 +1,13 @@
-import {createAsyncThunk, createSelector, createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {Account, UpdatedAccount} from '@neelkamath/omni-chat';
-import {QueriesApiWrapper} from '../../api/QueriesApiWrapper';
-import {RootState} from '../store';
-import {useDispatch} from 'react-redux';
-import {useEffect} from 'react';
+import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Account, UpdatedAccount } from '@neelkamath/omni-chat';
+import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
+import { RootState } from '../store';
+import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 
 export namespace AccountSlice {
   export interface State {
-    /**
-     * The user's {@link Account}. `undefined` if it hasn't been fetched
-     * yet.
-     */
+    /** The user's {@link Account}. `undefined` if it hasn't been fetched yet. */
     readonly data?: Account;
     /** Whether the {@link data} is being fetched. */
     readonly isLoading: boolean;
@@ -24,42 +21,42 @@ export namespace AccountSlice {
   }
 
   export const fetchAccount = createAsyncThunk('account/fetchAccount', QueriesApiWrapper.readAccount, {
-    condition: (_, {getState}) => {
-      const {account} = getState() as {account: State};
+    condition: (_, { getState }) => {
+      const { account } = getState() as { account: State };
       return account.data === undefined && !account.isLoading;
     },
   });
 
   const slice = createSlice({
     name: 'account',
-    initialState: {isLoading: false} as State,
+    initialState: { isLoading: false } as State,
     reducers: {
-      update: (state, {payload}: PayloadAction<UpdatedAccount>) => {
-        state.data = {...payload, __typename: 'Account', id: payload.userId};
+      update: (state, { payload }: PayloadAction<UpdatedAccount>) => {
+        state.data = { ...payload, __typename: 'Account', id: payload.id };
       },
     },
-    extraReducers: builder => {
+    extraReducers: (builder) => {
       builder
-        .addCase(fetchAccount.rejected, account => {
+        .addCase(fetchAccount.rejected, (account) => {
           account.isLoading = false;
         })
-        .addCase(fetchAccount.fulfilled, (_, {payload: data}) => ({
+        .addCase(fetchAccount.fulfilled, (_, { payload: data }) => ({
           data,
           isLoading: false,
         }))
-        .addCase(fetchAccount.pending, state => {
+        .addCase(fetchAccount.pending, (state) => {
           state.isLoading = true;
         });
     },
   });
 
-  export const {reducer} = slice;
+  export const { reducer } = slice;
 
-  export const {update} = slice.actions;
+  export const { update } = slice.actions;
 
   /** @returns `undefined` if the {@link Account} hasn't been fetched yet. */
   export const select = createSelector(
     (state: RootState) => state.account,
-    ({data}: State) => data
+    ({ data }: State) => data,
   );
 }

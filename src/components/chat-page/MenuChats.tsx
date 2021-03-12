@@ -1,13 +1,21 @@
-import React, {ReactElement, useContext} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {ChatsSlice} from '../../store/slices/ChatsSlice';
-import {Avatar, Card, Col, Menu, Row, Spin, Tag, Typography} from 'antd';
-import {ActionMessage, Chat, GroupChat, PicMessage, PollMessage, PrivateChat, TextMessage} from '@neelkamath/omni-chat';
-import {ChatPageLayoutContext} from '../../chatPageLayoutContext';
+import React, { ReactElement, useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { ChatsSlice } from '../../store/slices/ChatsSlice';
+import { Avatar, Card, Col, Menu, Row, Spin, Tag, Typography } from 'antd';
+import {
+  ActionMessage,
+  Chat,
+  GroupChat,
+  PicMessage,
+  PollMessage,
+  PrivateChat,
+  TextMessage,
+} from '@neelkamath/omni-chat';
+import { ChatPageLayoutContext } from '../../chatPageLayoutContext';
 import ChatSection from './ChatSection';
-import {RootState} from '../../store/store';
-import {PicsSlice} from '../../store/slices/PicsSlice';
-import {TeamOutlined, UserOutlined} from '@ant-design/icons';
+import { RootState } from '../../store/store';
+import { PicsSlice } from '../../store/slices/PicsSlice';
+import { TeamOutlined, UserOutlined } from '@ant-design/icons';
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function MenuChats(): ReactElement {
@@ -16,7 +24,7 @@ export default function MenuChats(): ReactElement {
   const dispatch = useDispatch();
   dispatch(ChatsSlice.fetchChats());
   if (!isLoaded) return <Spin />;
-  const items = chats.map(chat => {
+  const items = chats.map((chat) => {
     return (
       <Menu.Item key={chat.id}>
         <ChatCard chat={chat} />
@@ -32,8 +40,8 @@ interface ChatCardProps {
 
 // TODO: Ensure long messages and chat names don't overflow.
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
-function ChatCard({chat}: ChatCardProps): ReactElement {
-  const {setContent} = useContext(ChatPageLayoutContext)!;
+function ChatCard({ chat }: ChatCardProps): ReactElement {
+  const { setContent } = useContext(ChatPageLayoutContext)!;
   return (
     <Card hoverable={true} onClick={() => setContent(<ChatSection chatId={chat.id} />)}>
       <Row>
@@ -54,7 +62,7 @@ interface ChatPicProps {
   readonly chat: Chat;
 }
 
-function ChatPic({chat}: ChatPicProps): ReactElement {
+function ChatPic({ chat }: ChatPicProps): ReactElement {
   switch (chat.__typename) {
     case 'PrivateChat':
       return <PrivateChatPic userId={(chat as PrivateChat).user.id} />;
@@ -67,7 +75,7 @@ interface ChatNameProps {
   readonly chat: Chat;
 }
 
-function ChatName({chat}: ChatNameProps): ReactElement {
+function ChatName({ chat }: ChatNameProps): ReactElement {
   return (
     <Typography.Text strong>
       {chat.__typename === 'PrivateChat' ? (chat as PrivateChat).user.username : (chat as GroupChat).title}
@@ -79,7 +87,7 @@ interface ChatTagsProps {
   readonly chat: Chat;
 }
 
-function ChatTags({chat}: ChatTagsProps): ReactElement {
+function ChatTags({ chat }: ChatTagsProps): ReactElement {
   const tags = [];
   switch (chat.__typename) {
     case 'GroupChat':
@@ -92,7 +100,7 @@ function ChatTags({chat}: ChatTagsProps): ReactElement {
   }
   return (
     <>
-      {tags.map(tag => (
+      {tags.map((tag) => (
         <Tag key={tag}>{tag}</Tag>
       ))}
     </>
@@ -103,7 +111,7 @@ interface LastChatMessageProps {
   readonly chatId: number;
 }
 
-function LastChatMessage({chatId}: LastChatMessageProps): ReactElement {
+function LastChatMessage({ chatId }: LastChatMessageProps): ReactElement {
   const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
   const dispatch = useDispatch();
   dispatch(ChatsSlice.fetchChat(chatId));
@@ -148,18 +156,18 @@ interface PrivateChatPicProps {
   readonly userId: number;
 }
 
-function PrivateChatPic({userId}: PrivateChatPicProps): ReactElement {
+function PrivateChatPic({ userId }: PrivateChatPicProps): ReactElement {
   /*
-  A <NonexistentUserIdError> will occur when the user deletes their account.
-  It's the responsibility of the parent element to handle this accordingly.
+  A <NonexistentUserIdError> will occur when the user deletes their account. It's the responsibility of the parent
+  element to handle this accordingly.
    */
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId));
   const dispatch = useDispatch();
-  dispatch(PicsSlice.fetchPic({id: userId, type: 'PROFILE_PIC'}));
+  dispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
   return url === undefined ? (
-    <Spin size="small" />
+    <Spin size='small' />
   ) : (
-    <Avatar size="large" src={url === null ? <UserOutlined /> : url} />
+    <Avatar size='large' src={url === null ? <UserOutlined /> : url} />
   );
 }
 
@@ -167,13 +175,13 @@ interface GroupChatPicProps {
   readonly chatId: number;
 }
 
-function GroupChatPic({chatId}: GroupChatPicProps): ReactElement {
+function GroupChatPic({ chatId }: GroupChatPicProps): ReactElement {
   const pic = useSelector((state: RootState) => PicsSlice.selectPic(state, 'GROUP_CHAT_PIC', chatId));
   const dispatch = useDispatch();
-  dispatch(PicsSlice.fetchPic({id: chatId, type: 'GROUP_CHAT_PIC'}));
+  dispatch(PicsSlice.fetchPic({ id: chatId, type: 'GROUP_CHAT_PIC' }));
   return pic === undefined ? (
-    <Spin size="small" />
+    <Spin size='small' />
   ) : (
-    <Avatar size="large" src={pic === null ? <TeamOutlined /> : pic} />
+    <Avatar size='large' src={pic === null ? <TeamOutlined /> : pic} />
   );
 }

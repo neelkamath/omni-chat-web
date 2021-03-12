@@ -1,7 +1,7 @@
-import {Storage} from '../Storage';
-import {message} from 'antd';
+import { Storage } from '../Storage';
+import { message } from 'antd';
 import logOut from '../logOut';
-import {displayBugReporter, handleGraphQlApiError} from './errorHandlers';
+import { displayBugReporter, handleGraphQlApiError } from './errorHandlers';
 import {
   AccountInput,
   AccountUpdate,
@@ -24,7 +24,7 @@ import {
   Uuid,
   UuidScalarError,
 } from '@neelkamath/omni-chat';
-import {QueriesApiWrapper} from './QueriesApiWrapper';
+import { QueriesApiWrapper } from './QueriesApiWrapper';
 
 export namespace MutationsApiWrapper {
   const mutationsApi = new MutationsApi(process.env.HTTP as HttpProtocol, process.env.API_URL!);
@@ -86,7 +86,7 @@ export namespace MutationsApiWrapper {
   export async function resetPassword(
     emailAddress: string,
     passwordResetCode: number,
-    newPassword: string
+    newPassword: string,
   ): Promise<void> {
     let isReset;
     try {
@@ -241,10 +241,10 @@ export namespace MutationsApiWrapper {
     } catch (error) {
       if (error instanceof InvalidUserIdError)
         message.error(
-          "You're the last admin, and there are participants other than " +
-            "yourself. You'll need to first appoint a different user as an " +
-            'admin.',
-          10
+          'You\'re the last admin, and there are participants other than ' +
+          'yourself. You\'ll need to first appoint a different user as an ' +
+          'admin.',
+          10,
         );
       else await handleGraphQlApiError(error);
     }
@@ -313,7 +313,7 @@ export namespace MutationsApiWrapper {
   export async function createTextMessage(
     chatId: number,
     text: MessageText,
-    contextMessageId?: ContextMessageId
+    contextMessageId?: ContextMessageId,
   ): Promise<void> {
     try {
       await mutationsApi.createTextMessage(Storage.readTokenSet()!.accessToken, chatId, text, contextMessageId);
@@ -326,14 +326,14 @@ export namespace MutationsApiWrapper {
   export async function createActionMessage(
     chatId: number,
     actionMessage: ActionMessageInput,
-    contextMessageId?: ContextMessageId
+    contextMessageId?: ContextMessageId,
   ): Promise<void> {
     try {
       await mutationsApi.createActionMessage(
         Storage.readTokenSet()!.accessToken,
         chatId,
         actionMessage,
-        contextMessageId
+        contextMessageId,
       );
     } catch (error) {
       if (error instanceof InvalidMessageIdError) message.error('The message being replied to no longer exists.');
@@ -344,14 +344,14 @@ export namespace MutationsApiWrapper {
   export async function createGroupChatInviteMessage(
     chatId: number,
     invitedChatId: number,
-    contextMessageId?: ContextMessageId
+    contextMessageId?: ContextMessageId,
   ): Promise<void> {
     try {
       await mutationsApi.createGroupChatInviteMessage(
         Storage.readTokenSet()!.accessToken,
         chatId,
         invitedChatId,
-        contextMessageId
+        contextMessageId,
       );
     } catch (error) {
       if (error instanceof InvalidMessageIdError) message.error('The message being replied to no longer exists.');
@@ -362,7 +362,7 @@ export namespace MutationsApiWrapper {
   export async function createPollMessage(
     chatId: number,
     poll: PollInput,
-    contextMessageId?: ContextMessageId
+    contextMessageId?: ContextMessageId,
   ): Promise<void> {
     try {
       await mutationsApi.createPollMessage(Storage.readTokenSet()!.accessToken, chatId, poll, contextMessageId);
@@ -375,7 +375,7 @@ export namespace MutationsApiWrapper {
   export async function forwardMessage(
     chatId: number,
     messageId: number,
-    contextMessageId?: ContextMessageId
+    contextMessageId?: ContextMessageId,
   ): Promise<void> {
     try {
       await mutationsApi.forwardMessage(Storage.readTokenSet()!.accessToken, chatId, messageId, contextMessageId);

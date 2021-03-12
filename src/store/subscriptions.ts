@@ -1,16 +1,16 @@
-import {SubscriptionsApiWrapper} from '../api/SubscriptionsApiWrapper';
-import {Storage} from '../Storage';
+import { SubscriptionsApiWrapper } from '../api/SubscriptionsApiWrapper';
+import { Storage } from '../Storage';
 import store from './store';
-import {AccountSlice} from './slices/AccountSlice';
-import {PicsSlice} from './slices/PicsSlice';
-import {SearchedContactsSlice} from './slices/SearchedContactsSlice';
-import {SearchedUsersSlice} from './slices/SearchedUsersSlice';
-import {BlockedUsersSlice} from './slices/BlockedUsersSlice';
-import {ChatsSlice} from './slices/ChatsSlice';
-import {OnlineStatusesSlice} from './slices/OnlineStatusesSlice';
-import {TypingStatusesSlice} from './slices/TypingStatusesSlice';
-import {ContactsSlice} from './slices/ContactsSlice';
-import {OnSocketClose} from '@neelkamath/omni-chat';
+import { AccountSlice } from './slices/AccountSlice';
+import { PicsSlice } from './slices/PicsSlice';
+import { SearchedContactsSlice } from './slices/SearchedContactsSlice';
+import { SearchedUsersSlice } from './slices/SearchedUsersSlice';
+import { BlockedUsersSlice } from './slices/BlockedUsersSlice';
+import { ChatsSlice } from './slices/ChatsSlice';
+import { OnlineStatusesSlice } from './slices/OnlineStatusesSlice';
+import { TypingStatusesSlice } from './slices/TypingStatusesSlice';
+import { ContactsSlice } from './slices/ContactsSlice';
+import { OnSocketClose } from '@neelkamath/omni-chat';
 
 // TODO: Create web notifications of new messages, group chats added to, etc.
 
@@ -50,19 +50,16 @@ export function shutDownSubscriptions(): void {
     onMessagesSubscriptionClose,
     onOnlineStatusesSubscriptionClose,
     onTypingStatusesSubscriptionClose,
-  ].forEach(onClose => {
+  ].forEach((onClose) => {
     if (onClose !== undefined) onClose();
   });
 }
 
-/**
- * Keeps the {@link store} up-to-date with events from
- * {@link SubscriptionsApiWrapper.subscribeToAccounts}.
- */
+/** Keeps the {@link store} up-to-date with events from {@link SubscriptionsApiWrapper.subscribeToAccounts}. */
 async function setUpAccountsSubscription(): Promise<void> {
   verifyCreation(onAccountsSubscriptionClose);
-  return new Promise(resolve => {
-    onAccountsSubscriptionClose = SubscriptionsApiWrapper.subscribeToAccounts(message => {
+  return new Promise((resolve) => {
+    onAccountsSubscriptionClose = SubscriptionsApiWrapper.subscribeToAccounts((message) => {
       switch (message.__typename) {
         case 'CreatedSubscription':
           resolve(undefined);
@@ -80,7 +77,7 @@ async function setUpAccountsSubscription(): Promise<void> {
               id: message.id,
               type: 'PROFILE_PIC',
               shouldUpdateOnly: true,
-            })
+            }),
           );
           break;
         case 'BlockedAccount':
@@ -99,14 +96,11 @@ async function setUpAccountsSubscription(): Promise<void> {
   });
 }
 
-/**
- * Keeps the {@link store} up-to-date with events from
- * {@link SubscriptionsApiWrapper.subscribeToGroupChats}.
- */
+/** Keeps the {@link store} up-to-date with events from {@link SubscriptionsApiWrapper.subscribeToGroupChats}. */
 async function setUpGroupChatsSubscription(): Promise<void> {
   verifyCreation(onGroupChatsSubscriptionClose);
-  return new Promise(resolve => {
-    onGroupChatsSubscriptionClose = SubscriptionsApiWrapper.subscribeToGroupChats(message => {
+  return new Promise((resolve) => {
+    onGroupChatsSubscriptionClose = SubscriptionsApiWrapper.subscribeToGroupChats((message) => {
       switch (message.__typename) {
         case 'CreatedSubscription':
           resolve();
@@ -126,21 +120,18 @@ async function setUpGroupChatsSubscription(): Promise<void> {
               id: message.id,
               type: 'GROUP_CHAT_PIC',
               shouldUpdateOnly: true,
-            })
+            }),
           );
       }
     });
   });
 }
 
-/**
- * Keeps the {@link store} up-to-date with events from
- * {@link SubscriptionsApiWrapper.subscribeToMessages}.
- */
+/** Keeps the {@link store} up-to-date with events from {@link SubscriptionsApiWrapper.subscribeToMessages}. */
 async function setUpMessagesSubscription(): Promise<void> {
   verifyCreation(onMessagesSubscriptionClose);
-  return new Promise(resolve => {
-    onMessagesSubscriptionClose = SubscriptionsApiWrapper.subscribeToMessages(message => {
+  return new Promise((resolve) => {
+    onMessagesSubscriptionClose = SubscriptionsApiWrapper.subscribeToMessages((message) => {
       switch (message.__typename) {
         case 'CreatedSubscription':
           resolve();
@@ -163,14 +154,11 @@ async function setUpMessagesSubscription(): Promise<void> {
   });
 }
 
-/**
- * Keeps the {@link store} up-to-date with events from
- * {@link SubscriptionsApiWrapper.subscribeToOnlineStatuses}.
- */
+/** Keeps the {@link store} up-to-date with events from {@link SubscriptionsApiWrapper.subscribeToOnlineStatuses}. */
 async function setUpOnlineStatusesSubscription(): Promise<void> {
   verifyCreation(onOnlineStatusesSubscriptionClose);
-  return new Promise(resolve => {
-    onOnlineStatusesSubscriptionClose = SubscriptionsApiWrapper.subscribeToOnlineStatuses(message => {
+  return new Promise((resolve) => {
+    onOnlineStatusesSubscriptionClose = SubscriptionsApiWrapper.subscribeToOnlineStatuses((message) => {
       switch (message.__typename) {
         case 'CreatedSubscription':
           resolve();
@@ -181,21 +169,18 @@ async function setUpOnlineStatusesSubscription(): Promise<void> {
               ...message,
               __typename: 'OnlineStatus',
               lastOnline: new Date().toISOString(),
-            })
+            }),
           );
       }
     });
   });
 }
 
-/**
- * Keeps the {@link store} up-to-date with events from
- * {@link SubscriptionsApiWrapper.subscribeToTypingStatuses}.
- */
+/** Keeps the {@link store} up-to-date with events from {@link SubscriptionsApiWrapper.subscribeToTypingStatuses}. */
 async function setUpTypingStatusesSubscription(): Promise<void> {
   verifyCreation(onTypingStatusesSubscriptionClose);
-  return new Promise(resolve => {
-    onTypingStatusesSubscriptionClose = SubscriptionsApiWrapper.subscribeToTypingStatuses(message => {
+  return new Promise((resolve) => {
+    onTypingStatusesSubscriptionClose = SubscriptionsApiWrapper.subscribeToTypingStatuses((message) => {
       switch (message.__typename) {
         case 'CreatedSubscription':
           resolve();

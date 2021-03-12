@@ -1,15 +1,15 @@
-import React, {ReactElement, ReactNode} from 'react';
-import {Layout, Menu, Typography} from 'antd';
-import {Link} from 'react-router-dom';
-import {CodeOutlined, HomeOutlined, LoginOutlined, UserAddOutlined} from '@ant-design/icons';
-import {Storage} from '../Storage';
+import React, { ReactElement, ReactNode } from 'react';
+import { Layout, Menu, Typography } from 'antd';
+import { Link } from 'react-router-dom';
+import { CodeOutlined, HomeOutlined, LoginOutlined, UserAddOutlined } from '@ant-design/icons';
+import { Storage } from '../Storage';
 import SupportSection from './SupportSection';
 
 export interface HomeLayoutProps {
   readonly children: ReactNode;
 }
 
-export default function HomeLayout({children}: HomeLayoutProps): ReactElement {
+export default function HomeLayout({ children }: HomeLayoutProps): ReactElement {
   return (
     <Layout>
       <Layout.Header>
@@ -25,18 +25,18 @@ export default function HomeLayout({children}: HomeLayoutProps): ReactElement {
 
 function HeaderMenu(): ReactElement {
   return (
-    <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[location.pathname]}>
-      <Menu.Item key="/">
-        <Link component={Typography.Link} to="/">
+    <Menu theme='dark' mode='horizontal' defaultSelectedKeys={[location.pathname]}>
+      <Menu.Item key='/'>
+        <Link component={Typography.Link} to='/'>
           <HomeOutlined /> Home
         </Link>
       </Menu.Item>
-      <Menu.Item key="/register">
-        <Link component={Typography.Link} to="/register">
+      <Menu.Item key='/register'>
+        <Link component={Typography.Link} to='/register'>
           <UserAddOutlined /> Register
         </Link>
       </Menu.Item>
-      <Menu.Item key="/sign-in">
+      <Menu.Item key='/sign-in'>
         <Typography.Link
           onClick={() => {
             location.href = Storage.readTokenSet() === undefined ? '/sign-in' : '/chat';
@@ -45,8 +45,8 @@ function HeaderMenu(): ReactElement {
           <LoginOutlined /> Sign In
         </Typography.Link>
       </Menu.Item>
-      <Menu.Item key="/developers">
-        <Link component={Typography.Link} to="/developers">
+      <Menu.Item key='/developers'>
+        <Link component={Typography.Link} to='/developers'>
           <CodeOutlined /> Developers
         </Link>
       </Menu.Item>

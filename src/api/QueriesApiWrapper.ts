@@ -1,5 +1,5 @@
 import logOut from '../logOut';
-import {displayBugReporter, handleGraphQlApiError} from './errorHandlers';
+import { displayBugReporter, handleGraphQlApiError } from './errorHandlers';
 import {
   Account,
   AccountsConnection,
@@ -20,8 +20,8 @@ import {
   Uuid,
   UuidScalarError,
 } from '@neelkamath/omni-chat';
-import {Storage} from '../Storage';
-import {message} from 'antd';
+import { Storage } from '../Storage';
+import { message } from 'antd';
 
 export namespace QueriesApiWrapper {
   const queriesApi = new QueriesApi(process.env.HTTP as HttpProtocol, process.env.API_URL!);
@@ -41,9 +41,8 @@ export namespace QueriesApiWrapper {
   }
 
   /**
-   * Ensures the token set saved to {@link localStorage} is always valid. If the
-   * currently saved token set either doesn't exist or is invalid, the user will
-   * be logged out.
+   * Ensures the token set saved to {@link localStorage} is always valid. If the currently saved token set either
+   * doesn't exist or is invalid, the user will be logged out.
    */
   export async function refreshTokenSet(): Promise<void> {
     const refreshToken = Storage.readTokenSet()?.refreshToken;
@@ -74,7 +73,7 @@ export namespace QueriesApiWrapper {
 
   export async function searchUsers(
     query: string,
-    pagination?: ForwardPagination
+    pagination?: ForwardPagination,
   ): Promise<AccountsConnection | undefined> {
     try {
       return await queriesApi.searchUsers(query, pagination);
@@ -86,7 +85,7 @@ export namespace QueriesApiWrapper {
 
   export async function searchContacts(
     query: string,
-    pagination?: ForwardPagination
+    pagination?: ForwardPagination,
   ): Promise<AccountsConnection | undefined> {
     try {
       return await queriesApi.searchContacts(Storage.readTokenSet()!.accessToken, query, pagination);
@@ -118,7 +117,7 @@ export namespace QueriesApiWrapper {
     id: number,
     privateChatMessagesPagination?: BackwardPagination,
     groupChatUsersPagination?: ForwardPagination,
-    groupChatMessagesPagination?: BackwardPagination
+    groupChatMessagesPagination?: BackwardPagination,
   ): Promise<Chat | undefined> {
     try {
       return await queriesApi.readChat(
@@ -126,7 +125,7 @@ export namespace QueriesApiWrapper {
         id,
         privateChatMessagesPagination,
         groupChatUsersPagination,
-        groupChatMessagesPagination
+        groupChatMessagesPagination,
       );
     } catch (error) {
       await handleGraphQlApiError(error);
@@ -146,14 +145,14 @@ export namespace QueriesApiWrapper {
   export async function readChats(
     privateChatMessagesPagination?: BackwardPagination,
     groupChatUsersPagination?: ForwardPagination,
-    groupChatMessagesPagination?: BackwardPagination
+    groupChatMessagesPagination?: BackwardPagination,
   ): Promise<Chat[] | undefined> {
     try {
       return await queriesApi.readChats(
         Storage.readTokenSet()!.accessToken,
         privateChatMessagesPagination,
         groupChatUsersPagination,
-        groupChatMessagesPagination
+        groupChatMessagesPagination,
       );
     } catch (error) {
       await handleGraphQlApiError(error);
@@ -173,7 +172,7 @@ export namespace QueriesApiWrapper {
   export async function searchChatMessages(
     chatId: number,
     query: string,
-    pagination?: BackwardPagination
+    pagination?: BackwardPagination,
   ): Promise<MessageEdge[] | undefined> {
     try {
       return await queriesApi.searchChatMessages(Storage.readTokenSet()!.accessToken, chatId, query, pagination);
@@ -187,7 +186,7 @@ export namespace QueriesApiWrapper {
     query: string,
     privateChatMessagesPagination?: BackwardPagination,
     groupChatUsersPagination?: ForwardPagination,
-    groupChatMessagesPagination?: BackwardPagination
+    groupChatMessagesPagination?: BackwardPagination,
   ): Promise<ChatMessages[] | undefined> {
     try {
       return await queriesApi.searchMessages(
@@ -195,7 +194,7 @@ export namespace QueriesApiWrapper {
         query,
         privateChatMessagesPagination,
         groupChatUsersPagination,
-        groupChatMessagesPagination
+        groupChatMessagesPagination,
       );
     } catch (error) {
       await handleGraphQlApiError(error);
@@ -217,7 +216,7 @@ export namespace QueriesApiWrapper {
     query: string,
     privateChatMessagesPagination?: BackwardPagination,
     groupChatUsersPagination?: ForwardPagination,
-    groupChatMessagesPagination?: BackwardPagination
+    groupChatMessagesPagination?: BackwardPagination,
   ): Promise<Chat[] | undefined> {
     try {
       return await queriesApi.searchChats(
@@ -225,7 +224,7 @@ export namespace QueriesApiWrapper {
         query,
         privateChatMessagesPagination,
         groupChatUsersPagination,
-        groupChatMessagesPagination
+        groupChatMessagesPagination,
       );
     } catch (error) {
       await handleGraphQlApiError(error);

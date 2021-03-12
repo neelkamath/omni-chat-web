@@ -1,19 +1,18 @@
-import {configureStore} from '@reduxjs/toolkit';
-import {PicsSlice} from './slices/PicsSlice';
-import {AccountSlice} from './slices/AccountSlice';
-import {SearchedUsersSlice} from './slices/SearchedUsersSlice';
-import {SearchedContactsSlice} from './slices/SearchedContactsSlice';
-import {BlockedUsersSlice} from './slices/BlockedUsersSlice';
-import {ChatsSlice} from './slices/ChatsSlice';
-import {OnlineStatusesSlice} from './slices/OnlineStatusesSlice';
-import {TypingStatusesSlice} from './slices/TypingStatusesSlice';
-import {ContactsSlice} from './slices/ContactsSlice';
+import { configureStore } from '@reduxjs/toolkit';
+import { PicsSlice } from './slices/PicsSlice';
+import { AccountSlice } from './slices/AccountSlice';
+import { SearchedUsersSlice } from './slices/SearchedUsersSlice';
+import { SearchedContactsSlice } from './slices/SearchedContactsSlice';
+import { BlockedUsersSlice } from './slices/BlockedUsersSlice';
+import { ChatsSlice } from './slices/ChatsSlice';
+import { OnlineStatusesSlice } from './slices/OnlineStatusesSlice';
+import { TypingStatusesSlice } from './slices/TypingStatusesSlice';
+import { ContactsSlice } from './slices/ContactsSlice';
 
 // TODO: Write tests for slices. Otherwise, delete testing dependencies. Updating the testing docs in CONTRIBUTING.md#style-guide.
 
 /**
- * - `'IDLE'` indicates that either the entities have never been fetched or an
- * error occurred during the last fetch.
+ * - `'IDLE'` indicates that either the entities have never been fetched or an error occurred during the last fetch.
  * - `'LOADING'` indicates that the entities are being fetched.
  * - `'LOADED'` indicates that the entities have been fetched.
  */

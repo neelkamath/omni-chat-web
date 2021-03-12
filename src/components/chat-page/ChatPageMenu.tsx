@@ -1,7 +1,7 @@
-import {Button, Menu} from 'antd';
-import React, {ReactElement, useContext} from 'react';
+import { Button, Menu } from 'antd';
+import React, { ReactElement, useContext } from 'react';
 import ChatPageSupportSection from './ChatPageSupportSection';
-import {ChatPageLayoutContext} from '../../chatPageLayoutContext';
+import { ChatPageLayoutContext } from '../../chatPageLayoutContext';
 import {
   CodeOutlined,
   ContactsOutlined,
@@ -23,7 +23,7 @@ import MenuChats from './MenuChats';
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function ChatPageMenu(): ReactElement {
-  const {setContent} = useContext(ChatPageLayoutContext)!;
+  const { setContent } = useContext(ChatPageLayoutContext)!;
   return (
     <Menu>
       <Menu.Item>

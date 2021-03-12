@@ -1,33 +1,27 @@
-import React, {ReactElement, useContext, useState} from 'react';
-import {Button, List, Modal, Spin, Typography} from 'antd';
-import {ChatPageLayoutContext} from '../../chatPageLayoutContext';
+import React, { ReactElement, useContext, useState } from 'react';
+import { Button, List, Modal, Spin, Typography } from 'antd';
+import { ChatPageLayoutContext } from '../../chatPageLayoutContext';
 import ChatSection from './ChatSection';
-import {Account} from '@neelkamath/omni-chat';
-import {MutationsApiWrapper} from '../../api/MutationsApiWrapper';
-import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../../store/store';
-import {ContactsSlice} from '../../store/slices/ContactsSlice';
-import {BlockedUsersSlice} from '../../store/slices/BlockedUsersSlice';
-import {PicsSlice} from '../../store/slices/PicsSlice';
+import { Account } from '@neelkamath/omni-chat';
+import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
+import { ContactsSlice } from '../../store/slices/ContactsSlice';
+import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
+import { PicsSlice } from '../../store/slices/PicsSlice';
 
 export interface ProfileModalProps {
   readonly account: Account;
-  /**
-   * Whether to display a button which opens a private chat with this
-   * {@link account}.
-   */
+  /** Whether to display a button which opens a private chat with this {@link account}. */
   readonly hasChatButton: boolean;
   /** Whether the modal is visible. */
   readonly isVisible: boolean;
-  /**
-   * Callback for when the user attempts to close the modal. You could set
-   * {@link isVisible} to `false` here.
-   */
+  /** Callback for when the user attempts to close the modal. You could set {@link isVisible} to `false` here. */
   readonly onCancel: () => void;
 }
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
-export default function ProfileModal({account, hasChatButton, isVisible, onCancel}: ProfileModalProps): ReactElement {
+export default function ProfileModal({ account, hasChatButton, isVisible, onCancel }: ProfileModalProps): ReactElement {
   return (
     <Modal footer={null} visible={isVisible} onCancel={onCancel}>
       <ProfileSection account={account} hasChatButton={hasChatButton} />
@@ -37,18 +31,15 @@ export default function ProfileModal({account, hasChatButton, isVisible, onCance
 
 interface ProfileSectionProps {
   readonly account: Account;
-  /**
-   * Whether to display a button which opens a private chat with this
-   * {@link account}.
-   */
+  /** Whether to display a button which opens a private chat with this {@link account}. */
   readonly hasChatButton: boolean;
 }
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
-function ProfileSection({account, hasChatButton}: ProfileSectionProps) {
+function ProfileSection({ account, hasChatButton }: ProfileSectionProps) {
   const pic = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.id, 'ORIGINAL'));
   const dispatch = useDispatch();
-  dispatch(PicsSlice.fetchPic({id: account.id, type: 'PROFILE_PIC'}));
+  dispatch(PicsSlice.fetchPic({ id: account.id, type: 'PROFILE_PIC' }));
   const name = `${account.firstName} ${account.lastName}`;
   return (
     <List>
@@ -89,8 +80,8 @@ interface ChatButtonProps {
 }
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
-function ChatButton({userId}: ChatButtonProps): ReactElement {
-  const {setContent} = useContext(ChatPageLayoutContext)!;
+function ChatButton({ userId }: ChatButtonProps): ReactElement {
+  const { setContent } = useContext(ChatPageLayoutContext)!;
   const [isLoading, setLoading] = useState(false);
   const onClick = async () => {
     setLoading(true);
@@ -110,13 +101,13 @@ interface ContactButtonProps {
   readonly userId: number;
 }
 
-function ContactButton({userId}: ContactButtonProps): ReactElement {
+function ContactButton({ userId }: ContactButtonProps): ReactElement {
   const isButtonLoading = useSelector(ContactsSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
   const isContact = useSelector((state: RootState) => ContactsSlice.selectIsContact(state, userId));
   const dispatch = useDispatch();
   dispatch(ContactsSlice.fetchContacts());
-  if (isButtonLoading) return <Spin size="small" />;
+  if (isButtonLoading) return <Spin size='small' />;
   const onClick = async () => {
     setLoading(true);
     if (isContact) await MutationsApiWrapper.deleteContacts([userId]);
@@ -135,13 +126,13 @@ interface BlockButtonProps {
   readonly userId: number;
 }
 
-function BlockButton({userId}: BlockButtonProps): ReactElement {
+function BlockButton({ userId }: BlockButtonProps): ReactElement {
   const isBlocked = useSelector((state: RootState) => BlockedUsersSlice.selectIsBlocked(state, userId));
   const isButtonLoading = useSelector(BlockedUsersSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
   const dispatch = useDispatch();
   dispatch(BlockedUsersSlice.fetchUsers());
-  if (isButtonLoading) return <Spin size="small" />;
+  if (isButtonLoading) return <Spin size='small' />;
   const onClick = async () => {
     setLoading(true);
     isBlocked ? await MutationsApiWrapper.unblockUser(userId) : await MutationsApiWrapper.blockUser(userId);

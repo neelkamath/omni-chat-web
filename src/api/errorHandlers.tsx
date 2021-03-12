@@ -1,5 +1,5 @@
 import logOut from '../logOut';
-import {message, notification, Typography} from 'antd';
+import { message, notification, Typography } from 'antd';
 import React from 'react';
 import {
   BioScalarError,
@@ -36,10 +36,10 @@ export async function handleGraphQlApiError(error: Error): Promise<void> {
   else if (error instanceof EmailAddressTakenError) message.error('That email address is taken. Try another.');
   else if (error instanceof InvalidDomainError)
     message.error(
-      "The administrator has disallowed the email address's domain you've " +
-        'used. For example, if the administrator has only allowed Gmail ' +
-        "accounts, you'll be unable to sign up with an Outlook account.",
-      10
+      'The administrator has disallowed the email address\'s domain you\'ve ' +
+      'used. For example, if the administrator has only allowed Gmail ' +
+      'accounts, you\'ll be unable to sign up with an Outlook account.',
+      10,
     );
   else if (error instanceof UnregisteredEmailAddressError)
     message.error("That email address isn't associated with an account.");
@@ -47,9 +47,9 @@ export async function handleGraphQlApiError(error: Error): Promise<void> {
   else if (error instanceof CannotDeleteAccountError)
     message.error(
       'You are the only admin of a group chat containing users other than ' +
-        "yourself. You'll need to first appoint a different user as an admin " +
-        'in order to be able to delete your account.',
-      10
+      'yourself. You\'ll need to first appoint a different user as an admin ' +
+      'in order to be able to delete your account.',
+      10,
     );
   else if (error instanceof InvalidChatIdError) message.error('You are no longer in the chat.');
   else if (error instanceof UnverifiedEmailAddressError) message.error('You must first verify your email address.');
@@ -86,7 +86,7 @@ async function handleCommonApiError(error: Error): Promise<void> {
   else if (error instanceof UsernameScalarError)
     message.error(
       'A username must not contain whitespace, must be lowercase, and must ' + 'be 1-30 characters long.',
-      10
+      10,
     );
   else if (error instanceof PasswordScalarError) message.error('A password must contain non-whitespace characters.');
   else if (error instanceof NameScalarError)

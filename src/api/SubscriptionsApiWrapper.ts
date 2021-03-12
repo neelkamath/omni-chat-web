@@ -1,5 +1,5 @@
-import {Storage} from '../Storage';
-import {displayConnectionError} from './errorHandlers';
+import { Storage } from '../Storage';
+import { displayConnectionError } from './errorHandlers';
 import {
   AccountsSubscription,
   GroupChatsSubscription,
@@ -19,7 +19,7 @@ export namespace SubscriptionsApiWrapper {
     return subscriptionsApi.subscribeToAccounts(
       Storage.readTokenSet()!.accessToken!,
       onMessage,
-      displayConnectionError
+      displayConnectionError,
     );
   }
 
@@ -27,7 +27,7 @@ export namespace SubscriptionsApiWrapper {
     return subscriptionsApi.subscribeToOnlineStatuses(
       Storage.readTokenSet()!.accessToken!,
       onMessage,
-      displayConnectionError
+      displayConnectionError,
     );
   }
 
@@ -35,7 +35,7 @@ export namespace SubscriptionsApiWrapper {
     return subscriptionsApi.subscribeToTypingStatuses(
       Storage.readTokenSet()!.accessToken!,
       onMessage,
-      displayConnectionError
+      displayConnectionError,
     );
   }
 
@@ -43,7 +43,7 @@ export namespace SubscriptionsApiWrapper {
     return subscriptionsApi.subscribeToMessages(
       Storage.readTokenSet()!.accessToken!,
       onMessage,
-      displayConnectionError
+      displayConnectionError,
     );
   }
 
@@ -51,7 +51,7 @@ export namespace SubscriptionsApiWrapper {
     return subscriptionsApi.subscribeToGroupChats(
       Storage.readTokenSet()!.accessToken!,
       onMessage,
-      displayConnectionError
+      displayConnectionError,
     );
   }
 }

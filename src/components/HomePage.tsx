@@ -1,5 +1,5 @@
-import React, {ReactElement} from 'react';
-import {Col, Divider, Image, List, Row, Space, Typography} from 'antd';
+import React, { ReactElement } from 'react';
+import { Col, Divider, Image, List, Row, Space, Typography } from 'antd';
 import femaleAvatarImage from '../images/female-avatar.svg';
 import onlineDiscussionImage from '../images/online-discussion.svg';
 import groupChatImage from '../images/group-chat.svg';
@@ -20,14 +20,14 @@ import {
 export default function HomePage(): ReactElement {
   return (
     <HomeLayout>
-      <Space direction="vertical">
-        <Image preview={false} src={coverImage} alt="Cover" />
-        <Row gutter={16} justify="space-around">
+      <Space direction='vertical'>
+        <Image preview={false} src={coverImage} alt='Cover' />
+        <Row gutter={16} justify='space-around'>
           <Col>
             <Typography.Title level={2}>Trusted, Extensible, Better Chat</Typography.Title>
           </Col>
         </Row>
-        <Row gutter={16} style={{padding: 16}}>
+        <Row gutter={16} style={{ padding: 16 }}>
           <UsersRow />
           <Divider />
           <ChatsRow />
@@ -47,7 +47,7 @@ export default function HomePage(): ReactElement {
 
 function UsersRow(): ReactElement {
   return (
-    <Row gutter={16} justify="space-around" align="middle">
+    <Row gutter={16} justify='space-around' align='middle'>
       <Col span={12}>
         <Typography.Title level={3}>
           <Space>
@@ -62,7 +62,7 @@ function UsersRow(): ReactElement {
         </List>
       </Col>
       <Col span={4}>
-        <Image preview={false} src={femaleAvatarImage} alt="Female avatar" />
+        <Image preview={false} src={femaleAvatarImage} alt='Female avatar' />
       </Col>
     </Row>
   );
@@ -70,9 +70,9 @@ function UsersRow(): ReactElement {
 
 function ChatsRow(): ReactElement {
   return (
-    <Row gutter={16} justify="space-around" align="middle">
+    <Row gutter={16} justify='space-around' align='middle'>
       <Col span={6}>
-        <Image preview={false} src={onlineDiscussionImage} alt="Online discussion" />
+        <Image preview={false} src={onlineDiscussionImage} alt='Online discussion' />
       </Col>
       <Col span={12}>
         <Typography.Title level={3}>
@@ -100,7 +100,7 @@ function ChatsRow(): ReactElement {
 
 function GroupChatsRow(): ReactElement {
   return (
-    <Row gutter={16} justify="space-around" align="middle">
+    <Row gutter={16} justify='space-around' align='middle'>
       <Col span={12}>
         <Typography.Title level={3}>
           <Space>
@@ -116,7 +116,7 @@ function GroupChatsRow(): ReactElement {
         </List>
       </Col>
       <Col span={6}>
-        <Image preview={false} src={groupChatImage} alt="Group chat" />
+        <Image preview={false} src={groupChatImage} alt='Group chat' />
       </Col>
     </Row>
   );
@@ -124,9 +124,9 @@ function GroupChatsRow(): ReactElement {
 
 function FreeCallsRow(): ReactElement {
   return (
-    <Row gutter={16} justify="space-around" align="middle">
+    <Row gutter={16} justify='space-around' align='middle'>
       <Col span={7}>
-        <Image preview={false} src={videoCallImage} alt="Video call" />
+        <Image preview={false} src={videoCallImage} alt='Video call' />
       </Col>
       <Col span={12}>
         <Typography.Title level={3}>
@@ -148,7 +148,7 @@ function FreeCallsRow(): ReactElement {
 
 function PowerfulMessagesRow(): ReactElement {
   return (
-    <Row gutter={16} justify="space-around" align="middle">
+    <Row gutter={16} justify='space-around' align='middle'>
       <Col span={12}>
         <Typography.Title level={3}>
           <Space>
@@ -170,7 +170,7 @@ function PowerfulMessagesRow(): ReactElement {
         </List>
       </Col>
       <Col span={8}>
-        <Image preview={false} src={messagingFunImage} alt="Messaging fun" />
+        <Image preview={false} src={messagingFunImage} alt='Messaging fun' />
       </Col>
     </Row>
   );
@@ -178,9 +178,9 @@ function PowerfulMessagesRow(): ReactElement {
 
 function ExtensibleRow(): ReactElement {
   return (
-    <Row gutter={16} justify="space-around" align="middle">
+    <Row gutter={16} justify='space-around' align='middle'>
       <Col span={9}>
-        <Image preview={false} src={securityImage} alt="Security" />
+        <Image preview={false} src={securityImage} alt='Security' />
       </Col>
       <Col span={12}>
         <Typography.Title level={3}>
@@ -195,7 +195,7 @@ function ExtensibleRow(): ReactElement {
             accounts. This way, even if an intruder gets into the company&apos;s network, they won&apos;t be able to
             create an account since they won&apos;t have a company issued email address. This feature also prevents
             employees from creating an account with their personal email address. Here are the instructions to{' '}
-            <Typography.Link href="https://github.com/neelkamath/omni-chat-web" target="_blank">
+            <Typography.Link href='https://github.com/neelkamath/omni-chat-web' target='_blank'>
               run your own instance
             </Typography.Link>
             .

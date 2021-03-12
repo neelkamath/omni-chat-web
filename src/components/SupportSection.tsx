@@ -1,5 +1,5 @@
-import React, {ReactElement} from 'react';
-import {Typography} from 'antd';
+import React, { ReactElement } from 'react';
+import { Typography } from 'antd';
 
 export default function SupportSection(): ReactElement {
   return (

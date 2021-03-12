@@ -1,13 +1,13 @@
-import React, {ReactElement} from 'react';
-import {Layout} from 'antd';
-import {GroupChat} from '@neelkamath/omni-chat';
+import React, { ReactElement } from 'react';
+import { Layout } from 'antd';
+import { GroupChat } from '@neelkamath/omni-chat';
 
 export interface GroupChatSectionProps {
   readonly chat: GroupChat;
 }
 
 // TODO
-export default function GroupChatSection({chat}: GroupChatSectionProps): ReactElement {
+export default function GroupChatSection({ chat }: GroupChatSectionProps): ReactElement {
   return (
     <Layout>
       <Layout.Header>Header</Layout.Header>

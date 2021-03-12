@@ -1,22 +1,22 @@
-import React, {ReactElement, useMemo, useState} from 'react';
-import {DeleteOutlined, UploadOutlined} from '@ant-design/icons';
-import {Storage} from '../../Storage';
+import React, { ReactElement, useMemo, useState } from 'react';
+import { DeleteOutlined, UploadOutlined } from '@ant-design/icons';
+import { Storage } from '../../Storage';
 import logOut from '../../logOut';
-import {Button, Divider, Form, Input, Row, Space, Spin, Typography, Upload} from 'antd';
-import {ShowUploadListInterface} from 'antd/lib/upload/interface';
+import { Button, Divider, Form, Input, Row, Space, Spin, Typography, Upload } from 'antd';
+import { ShowUploadListInterface } from 'antd/lib/upload/interface';
 import OriginalProfilePic from './OriginalProfilePic';
-import {RestApiWrapper} from '../../api/RestApiWrapper';
-import {NonexistentUserIdError} from '@neelkamath/omni-chat';
-import {MutationsApiWrapper} from '../../api/MutationsApiWrapper';
-import {useSelector} from 'react-redux';
-import {AccountSlice} from '../../store/slices/AccountSlice';
-import {RootState} from '../../store/store';
-import {PicsSlice} from '../../store/slices/PicsSlice';
+import { RestApiWrapper } from '../../api/RestApiWrapper';
+import { NonexistentUserIdError } from '@neelkamath/omni-chat';
+import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
+import { useSelector } from 'react-redux';
+import { AccountSlice } from '../../store/slices/AccountSlice';
+import { RootState } from '../../store/store';
+import { PicsSlice } from '../../store/slices/PicsSlice';
 
 export default function AccountEditor(): ReactElement {
   return (
-    <Row style={{padding: 16}}>
-      <Space direction="vertical">
+    <Row style={{ padding: 16 }}>
+      <Space direction='vertical'>
         <ProfilePic />
         <NewProfilePicButton />
         <DeleteProfilePicButton />
@@ -34,8 +34,8 @@ function ProfilePic(): ReactElement {
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'ORIGINAL'));
   const error = useSelector((state: RootState) => PicsSlice.selectError(state, 'PROFILE_PIC', userId));
   if (error instanceof NonexistentUserIdError) logOut();
-  PicsSlice.useFetchPic({id: userId, type: 'PROFILE_PIC'});
-  if (url === undefined) return <Spin size="small" />;
+  PicsSlice.useFetchPic({ id: userId, type: 'PROFILE_PIC' });
+  if (url === undefined) return <Spin size='small' />;
   else if (url === null) return <Typography.Text>No profile picture set.</Typography.Text>;
   else return <OriginalProfilePic url={url} />;
 }
@@ -50,13 +50,13 @@ function DeleteProfilePicButton(): ReactElement {
 }
 
 function NewProfilePicButton(): ReactElement {
-  const [showUploadList, setShowUploadList] = useState<ShowUploadListInterface | boolean>({showRemoveIcon: false});
+  const [showUploadList, setShowUploadList] = useState<ShowUploadListInterface | boolean>({ showRemoveIcon: false });
   const customRequest = async (data: RcCustomRequestOptions) => {
     await RestApiWrapper.patchProfilePic(data.file);
     setShowUploadList(false);
   };
   return (
-    <Upload showUploadList={showUploadList} customRequest={customRequest} accept="image/png,image/jpeg">
+    <Upload showUploadList={showUploadList} customRequest={customRequest} accept='image/png,image/jpeg'>
       <Button icon={<UploadOutlined />}>New Profile Picture</Button>
     </Upload>
   );
@@ -97,34 +97,34 @@ function UpdateAccountForm(): ReactElement {
     setLoading(false);
   };
   return (
-    <Form onFinish={onFinish} name="updateAccount" layout="vertical">
+    <Form onFinish={onFinish} name='updateAccount' layout='vertical'>
       <Form.Item
-        name="username"
-        label="Username"
+        name='username'
+        label='Username'
         initialValue={account.username}
-        rules={[{required: true, message: 'Enter a username.'}]}
+        rules={[{ required: true, message: 'Enter a username.' }]}
       >
         <Input />
       </Form.Item>
       <Form.Item
-        name="emailAddress"
-        label="Email address"
+        name='emailAddress'
+        label='Email address'
         initialValue={account.emailAddress}
-        rules={[{required: true, message: 'Enter an email address.'}]}
+        rules={[{ required: true, message: 'Enter an email address.' }]}
       >
-        <Input type="email" />
+        <Input type='email' />
       </Form.Item>
-      <Form.Item name="firstName" label="First name" initialValue={account.firstName}>
+      <Form.Item name='firstName' label='First name' initialValue={account.firstName}>
         <Input />
       </Form.Item>
-      <Form.Item name="lastName" label="Last name" initialValue={account.lastName}>
+      <Form.Item name='lastName' label='Last name' initialValue={account.lastName}>
         <Input />
       </Form.Item>
-      <Form.Item name="bio" label="Bio" initialValue={account.bio}>
+      <Form.Item name='bio' label='Bio' initialValue={account.bio}>
         <Input.TextArea />
       </Form.Item>
       <Form.Item>
-        <Button type="primary" htmlType="submit" loading={isLoading}>
+        <Button type='primary' htmlType='submit' loading={isLoading}>
           Submit
         </Button>
       </Form.Item>
@@ -138,7 +138,7 @@ interface UpdatePasswordFormData {
 
 function UpdatePasswordForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
-  const onFinish = async ({password}: UpdatePasswordFormData) => {
+  const onFinish = async ({ password }: UpdatePasswordFormData) => {
     setLoading(true);
     await MutationsApiWrapper.updateAccount({
       __typename: 'AccountUpdate',
@@ -152,12 +152,12 @@ function UpdatePasswordForm(): ReactElement {
     setLoading(false);
   };
   return (
-    <Form onFinish={onFinish} name="updatePassword" layout="vertical">
-      <Form.Item name="password" label="New password" rules={[{required: true, message: 'Enter a password.'}]}>
+    <Form onFinish={onFinish} name='updatePassword' layout='vertical'>
+      <Form.Item name='password' label='New password' rules={[{ required: true, message: 'Enter a password.' }]}>
         <Input.Password />
       </Form.Item>
       <Form.Item>
-        <Button type="primary" htmlType="submit" loading={isLoading}>
+        <Button type='primary' htmlType='submit' loading={isLoading}>
           Submit
         </Button>
       </Form.Item>
