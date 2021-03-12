@@ -26,8 +26,7 @@ export namespace SearchedContactsSlice {
       overwrite: (_, {payload}: PayloadAction<Replacer>) => payload,
       updateAccount: (state, {payload}: PayloadAction<UpdatedAccount>) => {
         state.contacts?.edges.forEach(edge => {
-          if (edge.node.id === payload.userId)
-            edge.node = {...edge.node, id: payload.userId};
+          if (edge.node.id === payload.userId) edge.node = {...edge.node, id: payload.userId};
         });
       },
     },

@@ -7,12 +7,7 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import {QueriesApiWrapper} from '../../api/QueriesApiWrapper';
-import {
-  Account,
-  DeletedContact,
-  NewContact,
-  UpdatedAccount,
-} from '@neelkamath/omni-chat';
+import {Account, DeletedContact, NewContact, UpdatedAccount} from '@neelkamath/omni-chat';
 import {FetchStatus, RootState} from '../store';
 
 export namespace ContactsSlice {
@@ -30,7 +25,7 @@ export namespace ContactsSlice {
     },
     {
       condition: (_, {getState}) => {
-        const {contacts} = getState() as { contacts: State };
+        const {contacts} = getState() as {contacts: State};
         return contacts.status === 'IDLE';
       },
     }
@@ -46,8 +41,7 @@ export namespace ContactsSlice {
           changes: {...payload, __typename: 'Account'},
         });
       },
-      removeOne: (state, {payload}: PayloadAction<DeletedContact>) =>
-        adapter.removeOne(state, payload.id),
+      removeOne: (state, {payload}: PayloadAction<DeletedContact>) => adapter.removeOne(state, payload.id),
       upsertOne: (state, {payload}: PayloadAction<NewContact>) => {
         adapter.upsertOne(state, {...payload, __typename: 'Account'});
       },
@@ -72,10 +66,7 @@ export namespace ContactsSlice {
   export const {updateOne, removeOne, upsertOne} = slice.actions;
 
   export const selectIsContact = createSelector(
-    [
-      (state: RootState) => state.contacts.ids,
-      (_: RootState, userId: number) => userId,
-    ],
+    [(state: RootState) => state.contacts.ids, (_: RootState, userId: number) => userId],
     (ids: (string | number)[], userId: number) => ids.includes(userId)
   );
 

@@ -20,6 +20,6 @@ export const ChatPageLayoutContext = createContext<ChatPageLayoutContextData | u
  * {@link ChatPageLayoutContextData.content} is {@link Empty} by default.
  */
 export function useChatPageLayoutContext(): ChatPageLayoutContextData {
-  const [content, setContent] = useState(<Empty style={{padding: 16}}/>);
+  const [content, setContent] = useState(<Empty style={{padding: 16}} />);
   return {content, setContent};
 }

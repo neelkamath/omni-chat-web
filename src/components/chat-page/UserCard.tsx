@@ -20,10 +20,7 @@ export interface UserCardProps {
 }
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
-export default function UserCard({
-                                   account,
-                                   onModalClose,
-                                 }: UserCardProps): ReactElement {
+export default function UserCard({account, onModalClose}: UserCardProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
   const onCancel = () => {
     setVisible(false);
@@ -34,19 +31,14 @@ export default function UserCard({
       <Card hoverable={true} onClick={() => setVisible(true)}>
         <Row gutter={16} align="middle">
           <Col>
-            <ProfilePic userId={account.id}/>
+            <ProfilePic userId={account.id} />
           </Col>
           <Col>
             <Typography.Text strong>{account.username}</Typography.Text>
           </Col>
         </Row>
       </Card>
-      <ProfileModal
-        account={account}
-        isVisible={isVisible}
-        onCancel={onCancel}
-        hasChatButton={true}
-      />
+      <ProfileModal account={account} isVisible={isVisible} onCancel={onCancel} hasChatButton={true} />
     </>
   );
 }
@@ -57,19 +49,17 @@ interface ProfilePicProps {
 
 function ProfilePic({userId}: ProfilePicProps): ReactElement {
   /*
-    A <NonexistentUserIdError> will occur if a user who was to be displayed in
-    the search results deleted their account in between being searched, and
-    having the profile pic displayed. Since this rarely ever happens, and no
-    harm comes from leaving the search result up, we ignore this possibility.
-     */
-  const pic = useSelector((state: RootState) =>
-    PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL')
-  );
+  A <NonexistentUserIdError> will occur if a user who was to be displayed in
+  the search results deleted their account in between being searched, and
+  having the profile pic displayed. Since this rarely ever happens, and no
+  harm comes from leaving the search result up, we ignore this possibility.
+   */
+  const pic = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
   const dispatch = useDispatch();
   dispatch(PicsSlice.fetchPic({id: userId, type: 'PROFILE_PIC'}));
   return pic === undefined ? (
-    <Spin size="small"/>
+    <Spin size="small" />
   ) : (
-    <Avatar size="large" src={pic === null ? <UserOutlined/> : pic}/>
+    <Avatar size="large" src={pic === null ? <UserOutlined /> : pic} />
   );
 }

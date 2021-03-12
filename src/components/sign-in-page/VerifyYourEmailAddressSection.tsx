@@ -7,11 +7,11 @@ export default function VerifyYourEmailAddressSection(): ReactElement {
   return (
     <Row gutter={16} justify="space-around" align="middle">
       <Col span={7}>
-        <Image preview={false} alt="Mail sent" src={mailSentImage}/>
+        <Image preview={false} alt="Mail sent" src={mailSentImage} />
       </Col>
       <Col span={12}>
         <Typography.Title level={2}>Verify Your Email Address</Typography.Title>
-        <VerifyYourEmailAddressForm/>
+        <VerifyYourEmailAddressForm />
       </Col>
     </Row>
   );
@@ -24,15 +24,9 @@ interface VerifyYourEmailAddressFormData {
 
 function VerifyYourEmailAddressForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
-  const onFinish = async ({
-                            emailAddress,
-                            verificationCode,
-                          }: VerifyYourEmailAddressFormData) => {
+  const onFinish = async ({emailAddress, verificationCode}: VerifyYourEmailAddressFormData) => {
     setLoading(true);
-    await MutationsApiWrapper.verifyEmailAddress(
-      emailAddress,
-      verificationCode
-    );
+    await MutationsApiWrapper.verifyEmailAddress(emailAddress, verificationCode);
     setLoading(false);
   };
   return (
@@ -42,14 +36,14 @@ function VerifyYourEmailAddressForm(): ReactElement {
         label="Email address"
         rules={[{required: true, message: 'Enter your email address.'}]}
       >
-        <Input type="email"/>
+        <Input type="email" />
       </Form.Item>
       <Form.Item
         name="verificationCode"
         label="Verification code"
         rules={[{required: true, message: 'Enter your verification code.'}]}
       >
-        <Input type="number"/>
+        <Input type="number" />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={isLoading}>

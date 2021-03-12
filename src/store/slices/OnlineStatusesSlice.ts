@@ -19,16 +19,12 @@ export namespace OnlineStatusesSlice {
     readonly status: FetchStatus;
   }
 
-  export const fetchStatuses = createAsyncThunk(
-    'onlineStatuses/fetchStatuses',
-    QueriesApiWrapper.readOnlineStatuses,
-    {
-      condition: (_, {getState}) => {
-        const {onlineStatuses} = getState() as { onlineStatuses: State };
-        return onlineStatuses.status === 'IDLE';
-      },
-    }
-  );
+  export const fetchStatuses = createAsyncThunk('onlineStatuses/fetchStatuses', QueriesApiWrapper.readOnlineStatuses, {
+    condition: (_, {getState}) => {
+      const {onlineStatuses} = getState() as {onlineStatuses: State};
+      return onlineStatuses.status === 'IDLE';
+    },
+  });
 
   const slice = createSlice({
     name: 'onlineStatuses',
@@ -54,10 +50,7 @@ export namespace OnlineStatusesSlice {
   export const {upsertOne} = slice.actions;
 
   export const select = createSelector(
-    [
-      (state: RootState) => state.onlineStatuses.entities,
-      (_: RootState, userId: number) => userId,
-    ],
+    [(state: RootState) => state.onlineStatuses.entities, (_: RootState, userId: number) => userId],
     (entities: Dictionary<OnlineStatus>, userId: number) => entities[userId]
   );
 }

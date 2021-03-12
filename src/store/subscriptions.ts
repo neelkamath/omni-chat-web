@@ -28,8 +28,7 @@ let onOnlineStatusesSubscriptionClose: OnSubscriptionClose;
 let onTypingStatusesSubscriptionClose: OnSubscriptionClose;
 
 function verifyCreation(onSubscriptionClose: OnSubscriptionClose): void {
-  if (onSubscriptionClose !== undefined)
-    throw new Error("Previous subscription hasn't been closed.");
+  if (onSubscriptionClose !== undefined) throw new Error("Previous subscription hasn't been closed.");
 }
 
 /** Sets up the GraphQL subscriptions to keep the {@link store} up-to-date. */
@@ -63,43 +62,40 @@ export function shutDownSubscriptions(): void {
 async function setUpAccountsSubscription(): Promise<void> {
   verifyCreation(onAccountsSubscriptionClose);
   return new Promise(resolve => {
-    onAccountsSubscriptionClose = SubscriptionsApiWrapper.subscribeToAccounts(
-      message => {
-        switch (message.__typename) {
-          case 'CreatedSubscription':
-            resolve(undefined);
-            break;
-          case 'UpdatedAccount':
-            if (message.id === Storage.readUserId()!)
-              store.dispatch(AccountSlice.update(message));
-            store.dispatch(BlockedUsersSlice.updateAccount(message));
-            store.dispatch(ContactsSlice.updateOne(message));
-            store.dispatch(SearchedContactsSlice.updateAccount(message));
-            store.dispatch(SearchedUsersSlice.update(message));
-            break;
-          case 'UpdatedProfilePic':
-            store.dispatch(
-              PicsSlice.fetchPic({
-                id: message.id,
-                type: 'PROFILE_PIC',
-                shouldUpdateOnly: true,
-              })
-            );
-            break;
-          case 'BlockedAccount':
-            store.dispatch(BlockedUsersSlice.upsertOne(message));
-            break;
-          case 'DeletedContact':
-            store.dispatch(ContactsSlice.removeOne(message));
-            break;
-          case 'NewContact':
-            store.dispatch(ContactsSlice.upsertOne(message));
-            break;
-          case 'UnblockedAccount':
-            store.dispatch(BlockedUsersSlice.removeOne(message));
-        }
+    onAccountsSubscriptionClose = SubscriptionsApiWrapper.subscribeToAccounts(message => {
+      switch (message.__typename) {
+        case 'CreatedSubscription':
+          resolve(undefined);
+          break;
+        case 'UpdatedAccount':
+          if (message.id === Storage.readUserId()!) store.dispatch(AccountSlice.update(message));
+          store.dispatch(BlockedUsersSlice.updateAccount(message));
+          store.dispatch(ContactsSlice.updateOne(message));
+          store.dispatch(SearchedContactsSlice.updateAccount(message));
+          store.dispatch(SearchedUsersSlice.update(message));
+          break;
+        case 'UpdatedProfilePic':
+          store.dispatch(
+            PicsSlice.fetchPic({
+              id: message.id,
+              type: 'PROFILE_PIC',
+              shouldUpdateOnly: true,
+            })
+          );
+          break;
+        case 'BlockedAccount':
+          store.dispatch(BlockedUsersSlice.upsertOne(message));
+          break;
+        case 'DeletedContact':
+          store.dispatch(ContactsSlice.removeOne(message));
+          break;
+        case 'NewContact':
+          store.dispatch(ContactsSlice.upsertOne(message));
+          break;
+        case 'UnblockedAccount':
+          store.dispatch(BlockedUsersSlice.removeOne(message));
       }
-    );
+    });
   });
 }
 
@@ -110,33 +106,30 @@ async function setUpAccountsSubscription(): Promise<void> {
 async function setUpGroupChatsSubscription(): Promise<void> {
   verifyCreation(onGroupChatsSubscriptionClose);
   return new Promise(resolve => {
-    onGroupChatsSubscriptionClose = SubscriptionsApiWrapper.subscribeToGroupChats(
-      message => {
-        switch (message.__typename) {
-          case 'CreatedSubscription':
-            resolve();
-            break;
-          case 'GroupChatId':
-            store.dispatch(ChatsSlice.fetchChat(message.id));
-            break;
-          case 'ExitedUser':
-            if (message.userId === Storage.readUserId())
-              store.dispatch(ChatsSlice.removeOne(message.chatId));
-            break;
-          case 'UpdatedGroupChat':
-            store.dispatch(ChatsSlice.fetchChat(message.chatId));
-            break;
-          case 'UpdatedGroupChatPic':
-            store.dispatch(
-              PicsSlice.fetchPic({
-                id: message.id,
-                type: 'GROUP_CHAT_PIC',
-                shouldUpdateOnly: true,
-              })
-            );
-        }
+    onGroupChatsSubscriptionClose = SubscriptionsApiWrapper.subscribeToGroupChats(message => {
+      switch (message.__typename) {
+        case 'CreatedSubscription':
+          resolve();
+          break;
+        case 'GroupChatId':
+          store.dispatch(ChatsSlice.fetchChat(message.id));
+          break;
+        case 'ExitedUser':
+          if (message.userId === Storage.readUserId()) store.dispatch(ChatsSlice.removeOne(message.chatId));
+          break;
+        case 'UpdatedGroupChat':
+          store.dispatch(ChatsSlice.fetchChat(message.chatId));
+          break;
+        case 'UpdatedGroupChatPic':
+          store.dispatch(
+            PicsSlice.fetchPic({
+              id: message.id,
+              type: 'GROUP_CHAT_PIC',
+              shouldUpdateOnly: true,
+            })
+          );
       }
-    );
+    });
   });
 }
 
@@ -147,28 +140,26 @@ async function setUpGroupChatsSubscription(): Promise<void> {
 async function setUpMessagesSubscription(): Promise<void> {
   verifyCreation(onMessagesSubscriptionClose);
   return new Promise(resolve => {
-    onMessagesSubscriptionClose = SubscriptionsApiWrapper.subscribeToMessages(
-      message => {
-        switch (message.__typename) {
-          case 'CreatedSubscription':
-            resolve();
-            break;
-          case 'DeletedMessage':
-          case 'DeletionOfEveryMessage':
-          case 'MessageDeletionPoint':
-          case 'NewActionMessage':
-          case 'NewAudioMessage':
-          case 'NewDocMessage':
-          case 'NewGroupChatInviteMessage':
-          case 'NewPicMessage':
-          case 'NewPollMessage':
-          case 'NewTextMessage':
-          case 'NewVideoMessage':
-          case 'UserChatMessagesRemoval':
-            store.dispatch(ChatsSlice.fetchChat(message.chatId));
-        }
+    onMessagesSubscriptionClose = SubscriptionsApiWrapper.subscribeToMessages(message => {
+      switch (message.__typename) {
+        case 'CreatedSubscription':
+          resolve();
+          break;
+        case 'DeletedMessage':
+        case 'DeletionOfEveryMessage':
+        case 'MessageDeletionPoint':
+        case 'NewActionMessage':
+        case 'NewAudioMessage':
+        case 'NewDocMessage':
+        case 'NewGroupChatInviteMessage':
+        case 'NewPicMessage':
+        case 'NewPollMessage':
+        case 'NewTextMessage':
+        case 'NewVideoMessage':
+        case 'UserChatMessagesRemoval':
+          store.dispatch(ChatsSlice.fetchChat(message.chatId));
       }
-    );
+    });
   });
 }
 
@@ -179,23 +170,21 @@ async function setUpMessagesSubscription(): Promise<void> {
 async function setUpOnlineStatusesSubscription(): Promise<void> {
   verifyCreation(onOnlineStatusesSubscriptionClose);
   return new Promise(resolve => {
-    onOnlineStatusesSubscriptionClose = SubscriptionsApiWrapper.subscribeToOnlineStatuses(
-      message => {
-        switch (message.__typename) {
-          case 'CreatedSubscription':
-            resolve();
-            break;
-          case 'UpdatedOnlineStatus':
-            store.dispatch(
-              OnlineStatusesSlice.upsertOne({
-                ...message,
-                __typename: 'OnlineStatus',
-                lastOnline: new Date().toISOString(),
-              })
-            );
-        }
+    onOnlineStatusesSubscriptionClose = SubscriptionsApiWrapper.subscribeToOnlineStatuses(message => {
+      switch (message.__typename) {
+        case 'CreatedSubscription':
+          resolve();
+          break;
+        case 'UpdatedOnlineStatus':
+          store.dispatch(
+            OnlineStatusesSlice.upsertOne({
+              ...message,
+              __typename: 'OnlineStatus',
+              lastOnline: new Date().toISOString(),
+            })
+          );
       }
-    );
+    });
   });
 }
 
@@ -206,16 +195,14 @@ async function setUpOnlineStatusesSubscription(): Promise<void> {
 async function setUpTypingStatusesSubscription(): Promise<void> {
   verifyCreation(onTypingStatusesSubscriptionClose);
   return new Promise(resolve => {
-    onTypingStatusesSubscriptionClose = SubscriptionsApiWrapper.subscribeToTypingStatuses(
-      message => {
-        switch (message.__typename) {
-          case 'CreatedSubscription':
-            resolve();
-            break;
-          case 'TypingStatus':
-            store.dispatch(TypingStatusesSlice.upsertOne(message));
-        }
+    onTypingStatusesSubscriptionClose = SubscriptionsApiWrapper.subscribeToTypingStatuses(message => {
+      switch (message.__typename) {
+        case 'CreatedSubscription':
+          resolve();
+          break;
+        case 'TypingStatus':
+          store.dispatch(TypingStatusesSlice.upsertOne(message));
       }
-    );
+    });
   });
 }

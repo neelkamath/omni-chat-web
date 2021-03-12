@@ -13,14 +13,9 @@ import {
 } from '@neelkamath/omni-chat';
 
 export namespace SubscriptionsApiWrapper {
-  const subscriptionsApi = new SubscriptionsApi(
-    process.env.WS as WebSocketProtocol,
-    process.env.API_URL!
-  );
+  const subscriptionsApi = new SubscriptionsApi(process.env.WS as WebSocketProtocol, process.env.API_URL!);
 
-  export function subscribeToAccounts(
-    onMessage: OnSocketMessage<AccountsSubscription>
-  ): OnSocketClose {
+  export function subscribeToAccounts(onMessage: OnSocketMessage<AccountsSubscription>): OnSocketClose {
     return subscriptionsApi.subscribeToAccounts(
       Storage.readTokenSet()!.accessToken!,
       onMessage,
@@ -28,9 +23,7 @@ export namespace SubscriptionsApiWrapper {
     );
   }
 
-  export function subscribeToOnlineStatuses(
-    onMessage: OnSocketMessage<OnlineStatusesSubscription>
-  ): OnSocketClose {
+  export function subscribeToOnlineStatuses(onMessage: OnSocketMessage<OnlineStatusesSubscription>): OnSocketClose {
     return subscriptionsApi.subscribeToOnlineStatuses(
       Storage.readTokenSet()!.accessToken!,
       onMessage,
@@ -38,9 +31,7 @@ export namespace SubscriptionsApiWrapper {
     );
   }
 
-  export function subscribeToTypingStatuses(
-    onMessage: OnSocketMessage<TypingStatusesSubscription>
-  ): OnSocketClose {
+  export function subscribeToTypingStatuses(onMessage: OnSocketMessage<TypingStatusesSubscription>): OnSocketClose {
     return subscriptionsApi.subscribeToTypingStatuses(
       Storage.readTokenSet()!.accessToken!,
       onMessage,
@@ -48,9 +39,7 @@ export namespace SubscriptionsApiWrapper {
     );
   }
 
-  export function subscribeToMessages(
-    onMessage: OnSocketMessage<MessagesSubscription>
-  ): OnSocketClose {
+  export function subscribeToMessages(onMessage: OnSocketMessage<MessagesSubscription>): OnSocketClose {
     return subscriptionsApi.subscribeToMessages(
       Storage.readTokenSet()!.accessToken!,
       onMessage,
@@ -58,9 +47,7 @@ export namespace SubscriptionsApiWrapper {
     );
   }
 
-  export function subscribeToGroupChats(
-    onMessage: OnSocketMessage<GroupChatsSubscription>
-  ): OnSocketClose {
+  export function subscribeToGroupChats(onMessage: OnSocketMessage<GroupChatsSubscription>): OnSocketClose {
     return subscriptionsApi.subscribeToGroupChats(
       Storage.readTokenSet()!.accessToken!,
       onMessage,

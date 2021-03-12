@@ -7,9 +7,7 @@ export interface GroupChatSectionProps {
 }
 
 // TODO
-export default function GroupChatSection({
-                                           chat,
-                                         }: GroupChatSectionProps): ReactElement {
+export default function GroupChatSection({chat}: GroupChatSectionProps): ReactElement {
   return (
     <Layout>
       <Layout.Header>Header</Layout.Header>

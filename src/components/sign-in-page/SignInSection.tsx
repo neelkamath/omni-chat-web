@@ -8,10 +8,10 @@ export default function SignInSection(): ReactElement {
     <Row gutter={16} justify="space-around" align="middle">
       <Col span={12}>
         <Typography.Title level={2}>Sign In</Typography.Title>
-        <SignInForm/>
+        <SignInForm />
       </Col>
       <Col span={7}>
-        <Image preview={false} alt="Sign In" src={signInImage}/>
+        <Image preview={false} alt="Sign In" src={signInImage} />
       </Col>
     </Row>
   );
@@ -31,19 +31,11 @@ function SignInForm(): ReactElement {
   };
   return (
     <Form onFinish={onFinish} name="signIn" layout="vertical">
-      <Form.Item
-        name="username"
-        label="Username"
-        rules={[{required: true, message: 'Enter your username.'}]}
-      >
-        <Input/>
+      <Form.Item name="username" label="Username" rules={[{required: true, message: 'Enter your username.'}]}>
+        <Input />
       </Form.Item>
-      <Form.Item
-        name="password"
-        label="Password"
-        rules={[{required: true, message: 'Enter your password.'}]}
-      >
-        <Input.Password/>
+      <Form.Item name="password" label="Password" rules={[{required: true, message: 'Enter your password.'}]}>
+        <Input.Password />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={isLoading}>

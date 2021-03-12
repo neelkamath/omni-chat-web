@@ -27,67 +27,46 @@ export default function ChatPageMenu(): ReactElement {
   return (
     <Menu>
       <Menu.Item>
-        <Button
-          icon={<UserOutlined/>}
-          onClick={() => setContent(<AccountEditor/>)}
-        >
+        <Button icon={<UserOutlined />} onClick={() => setContent(<AccountEditor />)}>
           Account
         </Button>
       </Menu.Item>
       <Menu.Item>
-        <Button
-          icon={<ContactsOutlined/>}
-          onClick={() => setContent(<ContactsSection/>)}
-        >
+        <Button icon={<ContactsOutlined />} onClick={() => setContent(<ContactsSection />)}>
           Contacts
         </Button>
       </Menu.Item>
       <Menu.Item>
-        <Button
-          icon={<SearchOutlined/>}
-          onClick={() => setContent(<SearchUsersSection/>)}
-        >
+        <Button icon={<SearchOutlined />} onClick={() => setContent(<SearchUsersSection />)}>
           Search Users
         </Button>
       </Menu.Item>
       <Menu.Item>
-        <Button
-          icon={<StopOutlined/>}
-          onClick={() => setContent(<BlockedUsersSection/>)}
-        >
+        <Button icon={<StopOutlined />} onClick={() => setContent(<BlockedUsersSection />)}>
           Blocked Users
         </Button>
       </Menu.Item>
       <Menu.Item>
-        <Button
-          icon={<CustomerServiceOutlined/>}
-          onClick={() => setContent(<ChatPageSupportSection/>)}
-        >
+        <Button icon={<CustomerServiceOutlined />} onClick={() => setContent(<ChatPageSupportSection />)}>
           Support
         </Button>
       </Menu.Item>
       <Menu.Item>
-        <Button
-          icon={<CodeOutlined/>}
-          onClick={() => setContent(<DevelopersSection/>)}
-        >
+        <Button icon={<CodeOutlined />} onClick={() => setContent(<DevelopersSection />)}>
           Developers
         </Button>
       </Menu.Item>
       <Menu.Item>
-        <Button
-          icon={<UserDeleteOutlined/>}
-          onClick={() => setContent(<DeleteAccountSection/>)}
-        >
+        <Button icon={<UserDeleteOutlined />} onClick={() => setContent(<DeleteAccountSection />)}>
           Delete Account
         </Button>
       </Menu.Item>
       <Menu.Item>
-        <Button icon={<LogoutOutlined/>} onClick={logOut}>
+        <Button icon={<LogoutOutlined />} onClick={logOut}>
           Log Out
         </Button>
       </Menu.Item>
-      <MenuChats/>
+      <MenuChats />
     </Menu>
   );
 }

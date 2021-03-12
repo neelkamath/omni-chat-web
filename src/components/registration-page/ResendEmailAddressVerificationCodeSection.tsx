@@ -7,15 +7,13 @@ export default function ResendEmailAddressVerificationCodeSection(): ReactElemen
   return (
     <Row gutter={16} justify="space-around" align="middle">
       <Col span={5}>
-        <Image preview={false} alt="Happy news" src={happyNewsImage}/>
+        <Image preview={false} alt="Happy news" src={happyNewsImage} />
       </Col>
       <Col span={12}>
-        <Typography.Title level={2}>
-          Resend Email Address Verification Code
-        </Typography.Title>
+        <Typography.Title level={2}>Resend Email Address Verification Code</Typography.Title>
         <Space direction="vertical">
           Submit this form in case you lost your verification code email.
-          <ResendEmailAddressVerificationCodeForm/>
+          <ResendEmailAddressVerificationCodeForm />
         </Space>
       </Col>
     </Row>
@@ -28,9 +26,7 @@ interface ResendEmailAddressVerificationCodeFormData {
 
 function ResendEmailAddressVerificationCodeForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
-  const onFinish = async ({
-                            emailAddress,
-                          }: ResendEmailAddressVerificationCodeFormData) => {
+  const onFinish = async ({emailAddress}: ResendEmailAddressVerificationCodeFormData) => {
     setLoading(true);
     await MutationsApiWrapper.emailEmailAddressVerification(emailAddress);
     setLoading(false);
@@ -42,7 +38,7 @@ function ResendEmailAddressVerificationCodeForm(): ReactElement {
         label="Email address"
         rules={[{required: true, message: 'Enter your email address.'}]}
       >
-        <Input type="email"/>
+        <Input type="email" />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={isLoading}>

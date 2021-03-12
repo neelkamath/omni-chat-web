@@ -10,13 +10,8 @@ export default function BlockedUsersSection(): ReactElement {
   const users = useSelector(BlockedUsersSlice.selectAll);
   const dispatch = useDispatch();
   dispatch(BlockedUsersSlice.fetchUsers());
-  if (!isLoaded) return <Spin style={{padding: 16}}/>;
-  const cards = users.map(user => <UserCard key={user.id} account={user}/>);
-  const content =
-    cards.length === 0 ? (
-      <Empty/>
-    ) : (
-      <Space direction="vertical">{cards}</Space>
-    );
+  if (!isLoaded) return <Spin style={{padding: 16}} />;
+  const cards = users.map(user => <UserCard key={user.id} account={user} />);
+  const content = cards.length === 0 ? <Empty /> : <Space direction="vertical">{cards}</Space>;
   return <Col style={{padding: 16}}>{content}</Col>;
 }

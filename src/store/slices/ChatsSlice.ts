@@ -60,7 +60,7 @@ export namespace ChatsSlice {
     },
     {
       condition: (id, {getState}) => {
-        const {chats} = getState() as { chats: State };
+        const {chats} = getState() as {chats: State};
         return chats.entities[id] === undefined && !chats.fetching.has(id);
       },
     }
@@ -77,7 +77,7 @@ export namespace ChatsSlice {
     },
     {
       condition: (_, {getState}) => {
-        const {chats} = getState() as { chats: State };
+        const {chats} = getState() as {chats: State};
         return chats.status === 'IDLE';
       },
     }
@@ -87,8 +87,7 @@ export namespace ChatsSlice {
     name: 'chats',
     initialState: adapter.getInitialState({status: 'IDLE'}) as State,
     reducers: {
-      removeOne: (state, {payload}: PayloadAction<number>) =>
-        adapter.removeOne(state, payload),
+      removeOne: (state, {payload}: PayloadAction<number>) => adapter.removeOne(state, payload),
     },
     extraReducers: builder => {
       builder
@@ -149,11 +148,7 @@ export namespace ChatsSlice {
    * be selected. Otherwise, `undefined` will be selected.
    */
   export const selectLastMessage = createSelector(
-    [
-      (state: RootState) => state.chats.entities,
-      (_: RootState, chatId: number) => chatId,
-    ],
-    (chats: Dictionary<Chat>, chatId: number) =>
-      chats[chatId]?.messages.edges[0]?.node
+    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
+    (chats: Dictionary<Chat>, chatId: number) => chats[chatId]?.messages.edges[0]?.node
   );
 }

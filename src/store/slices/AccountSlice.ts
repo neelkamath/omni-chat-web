@@ -1,12 +1,9 @@
-import {
-  createAsyncThunk,
-  createSelector,
-  createSlice,
-  PayloadAction,
-} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSelector, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {Account, UpdatedAccount} from '@neelkamath/omni-chat';
 import {QueriesApiWrapper} from '../../api/QueriesApiWrapper';
 import {RootState} from '../store';
+import {useDispatch} from 'react-redux';
+import {useEffect} from 'react';
 
 export namespace AccountSlice {
   export interface State {
@@ -19,16 +16,19 @@ export namespace AccountSlice {
     readonly isLoading: boolean;
   }
 
-  export const fetchAccount = createAsyncThunk(
-    'account/fetchAccount',
-    QueriesApiWrapper.readAccount,
-    {
-      condition: (_, {getState}) => {
-        const {account} = getState() as { account: State };
-        return account.data === undefined && !account.isLoading;
-      },
-    }
-  );
+  export function useFetchAccount(): void {
+    const dispatch = useDispatch();
+    useEffect(() => {
+      dispatch(AccountSlice.fetchAccount());
+    }, [dispatch]);
+  }
+
+  export const fetchAccount = createAsyncThunk('account/fetchAccount', QueriesApiWrapper.readAccount, {
+    condition: (_, {getState}) => {
+      const {account} = getState() as {account: State};
+      return account.data === undefined && !account.isLoading;
+    },
+  });
 
   const slice = createSlice({
     name: 'account',

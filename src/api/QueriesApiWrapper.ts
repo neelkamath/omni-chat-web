@@ -24,10 +24,7 @@ import {Storage} from '../Storage';
 import {message} from 'antd';
 
 export namespace QueriesApiWrapper {
-  const queriesApi = new QueriesApi(
-    process.env.HTTP as HttpProtocol,
-    process.env.API_URL!
-  );
+  const queriesApi = new QueriesApi(process.env.HTTP as HttpProtocol, process.env.API_URL!);
 
   export async function requestTokenSet(login: Login): Promise<void> {
     let tokenSet;
@@ -92,25 +89,16 @@ export namespace QueriesApiWrapper {
     pagination?: ForwardPagination
   ): Promise<AccountsConnection | undefined> {
     try {
-      return await queriesApi.searchContacts(
-        Storage.readTokenSet()!.accessToken,
-        query,
-        pagination
-      );
+      return await queriesApi.searchContacts(Storage.readTokenSet()!.accessToken, query, pagination);
     } catch (error) {
       await handleGraphQlApiError(error);
       return undefined;
     }
   }
 
-  export async function readBlockedUsers(
-    pagination?: ForwardPagination
-  ): Promise<AccountsConnection | undefined> {
+  export async function readBlockedUsers(pagination?: ForwardPagination): Promise<AccountsConnection | undefined> {
     try {
-      return await queriesApi.readBlockedUsers(
-        Storage.readTokenSet()!.accessToken,
-        pagination
-      );
+      return await queriesApi.readBlockedUsers(Storage.readTokenSet()!.accessToken, pagination);
     } catch (error) {
       await handleGraphQlApiError(error);
       return undefined;
@@ -119,9 +107,7 @@ export namespace QueriesApiWrapper {
 
   export async function readTypingStatuses(): Promise<TypingStatus[] | undefined> {
     try {
-      return await queriesApi.readTypingStatuses(
-        Storage.readTokenSet()!.accessToken
-      );
+      return await queriesApi.readTypingStatuses(Storage.readTokenSet()!.accessToken);
     } catch (error) {
       await handleGraphQlApiError(error);
       return undefined;
@@ -150,9 +136,7 @@ export namespace QueriesApiWrapper {
 
   export async function readOnlineStatuses(): Promise<OnlineStatus[] | undefined> {
     try {
-      return await queriesApi.readOnlineStatuses(
-        Storage.readTokenSet()!.accessToken
-      );
+      return await queriesApi.readOnlineStatuses(Storage.readTokenSet()!.accessToken);
     } catch (error) {
       await handleGraphQlApiError(error);
       return undefined;
@@ -192,12 +176,7 @@ export namespace QueriesApiWrapper {
     pagination?: BackwardPagination
   ): Promise<MessageEdge[] | undefined> {
     try {
-      return await queriesApi.searchChatMessages(
-        Storage.readTokenSet()!.accessToken,
-        chatId,
-        query,
-        pagination
-      );
+      return await queriesApi.searchChatMessages(Storage.readTokenSet()!.accessToken, chatId, query, pagination);
     } catch (error) {
       await handleGraphQlApiError(error);
       return undefined;
@@ -224,9 +203,7 @@ export namespace QueriesApiWrapper {
     }
   }
 
-  export async function readGroupChat(
-    inviteCode: Uuid
-  ): Promise<GroupChatInfo | undefined> {
+  export async function readGroupChat(inviteCode: Uuid): Promise<GroupChatInfo | undefined> {
     try {
       return await queriesApi.readGroupChat(inviteCode);
     } catch (error) {
@@ -256,9 +233,7 @@ export namespace QueriesApiWrapper {
     }
   }
 
-  export async function searchPublicChats(
-    query: string
-  ): Promise<GroupChat[] | undefined> {
+  export async function searchPublicChats(query: string): Promise<GroupChat[] | undefined> {
     try {
       return await queriesApi.searchPublicChats(query);
     } catch (error) {
@@ -267,14 +242,9 @@ export namespace QueriesApiWrapper {
     }
   }
 
-  export async function readContacts(
-    pagination?: ForwardPagination
-  ): Promise<AccountsConnection | undefined> {
+  export async function readContacts(pagination?: ForwardPagination): Promise<AccountsConnection | undefined> {
     try {
-      return await queriesApi.readContacts(
-        Storage.readTokenSet()!.accessToken,
-        pagination
-      );
+      return await queriesApi.readContacts(Storage.readTokenSet()!.accessToken, pagination);
     } catch (error) {
       await handleGraphQlApiError(error);
       return undefined;

@@ -11,7 +11,7 @@ import {Provider} from 'react-redux';
 export default function App(): ReactElement {
   return (
     <Provider store={store}>
-      <Router/>
+      <Router />
     </Provider>
   );
 }
@@ -20,11 +20,11 @@ export function Router(): ReactElement {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path="/" component={HomePage}/>
-        <Route exact path="/register" component={RegistrationPage}/>
-        <Route exact path="/sign-in" component={SignInPage}/>
-        <Route exact path="/chat" component={ChatPage}/>
-        <Route exact path="/developers" component={DevelopersPage}/>
+        <Route exact path="/" component={HomePage} />
+        <Route exact path="/register" component={RegistrationPage} />
+        <Route exact path="/sign-in" component={SignInPage} />
+        <Route exact path="/chat" component={ChatPage} />
+        <Route exact path="/developers" component={DevelopersPage} />
       </Switch>
     </BrowserRouter>
   );

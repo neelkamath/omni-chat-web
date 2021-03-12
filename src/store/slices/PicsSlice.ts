@@ -7,13 +7,11 @@ import {
   EntityAdapter,
   EntityState,
 } from '@reduxjs/toolkit';
-import {
-  NonexistentChatError,
-  NonexistentUserIdError,
-  PicType,
-} from '@neelkamath/omni-chat';
+import {NonexistentChatError, NonexistentUserIdError, PicType} from '@neelkamath/omni-chat';
 import {RestApiWrapper} from '../../api/RestApiWrapper';
 import {RootState} from '../store';
+import {useDispatch} from 'react-redux';
+import {useEffect} from 'react';
 import EntityType = PicsSlice.EntityType;
 
 /** Generates the {@link Entity.id}. */
@@ -58,6 +56,13 @@ export namespace PicsSlice {
 
   const adapter: EntityAdapter<Entity> = createEntityAdapter();
 
+  export function useFetchPic(data: PicData): void {
+    const dispatch = useDispatch();
+    useEffect(() => {
+      dispatch(PicsSlice.fetchPic(data));
+    }, [dispatch, data]);
+  }
+
   export const fetchPic = createAsyncThunk(
     'pics/fetchPic',
     async ({id, type}: PicData) => {
@@ -71,8 +76,7 @@ export namespace PicsSlice {
           thumbnail = await RestApiWrapper.getProfilePic(id, 'THUMBNAIL');
           original = await RestApiWrapper.getProfilePic(id, 'ORIGINAL');
       }
-      const generateUrl = (pic: Blob | null | undefined) =>
-        pic instanceof Blob ? URL.createObjectURL(pic) : pic;
+      const generateUrl = (pic: Blob | null | undefined) => (pic instanceof Blob ? URL.createObjectURL(pic) : pic);
       return {
         id: generateId(type, id),
         type,
@@ -83,13 +87,10 @@ export namespace PicsSlice {
     },
     {
       condition: ({id, type, shouldUpdateOnly}, {getState}) => {
-        const {pics} = getState() as { pics: EntityState<Entity> };
+        const {pics} = getState() as {pics: EntityState<Entity>};
         const pic = pics.entities[generateId(type, id)];
         if (pic === undefined) return shouldUpdateOnly !== true;
-        return (
-          (pic.originalUrl === undefined || pic.thumbnailUrl === undefined) &&
-          !pic.isLoading
-        );
+        return (pic.originalUrl === undefined || pic.thumbnailUrl === undefined) && !pic.isLoading;
       },
     }
   );
@@ -103,16 +104,13 @@ export namespace PicsSlice {
         .addCase(fetchPic.rejected, ({entities}, {meta, error}) => {
           const entity = entities[generateId(meta.arg.type, meta.arg.id)]!;
           entity.isLoading = false;
-          if (error.name === NonexistentUserIdError.name)
-            entity.error = new NonexistentUserIdError();
-          else if (error.name === NonexistentChatError.name)
-            entity.error = new NonexistentChatError();
+          if (error.name === NonexistentUserIdError.name) entity.error = new NonexistentUserIdError();
+          else if (error.name === NonexistentChatError.name) entity.error = new NonexistentChatError();
         })
         .addCase(fetchPic.fulfilled, adapter.upsertOne)
         .addCase(fetchPic.pending, (state, {meta}) => {
           const id = generateId(meta.arg.type, meta.arg.id);
-          if (state.entities[id] === undefined)
-            adapter.addOne(state, {id, type: meta.arg.type, isLoading: true});
+          if (state.entities[id] === undefined) adapter.addOne(state, {id, type: meta.arg.type, isLoading: true});
         });
     },
   });
@@ -124,15 +122,9 @@ export namespace PicsSlice {
       (state: RootState) => state.pics.entities,
       (_: RootState, type: EntityType) => type,
       (_state: RootState, _type: EntityType, id: number) => id,
-      (_state: RootState, _type: EntityType, _id: number, picType: PicType) =>
-        picType,
+      (_state: RootState, _type: EntityType, _id: number, picType: PicType) => picType,
     ],
-    (
-      entities: Dictionary<Entity>,
-      type: EntityType,
-      id: number,
-      picType: PicType
-    ) => {
+    (entities: Dictionary<Entity>, type: EntityType, id: number, picType: PicType) => {
       const entity = entities[generateId(type, id)];
       switch (picType) {
         case 'THUMBNAIL':
@@ -154,7 +146,6 @@ export namespace PicsSlice {
       (_: RootState, type: EntityType) => type,
       (_state: RootState, _type: EntityType, id: number) => id,
     ],
-    (entities: Dictionary<Entity>, type: EntityType, id: number) =>
-      entities[generateId(type, id)]?.error
+    (entities: Dictionary<Entity>, type: EntityType, id: number) => entities[generateId(type, id)]?.error
   );
 }

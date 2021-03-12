@@ -6,8 +6,8 @@ import SupportSection from '../SupportSection';
 export default function ChatPageSupportSection(): ReactElement {
   return (
     <Space style={{padding: 16}}>
-      <SupportSection/>
-      <Image preview={false} alt="Contact us" src={contactUsImage}/>
+      <SupportSection />
+      <Image preview={false} alt="Contact us" src={contactUsImage} />
     </Space>
   );
 }

@@ -59,6 +59,37 @@ Here's how to test the production build:
     ```
 - Name TypeScript files having a main `export` the same as the export (e.g., [`logOut.ts`](src/logOut.ts), [`App.tsx`](src/components/App.tsx). Name other TypeScript files using _camelCase_.
 - Name directories and non-TypeScript files using _kebab-case_.
+- Occasionally when using React Redux, the following boilerplate is required to dispatch an action:
+
+    ```typescript
+    function ProfilePic(): ReactElement {
+      const userId = useMemo(() => Storage.readUserId()!, []);
+      const dispatch = useDispatch();
+      useEffect(() => {
+        dispatch(PicsSlice.fetchPic({id: userId, type: 'PROFILE_PIC'}));
+      }, [dispatch, userId]);
+    }
+    ```
+
+    In order to remove this boilerplate, [slices](../src/store/slices) must provide React hooks such as the following:
+
+    ```typescript
+    function useFetchPic(data: PicData): void {
+      const dispatch = useDispatch();
+      useEffect(() => {
+        dispatch(PicsSlice.fetchPic(data));
+      }, [dispatch, data]);
+    }
+    ```
+
+    Here's what the boilerplate-ridden code looks like when using the React hook:
+
+    ```typescript
+    function ProfilePic(): ReactElement {
+      const userId = useMemo(() => Storage.readUserId()!, []);
+      PicsSlice.useFetchPic({id: userId, type: 'PROFILE_PIC'}));
+    }
+    ```
 
 ## Support
 

@@ -1,16 +1,5 @@
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  PayloadAction,
-} from '@reduxjs/toolkit';
-import {
-  Account,
-  BlockedAccount,
-  UnblockedAccount,
-  UpdatedAccount,
-} from '@neelkamath/omni-chat';
+import {createAsyncThunk, createEntityAdapter, createSelector, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {Account, BlockedAccount, UnblockedAccount, UpdatedAccount} from '@neelkamath/omni-chat';
 import {FetchStatus, RootState} from '../store';
 import {QueriesApiWrapper} from '../../api/QueriesApiWrapper';
 
@@ -29,7 +18,7 @@ export namespace BlockedUsersSlice {
     },
     {
       condition: (_, {getState}) => {
-        const {blockedUsers} = getState() as { blockedUsers: State };
+        const {blockedUsers} = getState() as {blockedUsers: State};
         return blockedUsers.status === 'IDLE';
       },
     }
@@ -48,8 +37,7 @@ export namespace BlockedUsersSlice {
       upsertOne: (state, {payload}: PayloadAction<BlockedAccount>) => {
         adapter.upsertOne(state, {...payload, __typename: 'Account'});
       },
-      removeOne: (state, {payload}: PayloadAction<UnblockedAccount>) =>
-        adapter.removeOne(state, payload.id),
+      removeOne: (state, {payload}: PayloadAction<UnblockedAccount>) => adapter.removeOne(state, payload.id),
     },
     extraReducers: builder => {
       builder
@@ -70,15 +58,10 @@ export namespace BlockedUsersSlice {
 
   export const {updateAccount, upsertOne, removeOne} = slice.actions;
 
-  export const {selectAll} = adapter.getSelectors(
-    (state: RootState) => state.blockedUsers
-  );
+  export const {selectAll} = adapter.getSelectors((state: RootState) => state.blockedUsers);
 
   export const selectIsBlocked = createSelector(
-    [
-      (state: RootState) => state.blockedUsers.ids,
-      (_: RootState, userId: number) => userId,
-    ],
+    [(state: RootState) => state.blockedUsers.ids, (_: RootState, userId: number) => userId],
     (ids: (string | number)[], userId: number) => ids.includes(userId)
   );
 

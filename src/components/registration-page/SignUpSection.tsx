@@ -8,10 +8,10 @@ export default function SignUpSection(): ReactElement {
     <Row gutter={16} justify="space-around" align="middle">
       <Col span={12}>
         <Typography.Title level={2}>Sign Up</Typography.Title>
-        <SignUpForm/>
+        <SignUpForm />
       </Col>
       <Col span={12}>
-        <Image preview={false} alt="Completing" src={completingImage}/>
+        <Image preview={false} alt="Completing" src={completingImage} />
       </Col>
     </Row>
   );
@@ -38,35 +38,27 @@ function SignUpForm(): ReactElement {
   };
   return (
     <Form onFinish={onFinish} name="signUp" layout="vertical">
-      <Form.Item
-        name="username"
-        label="Username"
-        rules={[{required: true, message: 'Enter a username.'}]}
-      >
-        <Input/>
+      <Form.Item name="username" label="Username" rules={[{required: true, message: 'Enter a username.'}]}>
+        <Input />
       </Form.Item>
-      <Form.Item
-        name="password"
-        label="Password"
-        rules={[{required: true, message: 'Enter a password.'}]}
-      >
-        <Input.Password/>
+      <Form.Item name="password" label="Password" rules={[{required: true, message: 'Enter a password.'}]}>
+        <Input.Password />
       </Form.Item>
       <Form.Item
         name="emailAddress"
         label="Email address"
         rules={[{required: true, message: 'Enter an email address.'}]}
       >
-        <Input type="email"/>
+        <Input type="email" />
       </Form.Item>
       <Form.Item name="firstName" label="First name" initialValue="">
-        <Input/>
+        <Input />
       </Form.Item>
       <Form.Item name="lastName" label="Last name" initialValue="">
-        <Input/>
+        <Input />
       </Form.Item>
       <Form.Item name="bio" label="Bio" initialValue="">
-        <Input.TextArea/>
+        <Input.TextArea />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={isLoading}>

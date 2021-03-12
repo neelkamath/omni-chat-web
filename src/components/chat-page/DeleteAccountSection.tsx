@@ -7,11 +7,10 @@ import {AccountSlice} from '../../store/slices/AccountSlice';
 export default function DeleteAccountSection(): ReactElement {
   return (
     <Space direction="vertical" style={{padding: 16}}>
-      If you delete your account, all of your data will be wiped. This means
-      that your private chats with other users will be deleted, etc. Since this
-      is an irreversible action, the support team will be unable to retrieve
-      your data if you change your mind later on.
-      <DeleteAccountForm/>
+      If you delete your account, all of your data will be wiped. This means that your private chats with other users
+      will be deleted, etc. Since this is an irreversible action, the support team will be unable to retrieve your data
+      if you change your mind later on.
+      <DeleteAccountForm />
     </Space>
   );
 }
@@ -25,12 +24,10 @@ function DeleteAccountForm(): ReactElement {
   const dispatch = useDispatch();
   const username = useSelector(AccountSlice.select)?.username;
   dispatch(AccountSlice.fetchAccount());
-  if (username === undefined) return <Spin/>;
+  if (username === undefined) return <Spin />;
   const onFinish = async (data: DeleteAccountFormData) => {
     setLoading(true);
-    data.username === username
-      ? await MutationsApiWrapper.deleteAccount()
-      : message.error('Incorrect username.');
+    data.username === username ? await MutationsApiWrapper.deleteAccount() : message.error('Incorrect username.');
     setLoading(false);
   };
   return (
@@ -40,7 +37,7 @@ function DeleteAccountForm(): ReactElement {
         label={`Enter your username (${username}) to confirm account deletion.`}
         rules={[{required: true, message: 'Enter your username.'}]}
       >
-        <Input/>
+        <Input />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={isLoading} danger>

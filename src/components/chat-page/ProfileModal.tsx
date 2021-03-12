@@ -27,15 +27,10 @@ export interface ProfileModalProps {
 }
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
-export default function ProfileModal({
-                                       account,
-                                       hasChatButton,
-                                       isVisible,
-                                       onCancel,
-                                     }: ProfileModalProps): ReactElement {
+export default function ProfileModal({account, hasChatButton, isVisible, onCancel}: ProfileModalProps): ReactElement {
   return (
     <Modal footer={null} visible={isVisible} onCancel={onCancel}>
-      <ProfileSection account={account} hasChatButton={hasChatButton}/>
+      <ProfileSection account={account} hasChatButton={hasChatButton} />
     </Modal>
   );
 }
@@ -51,9 +46,7 @@ interface ProfileSectionProps {
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function ProfileSection({account, hasChatButton}: ProfileSectionProps) {
-  const pic = useSelector((state: RootState) =>
-    PicsSlice.selectPic(state, 'PROFILE_PIC', account.id, 'ORIGINAL')
-  );
+  const pic = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.id, 'ORIGINAL'));
   const dispatch = useDispatch();
   dispatch(PicsSlice.fetchPic({id: account.id, type: 'PROFILE_PIC'}));
   const name = `${account.firstName} ${account.lastName}`;
@@ -61,7 +54,7 @@ function ProfileSection({account, hasChatButton}: ProfileSectionProps) {
     <List>
       {pic === undefined && (
         <List.Item>
-          <Spin/>
+          <Spin />
         </List.Item>
       )}
       {pic !== undefined && pic !== null && <List.Item>{pic}</List.Item>}
@@ -74,8 +67,7 @@ function ProfileSection({account, hasChatButton}: ProfileSectionProps) {
         </List.Item>
       )}
       <List.Item>
-        <Typography.Text strong>Email address</Typography.Text>:{' '}
-        {account.emailAddress}
+        <Typography.Text strong>Email address</Typography.Text>: {account.emailAddress}
       </List.Item>
       {account.bio.trim().length > 0 && (
         <List.Item>
@@ -83,9 +75,9 @@ function ProfileSection({account, hasChatButton}: ProfileSectionProps) {
         </List.Item>
       )}
       <List.Item>
-        {hasChatButton && <ChatButton userId={account.id}/>}
-        <ContactButton userId={account.id}/>
-        <BlockButton userId={account.id}/>
+        {hasChatButton && <ChatButton userId={account.id} />}
+        <ContactButton userId={account.id} />
+        <BlockButton userId={account.id} />
       </List.Item>
     </List>
   );
@@ -104,7 +96,7 @@ function ChatButton({userId}: ChatButtonProps): ReactElement {
     setLoading(true);
     const chatId = await MutationsApiWrapper.createPrivateChat(userId);
     setLoading(false);
-    if (chatId !== undefined) setContent(<ChatSection chatId={chatId}/>);
+    if (chatId !== undefined) setContent(<ChatSection chatId={chatId} />);
   };
   return (
     <Button loading={isLoading} onClick={onClick}>
@@ -121,12 +113,10 @@ interface ContactButtonProps {
 function ContactButton({userId}: ContactButtonProps): ReactElement {
   const isButtonLoading = useSelector(ContactsSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
-  const isContact = useSelector((state: RootState) =>
-    ContactsSlice.selectIsContact(state, userId)
-  );
+  const isContact = useSelector((state: RootState) => ContactsSlice.selectIsContact(state, userId));
   const dispatch = useDispatch();
   dispatch(ContactsSlice.fetchContacts());
-  if (isButtonLoading) return <Spin size="small"/>;
+  if (isButtonLoading) return <Spin size="small" />;
   const onClick = async () => {
     setLoading(true);
     if (isContact) await MutationsApiWrapper.deleteContacts([userId]);
@@ -146,19 +136,15 @@ interface BlockButtonProps {
 }
 
 function BlockButton({userId}: BlockButtonProps): ReactElement {
-  const isBlocked = useSelector((state: RootState) =>
-    BlockedUsersSlice.selectIsBlocked(state, userId)
-  );
+  const isBlocked = useSelector((state: RootState) => BlockedUsersSlice.selectIsBlocked(state, userId));
   const isButtonLoading = useSelector(BlockedUsersSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
   const dispatch = useDispatch();
   dispatch(BlockedUsersSlice.fetchUsers());
-  if (isButtonLoading) return <Spin size="small"/>;
+  if (isButtonLoading) return <Spin size="small" />;
   const onClick = async () => {
     setLoading(true);
-    isBlocked
-      ? await MutationsApiWrapper.unblockUser(userId)
-      : await MutationsApiWrapper.blockUser(userId);
+    isBlocked ? await MutationsApiWrapper.unblockUser(userId) : await MutationsApiWrapper.blockUser(userId);
     setLoading(false);
   };
   return (

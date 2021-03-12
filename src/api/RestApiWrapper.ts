@@ -18,15 +18,9 @@ import {
 } from '@neelkamath/omni-chat';
 
 export namespace RestApiWrapper {
-  const restApi = new RestApi(
-    process.env.HTTP as HttpProtocol,
-    process.env.API_URL!
-  );
+  const restApi = new RestApi(process.env.HTTP as HttpProtocol, process.env.API_URL!);
 
-  export async function getProfilePic(
-    userId: number,
-    picType: PicType
-  ): Promise<Pic | null | undefined> {
+  export async function getProfilePic(userId: number, picType: PicType): Promise<Pic | null | undefined> {
     try {
       return await restApi.getProfilePic(userId, picType);
     } catch (error) {
@@ -46,16 +40,9 @@ export namespace RestApiWrapper {
     message.success('Profile picture updated.');
   }
 
-  export async function getGroupChatPic(
-    chatId: number,
-    picType: PicType
-  ): Promise<Pic | null | undefined> {
+  export async function getGroupChatPic(chatId: number, picType: PicType): Promise<Pic | null | undefined> {
     try {
-      return await restApi.getGroupChatPic(
-        Storage.readTokenSet()!.accessToken,
-        chatId,
-        picType
-      );
+      return await restApi.getGroupChatPic(Storage.readTokenSet()!.accessToken, chatId, picType);
     } catch (error) {
       if (error instanceof NonexistentChatError) throw error;
       await handleRestApiError(error);
@@ -63,16 +50,9 @@ export namespace RestApiWrapper {
     }
   }
 
-  export async function patchGroupChatPic(
-    chatId: number,
-    pic: File
-  ): Promise<void> {
+  export async function patchGroupChatPic(chatId: number, pic: File): Promise<void> {
     try {
-      await restApi.patchGroupChatPic(
-        Storage.readTokenSet()!.accessToken!,
-        chatId,
-        pic
-      );
+      await restApi.patchGroupChatPic(Storage.readTokenSet()!.accessToken!, chatId, pic);
     } catch (error) {
       await handleRestApiError(error);
       return;
@@ -80,16 +60,9 @@ export namespace RestApiWrapper {
     message.success('Group chat picture updated.');
   }
 
-  export async function getPicMessage(
-    messageId: number,
-    picType: PicType
-  ): Promise<Pic | undefined> {
+  export async function getPicMessage(messageId: number, picType: PicType): Promise<Pic | undefined> {
     try {
-      return await restApi.getPicMessage(
-        Storage.readTokenSet()!.accessToken,
-        messageId,
-        picType
-      );
+      return await restApi.getPicMessage(Storage.readTokenSet()!.accessToken, messageId, picType);
     } catch (error) {
       await handleRestApiError(error);
       return undefined;
@@ -103,31 +76,16 @@ export namespace RestApiWrapper {
     caption: MessageText
   ): Promise<void> {
     try {
-      await restApi.postPicMessage(
-        Storage.readTokenSet()!.accessToken,
-        pic,
-        chatId,
-        contextMessageId,
-        caption
-      );
+      await restApi.postPicMessage(Storage.readTokenSet()!.accessToken, pic, chatId, contextMessageId, caption);
     } catch (error) {
-      if (
-        error instanceof UserNotInChatError ||
-        error instanceof InvalidContextMessageError
-      )
-        throw error;
+      if (error instanceof UserNotInChatError || error instanceof InvalidContextMessageError) throw error;
       await handleRestApiError(error);
     }
   }
 
-  export async function getAudioMessage(
-    messageId: number
-  ): Promise<Audio | undefined> {
+  export async function getAudioMessage(messageId: number): Promise<Audio | undefined> {
     try {
-      return await restApi.getAudioMessage(
-        Storage.readTokenSet()!.accessToken,
-        messageId
-      );
+      return await restApi.getAudioMessage(Storage.readTokenSet()!.accessToken, messageId);
     } catch (error) {
       await handleRestApiError(error);
       return undefined;
@@ -140,30 +98,16 @@ export namespace RestApiWrapper {
     contextMessageId?: ContextMessageId
   ): Promise<void> {
     try {
-      await restApi.postAudioMessage(
-        Storage.readTokenSet()!.accessToken,
-        audio,
-        chatId,
-        contextMessageId
-      );
+      await restApi.postAudioMessage(Storage.readTokenSet()!.accessToken, audio, chatId, contextMessageId);
     } catch (error) {
-      if (
-        error instanceof UserNotInChatError ||
-        error instanceof InvalidContextMessageError
-      )
-        throw error;
+      if (error instanceof UserNotInChatError || error instanceof InvalidContextMessageError) throw error;
       await handleRestApiError(error);
     }
   }
 
-  export async function getVideoMessage(
-    messageId: number
-  ): Promise<Video | undefined> {
+  export async function getVideoMessage(messageId: number): Promise<Video | undefined> {
     try {
-      return await restApi.getVideoMessage(
-        Storage.readTokenSet()!.accessToken,
-        messageId
-      );
+      return await restApi.getVideoMessage(Storage.readTokenSet()!.accessToken, messageId);
     } catch (error) {
       await handleRestApiError(error);
       return undefined;
@@ -176,54 +120,27 @@ export namespace RestApiWrapper {
     contextMessageId?: ContextMessageId
   ): Promise<void> {
     try {
-      await restApi.postVideoMessage(
-        Storage.readTokenSet()!.accessToken,
-        video,
-        chatId,
-        contextMessageId
-      );
+      await restApi.postVideoMessage(Storage.readTokenSet()!.accessToken, video, chatId, contextMessageId);
     } catch (error) {
-      if (
-        error instanceof UserNotInChatError ||
-        error instanceof InvalidContextMessageError
-      )
-        throw error;
+      if (error instanceof UserNotInChatError || error instanceof InvalidContextMessageError) throw error;
       await handleRestApiError(error);
     }
   }
 
-  export async function getDocMessage(
-    messageId: number
-  ): Promise<Doc | undefined> {
+  export async function getDocMessage(messageId: number): Promise<Doc | undefined> {
     try {
-      return await restApi.getDocMessage(
-        Storage.readTokenSet()!.accessToken,
-        messageId
-      );
+      return await restApi.getDocMessage(Storage.readTokenSet()!.accessToken, messageId);
     } catch (error) {
       await handleRestApiError(error);
       return undefined;
     }
   }
 
-  export async function postDocMessage(
-    doc: File,
-    chatId: number,
-    contextMessageId?: ContextMessageId
-  ): Promise<void> {
+  export async function postDocMessage(doc: File, chatId: number, contextMessageId?: ContextMessageId): Promise<void> {
     try {
-      await restApi.postDocMessage(
-        Storage.readTokenSet()!.accessToken,
-        doc,
-        chatId,
-        contextMessageId
-      );
+      await restApi.postDocMessage(Storage.readTokenSet()!.accessToken, doc, chatId, contextMessageId);
     } catch (error) {
-      if (
-        error instanceof UserNotInChatError ||
-        error instanceof InvalidContextMessageError
-      )
-        throw error;
+      if (error instanceof UserNotInChatError || error instanceof InvalidContextMessageError) throw error;
       await handleRestApiError(error);
     }
   }

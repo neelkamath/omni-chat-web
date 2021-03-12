@@ -12,8 +12,8 @@ export default function ContactsSection(): ReactElement {
     <Space direction="vertical" style={{padding: 16}}>
       Search contacts by their name, username, or email address.
       <Space direction="vertical">
-        <SearchContactsForm/>
-        <Contacts/>
+        <SearchContactsForm />
+        <Contacts />
       </Space>
     </Space>
   );
@@ -31,23 +31,15 @@ function SearchContactsForm(): ReactElement {
     setLoading(true);
     const response = await QueriesApiWrapper.searchContacts(data.query);
     setLoading(false);
-    if (response !== undefined)
-      dispatch(
-        SearchedContactsSlice.overwrite({query: data.query, contacts: response})
-      );
+    if (response !== undefined) dispatch(SearchedContactsSlice.overwrite({query: data.query, contacts: response}));
   };
   return (
     <Form onFinish={onFinish} name="searchContacts" layout="inline">
       <Form.Item name="query" initialValue={query === undefined ? '' : query}>
-        <Input/>
+        <Input />
       </Form.Item>
       <Form.Item>
-        <Button
-          loading={isLoading}
-          type="primary"
-          htmlType="submit"
-          icon={<SearchOutlined/>}
-        />
+        <Button loading={isLoading} type="primary" htmlType="submit" icon={<SearchOutlined />} />
       </Form.Item>
     </Form>
   );
@@ -58,17 +50,12 @@ function Contacts(): ReactElement {
   const dispatch = useDispatch();
   if (contacts === undefined) {
     QueriesApiWrapper.readContacts().then(response => {
-      if (response !== undefined)
-        dispatch(SearchedContactsSlice.overwrite({contacts: response}));
+      if (response !== undefined) dispatch(SearchedContactsSlice.overwrite({contacts: response}));
     });
-    return <Spin/>;
+    return <Spin />;
   }
   const cards = contacts
     .filter(({node}) => node.id !== Storage.readUserId()!)
-    .map(({node}) => <UserCard key={node.id} account={node}/>);
-  return cards.length === 0 ? (
-    <Empty/>
-  ) : (
-    <Space direction="vertical">{cards}</Space>
-  );
+    .map(({node}) => <UserCard key={node.id} account={node} />);
+  return cards.length === 0 ? <Empty /> : <Space direction="vertical">{cards}</Space>;
 }

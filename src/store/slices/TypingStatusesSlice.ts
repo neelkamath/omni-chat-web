@@ -9,7 +9,7 @@ import {
 } from '@reduxjs/toolkit';
 import {TypingStatus} from '@neelkamath/omni-chat';
 import {FetchStatus, RootState} from '../store';
-import {QueriesApiWrapper} from "../../api/QueriesApiWrapper";
+import {QueriesApiWrapper} from '../../api/QueriesApiWrapper';
 
 /** Generates the {@link TypingStatusesSlice.Entity.id} */
 function generateId(userId: number, chatId: number): string {
@@ -32,13 +32,14 @@ export namespace TypingStatusesSlice {
     'typingStatuses/fetchStatuses',
     async () => {
       const users = await QueriesApiWrapper.readTypingStatuses();
-      return users?.map((status) => ({
-        ...status, id: generateId(status.userId, status.chatId),
+      return users?.map(status => ({
+        ...status,
+        id: generateId(status.userId, status.chatId),
       }));
     },
     {
       condition: (_, {getState}) => {
-        const {typingStatuses} = getState() as { typingStatuses: State };
+        const {typingStatuses} = getState() as {typingStatuses: State};
         return typingStatuses.status === 'IDLE';
       },
     }

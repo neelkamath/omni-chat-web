@@ -9,17 +9,12 @@ export default function EmailPasswordResetCodeSection(): ReactElement {
       <Col span={12}>
         <Typography.Title level={2}>Email Password Reset Code</Typography.Title>
         <Space direction="vertical">
-          If you forgot your password, submit this form to receive an email
-          containing a password reset code.
-          <EmailPasswordResetCodeForm/>
+          If you forgot your password, submit this form to receive an email containing a password reset code.
+          <EmailPasswordResetCodeForm />
         </Space>
       </Col>
       <Col span={4}>
-        <Image
-          preview={false}
-          alt="Forgot password"
-          src={forgotPasswordImage}
-        />
+        <Image preview={false} alt="Forgot password" src={forgotPasswordImage} />
       </Col>
     </Row>
   );
@@ -43,7 +38,7 @@ function EmailPasswordResetCodeForm(): ReactElement {
         label="Email address"
         rules={[{required: true, message: 'Enter your email address.'}]}
       >
-        <Input type="email"/>
+        <Input type="email" />
       </Form.Item>
       <Form.Item>
         <Button loading={isLoading} type="primary" htmlType="submit">

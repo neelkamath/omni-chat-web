@@ -17,9 +17,9 @@ export default function SearchUsersSection(): ReactElement {
     <Space direction="vertical" style={{padding: 16}}>
       Search users by their name, username, or email address.
       <Space direction="vertical">
-        <SearchUsersForm/>
-        <Users/>
-        {hasNextPage && <LoadMoreUsersButton/>}
+        <SearchUsersForm />
+        <Users />
+        {hasNextPage && <LoadMoreUsersButton />}
       </Space>
     </Space>
   );
@@ -37,22 +37,16 @@ function SearchUsersForm(): ReactElement {
     const users = await QueriesApiWrapper.searchUsers(query, {
       first: QUERY_COUNT,
     });
-    if (users !== undefined)
-      dispatch(SearchedUsersSlice.replace({query, users}));
+    if (users !== undefined) dispatch(SearchedUsersSlice.replace({query, users}));
     setLoading(false);
   };
   return (
     <Form onFinish={onFinish} name="searchUsers" layout="inline">
       <Form.Item name="query" initialValue="">
-        <Input/>
+        <Input />
       </Form.Item>
       <Form.Item>
-        <Button
-          loading={isLoading}
-          type="primary"
-          htmlType="submit"
-          icon={<SearchOutlined/>}
-        />
+        <Button loading={isLoading} type="primary" htmlType="submit" icon={<SearchOutlined />} />
       </Form.Item>
     </Form>
   );
@@ -63,12 +57,8 @@ function Users(): ReactElement {
   const users = useSelector(SearchedUsersSlice.selectAll);
   const cards = users
     .filter(({node}) => node.id !== Storage.readUserId()!)
-    .map(({node}) => <UserCard key={node.id} account={node}/>);
-  return cards.length === 0 ? (
-    <Empty/>
-  ) : (
-    <Space direction="vertical">{cards}</Space>
-  );
+    .map(({node}) => <UserCard key={node.id} account={node} />);
+  return cards.length === 0 ? <Empty /> : <Space direction="vertical">{cards}</Space>;
 }
 
 function LoadMoreUsersButton(): ReactElement {

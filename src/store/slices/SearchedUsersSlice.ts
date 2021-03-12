@@ -1,14 +1,5 @@
-import {
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  PayloadAction,
-} from '@reduxjs/toolkit';
-import {
-  AccountEdge,
-  AccountsConnection,
-  UpdatedAccount,
-} from '@neelkamath/omni-chat';
+import {createEntityAdapter, createSelector, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {AccountEdge, AccountsConnection, UpdatedAccount} from '@neelkamath/omni-chat';
 import {RootState} from '../store';
 
 export namespace SearchedUsersSlice {
@@ -50,8 +41,7 @@ export namespace SearchedUsersSlice {
       },
       update: (state, {payload}: PayloadAction<UpdatedAccount>) => {
         const user = state.entities[payload.userId];
-        if (user !== undefined)
-          user.node = {...payload, __typename: 'Account', id: payload.userId};
+        if (user !== undefined) user.node = {...payload, __typename: 'Account', id: payload.userId};
       },
     },
   });
@@ -60,9 +50,7 @@ export namespace SearchedUsersSlice {
 
   export const {replace, add, update} = slice.actions;
 
-  export const {selectAll} = adapter.getSelectors(
-    (state: RootState) => state.searchedUsers
-  );
+  export const {selectAll} = adapter.getSelectors((state: RootState) => state.searchedUsers);
 
   export const selectQuery = createSelector(
     (state: RootState) => state.searchedUsers,
@@ -71,7 +59,6 @@ export namespace SearchedUsersSlice {
 
   export const selectHasNextPage = createSelector(
     (state: RootState) => state.searchedUsers,
-    (state: State) =>
-      state.hasNextPage === undefined ? false : state.hasNextPage
+    (state: State) => (state.hasNextPage === undefined ? false : state.hasNextPage)
   );
 }

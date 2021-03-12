@@ -11,15 +11,15 @@ export interface ChatSectionProps {
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function ChatSection({chatId}: ChatSectionProps): ReactElement {
-  const [section, setSection] = useState(<Spin style={{padding: 16}}/>);
+  const [section, setSection] = useState(<Spin style={{padding: 16}} />);
   useEffect(() => {
     readChat(chatId).then(chat => {
       switch (chat?.__typename) {
         case 'PrivateChat':
-          setSection(<PrivateChatSection chat={chat as PrivateChat}/>);
+          setSection(<PrivateChatSection chat={chat as PrivateChat} />);
           break;
         case 'GroupChat':
-          setSection(<GroupChatSection chat={chat as GroupChat}/>);
+          setSection(<GroupChatSection chat={chat as GroupChat} />);
       }
     });
   }, [chatId]);

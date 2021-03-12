@@ -7,7 +7,7 @@ export default function DevelopersPage(): ReactElement {
   return (
     <HomeLayout>
       <Row style={{padding: 16}}>
-        <DevelopersSection/>
+        <DevelopersSection />
       </Row>
     </HomeLayout>
   );

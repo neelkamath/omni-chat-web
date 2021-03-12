@@ -11,13 +11,13 @@ export default function SignInPage(): ReactElement {
     <HomeLayout>
       <Row gutter={16} style={{padding: 16}}>
         <Row>
-          <SignInSection/>
-          <Divider/>
-          <VerifyYourEmailAddressSection/>
-          <Divider/>
-          <EmailPasswordResetCodeSection/>
-          <Divider/>
-          <ResetPasswordSection/>
+          <SignInSection />
+          <Divider />
+          <VerifyYourEmailAddressSection />
+          <Divider />
+          <EmailPasswordResetCodeSection />
+          <Divider />
+          <ResetPasswordSection />
         </Row>
       </Row>
     </HomeLayout>
