@@ -4,9 +4,9 @@
 
 1. Install the [app](install.md).
 1. Configure the development environment:
-    1. Copy the [`.env`](.env) file to the project's root directory.
-    1. If you're not running the Omni Chat API on `localhost`, change the value of the `API_URL` key (e.g., `localhost:8080`, `example.com/api`).
-    1. If the API server has an SSL certificate, change the values of the `HTTP` and `WS` keys to `https` and `wss` respectively.
+   1. Copy the [`.env`](.env) file to the project's root directory.
+   1. If you're not running the Omni Chat API on `localhost`, change the value of the `API_URL` key (e.g., `localhost:8080`, `example.com/api`).
+   1. If the API server has an SSL certificate, change the values of the `HTTP` and `WS` keys to `https` and `wss` respectively.
 
 ## Development
 
@@ -36,10 +36,10 @@ Here's how to test the production build:
 
 [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) is used to save data such as access tokens. The following data may be saved:
 
-|Key|Explanation|Example|
-|---|---|---|
-|`'accessToken'`|Access token (a JWT).|`'ey9.yfQ.Sfl'`|
-|`'refreshToken'`|Refresh token (a JWT).|`'ey9.yfQ.Sfl'`|
+| Key              | Explanation            | Example         |
+| ---------------- | ---------------------- | --------------- |
+| `'accessToken'`  | Access token (a JWT).  | `'ey9.yfQ.Sfl'` |
+| `'refreshToken'` | Refresh token (a JWT). | `'ey9.yfQ.Sfl'` |
 
 ## Design
 
@@ -51,45 +51,44 @@ Here's how to test the production build:
 
 ## Style Guide
 
-- Group each function's test cases in a `describe()` block. See [`profilePicsSlice.test.ts`](src/store/profilePicsSlice.test.ts) for an example.
+- Group each function's test cases in a `describe()` block. See [`AccountSlice.test.ts`](src/store/slices/__tests__/AccountSlice.test.ts) for an example.
 - Here's an example of how to name images when importing them in TypeScript: To import `happy-news.svg`, write:
 
-    ```typescript
-    import happyNewsImage from './happy-news.svg';
-    ```
+  ```typescript
+  import happyNewsImage from './happy-news.svg';
+  ```
+
 - Name TypeScript files having a main `export` the same as the export (e.g., [`logOut.ts`](src/logOut.ts), [`App.tsx`](src/components/App.tsx). Name other TypeScript files using _camelCase_.
 - Name directories and non-TypeScript files using _kebab-case_.
-- Occasionally when using React Redux, the following boilerplate is required to dispatch an action:
+- When using React Redux, the following boilerplate is occasionally required to dispatch an action:
 
-    ```typescript
-    function ProfilePic(): ReactElement {
-      const userId = useMemo(() => Storage.readUserId()!, []);
-      const dispatch = useDispatch();
-      useEffect(() => {
-        dispatch(PicsSlice.fetchPic({id: userId, type: 'PROFILE_PIC'}));
-      }, [dispatch, userId]);
-    }
-    ```
+  ```typescript
+  function ProfilePic(): ReactElement {
+    const dispatch = useDispatch();
+    useEffect(() => {
+      dispatch(PicsSlice.fetchPic({ id: Storage.readUserId()!, type: 'PROFILE_PIC' }));
+    }, [dispatch, userId]);
+  }
+  ```
 
-    In order to remove this boilerplate, [slices](../src/store/slices) must provide React hooks such as the following:
+  In order to remove this boilerplate, [slices](../src/store/slices) must provide React hooks such as the following:
 
-    ```typescript
-    function useFetchPic(data: PicData): void {
-      const dispatch = useDispatch();
-      useEffect(() => {
-        dispatch(PicsSlice.fetchPic(data));
-      }, [dispatch, data]);
-    }
-    ```
+  ```typescript
+  function useFetchPic(data: PicData): void {
+    const dispatch = useDispatch();
+    useEffect(() => {
+      dispatch(PicsSlice.fetchPic(data));
+    }, [dispatch, data]);
+  }
+  ```
 
-    Here's what the boilerplate-ridden code looks like when using the React hook:
+  Here's what the boilerplate-ridden code looks like when using the React hook:
 
-    ```typescript
-    function ProfilePic(): ReactElement {
-      const userId = useMemo(() => Storage.readUserId()!, []);
-      PicsSlice.useFetchPic({id: userId, type: 'PROFILE_PIC'}));
-    }
-    ```
+  ```typescript
+  function ProfilePic(): ReactElement {
+    PicsSlice.useFetchPic({ id: Storage.readUserId()!, type: 'PROFILE_PIC' }));
+  }
+  ```
 
 ## Support
 

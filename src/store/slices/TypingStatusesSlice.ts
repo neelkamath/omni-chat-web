@@ -17,6 +17,8 @@ function generateId(userId: number, chatId: number): string {
 }
 
 export namespace TypingStatusesSlice {
+  const sliceName = 'typingStatuses';
+
   export interface Entity {
     readonly id: string; // Generated using <generateId()>.
     readonly isTyping: boolean;
@@ -29,7 +31,7 @@ export namespace TypingStatusesSlice {
   const adapter: EntityAdapter<Entity> = createEntityAdapter();
 
   export const fetchStatuses = createAsyncThunk(
-    'typingStatuses/fetchStatuses',
+    `${sliceName}/fetchStatuses`,
     async () => {
       const users = await QueriesApiWrapper.readTypingStatuses();
       return users?.map((status) => ({
@@ -46,7 +48,7 @@ export namespace TypingStatusesSlice {
   );
 
   const slice = createSlice({
-    name: 'typingStatuses',
+    name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: {
       upsertOne: (state, { payload }: PayloadAction<TypingStatus>) => {

@@ -36,9 +36,8 @@ export async function handleGraphQlApiError(error: Error): Promise<void> {
   else if (error instanceof EmailAddressTakenError) message.error('That email address is taken. Try another.');
   else if (error instanceof InvalidDomainError)
     message.error(
-      'The administrator has disallowed the email address\'s domain you\'ve ' +
-      'used. For example, if the administrator has only allowed Gmail ' +
-      'accounts, you\'ll be unable to sign up with an Outlook account.',
+      "The administrator has disallowed the email address's domain you've used. For example, if the administrator " +
+        "has only allowed Gmail accounts, you'll be unable to sign up with an Outlook account.",
       10,
     );
   else if (error instanceof UnregisteredEmailAddressError)
@@ -46,9 +45,8 @@ export async function handleGraphQlApiError(error: Error): Promise<void> {
   else if (error instanceof EmailAddressVerifiedError) message.error('This email address has already been verified.');
   else if (error instanceof CannotDeleteAccountError)
     message.error(
-      'You are the only admin of a group chat containing users other than ' +
-      'yourself. You\'ll need to first appoint a different user as an admin ' +
-      'in order to be able to delete your account.',
+      "You are the only admin of a group chat containing users other than yourself. You'll need to first appoint a " +
+        'different user as an admin in order to be able to delete your account.',
       10,
     );
   else if (error instanceof InvalidChatIdError) message.error('You are no longer in the chat.');
@@ -84,10 +82,7 @@ async function handleCommonApiError(error: Error): Promise<void> {
   else if (error instanceof InternalServerError) await displayBugReporter();
   else if (error instanceof UnauthorizedError) await logOut();
   else if (error instanceof UsernameScalarError)
-    message.error(
-      'A username must not contain whitespace, must be lowercase, and must ' + 'be 1-30 characters long.',
-      10,
-    );
+    message.error('A username must not contain whitespace, must be lowercase, and must be 1-30 characters long.', 10);
   else if (error instanceof PasswordScalarError) message.error('A password must contain non-whitespace characters.');
   else if (error instanceof NameScalarError)
     message.error('A name must neither contain whitespace nor exceed 30 characters.');
@@ -95,9 +90,9 @@ async function handleCommonApiError(error: Error): Promise<void> {
   else if (error instanceof GroupChatDescriptionScalarError)
     message.error("A group chat's description must be at most 1,000 characters.");
   else if (error instanceof MessageTextScalarError)
-    message.error("The text must be 1-10,000 characters, of which at least one isn't " + 'whitespace.', 10);
+    message.error("The text must be 1-10,000 characters, of which at least one isn't whitespace.", 10);
   else if (error instanceof GroupChatTitleScalarError)
-    message.error("A group chat's title must be 1-70 characters, of which at least one " + "isn't whitespace.", 10);
+    message.error("A group chat's title must be 1-70 characters, of which at least one isn't whitespace.", 10);
   else throw error;
   console.error(error);
 }

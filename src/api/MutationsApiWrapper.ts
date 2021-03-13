@@ -241,9 +241,8 @@ export namespace MutationsApiWrapper {
     } catch (error) {
       if (error instanceof InvalidUserIdError)
         message.error(
-          'You\'re the last admin, and there are participants other than ' +
-          'yourself. You\'ll need to first appoint a different user as an ' +
-          'admin.',
+          "You're the last admin, and there are participants other than yourself. You'll need to first appoint a " +
+            'different user as an admin.',
           10,
         );
       else await handleGraphQlApiError(error);

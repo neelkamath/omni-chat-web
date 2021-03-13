@@ -22,6 +22,8 @@ export namespace ChatsSlice {
 
   const groupChatMessagesPagination = { last: 1 };
 
+  const sliceName = 'chats';
+
   const adapter = createEntityAdapter<Chat>({
     sortComparer: (a, b) => {
       const readSent = (chat: Chat) => {
@@ -48,7 +50,7 @@ export namespace ChatsSlice {
 
   /** Fetches/updates the specified chat. */
   export const fetchChat = createAsyncThunk(
-    'chats/fetchChat',
+    `${sliceName}/fetchChat`,
     async (id: number) => {
       return await QueriesApiWrapper.readChat(
         id,
@@ -66,7 +68,7 @@ export namespace ChatsSlice {
   );
 
   export const fetchChats = createAsyncThunk(
-    'chats/fetchChats',
+    `${sliceName}/fetchChats`,
     async () => {
       return await QueriesApiWrapper.readChats(
         privateChatMessagesPagination,
@@ -83,7 +85,7 @@ export namespace ChatsSlice {
   );
 
   const slice = createSlice({
-    name: 'chats',
+    name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: {
       removeOne: (state, { payload }: PayloadAction<number>) => adapter.removeOne(state, payload),

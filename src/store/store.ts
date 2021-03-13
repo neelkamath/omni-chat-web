@@ -9,7 +9,7 @@ import { OnlineStatusesSlice } from './slices/OnlineStatusesSlice';
 import { TypingStatusesSlice } from './slices/TypingStatusesSlice';
 import { ContactsSlice } from './slices/ContactsSlice';
 
-// TODO: Write tests for slices. Otherwise, delete testing dependencies. Updating the testing docs in CONTRIBUTING.md#style-guide.
+// TODO: Write tests for slices.
 
 /**
  * - `'IDLE'` indicates that either the entities have never been fetched or an error occurred during the last fetch.

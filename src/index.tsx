@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './components/App';
 import { MutationsApiWrapper } from './api/MutationsApiWrapper';
 
-// TODO: Test every LOC in ./chat-page/ and outside the /src/components/ directory to verify whether it works.
+// TODO: Test every LOC in ./chat-page/ and outside /src/components/ to verify whether it works.
 // TODO: Ensure subscriptions reconnect if the internet reconnects.
 // TODO: Use GraphQL properly by only querying relevant fields.
 // TODO: Version Omni Chat Web since it depends on certain versions of Omni Chat Backend.

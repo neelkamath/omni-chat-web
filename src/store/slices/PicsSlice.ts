@@ -21,6 +21,8 @@ function generateId(type: EntityType, id: number): string {
 
 /** Profile and group chat pics. */
 export namespace PicsSlice {
+  const sliceName = 'pics';
+
   /** `undefined` if it hasn't been fetched yet. `null` if the user doesn't have one. */
   export type PicUrl = string | null | undefined;
 
@@ -33,7 +35,7 @@ export namespace PicsSlice {
     readonly originalUrl?: PicUrl;
     /** Whether this entity is currently being fetched. */
     readonly isLoading: boolean;
-    /** If an error was thrown while fetching this entity. */
+    /** If an error was thrown while fetching this entity, this won't be `undefined`. */
     readonly error?: NonexistentUserIdError | NonexistentChatError;
   }
 
@@ -58,7 +60,7 @@ export namespace PicsSlice {
   }
 
   export const fetchPic = createAsyncThunk(
-    'pics/fetchPic',
+    `${sliceName}/fetchPic`,
     async ({ id, type }: PicData) => {
       let thumbnail, original;
       switch (type) {
@@ -90,7 +92,7 @@ export namespace PicsSlice {
   );
 
   const slice = createSlice({
-    name: 'pics',
+    name: sliceName,
     initialState: adapter.getInitialState(),
     reducers: {},
     extraReducers: (builder) => {

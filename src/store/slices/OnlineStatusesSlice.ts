@@ -15,11 +15,13 @@ export namespace OnlineStatusesSlice {
     selectId: (model) => model.userId,
   });
 
+  const sliceName = 'onlineStatuses';
+
   export interface State extends ReturnType<typeof adapter.getInitialState> {
     readonly status: FetchStatus;
   }
 
-  export const fetchStatuses = createAsyncThunk('onlineStatuses/fetchStatuses', QueriesApiWrapper.readOnlineStatuses, {
+  export const fetchStatuses = createAsyncThunk(`${sliceName}/fetchStatuses`, QueriesApiWrapper.readOnlineStatuses, {
     condition: (_, { getState }) => {
       const { onlineStatuses } = getState() as { onlineStatuses: State };
       return onlineStatuses.status === 'IDLE';
@@ -27,7 +29,7 @@ export namespace OnlineStatusesSlice {
   });
 
   const slice = createSlice({
-    name: 'onlineStatuses',
+    name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: { upsertOne: adapter.upsertOne },
     extraReducers: (builder) => {

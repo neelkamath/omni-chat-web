@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo, useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { DeleteOutlined, UploadOutlined } from '@ant-design/icons';
 import { Storage } from '../../Storage';
 import logOut from '../../logOut';
@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { AccountSlice } from '../../store/slices/AccountSlice';
 import { RootState } from '../../store/store';
 import { PicsSlice } from '../../store/slices/PicsSlice';
+import { UploadRequestOption as RcCustomRequestOptions } from 'rc-upload/lib/interface';
 
 export default function AccountEditor(): ReactElement {
   return (
@@ -30,7 +31,7 @@ export default function AccountEditor(): ReactElement {
 }
 
 function ProfilePic(): ReactElement {
-  const userId = useMemo(() => Storage.readUserId()!, []);
+  const userId = Storage.readUserId()!;
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'ORIGINAL'));
   const error = useSelector((state: RootState) => PicsSlice.selectError(state, 'PROFILE_PIC', userId));
   if (error instanceof NonexistentUserIdError) logOut();
@@ -41,9 +42,8 @@ function ProfilePic(): ReactElement {
 }
 
 function DeleteProfilePicButton(): ReactElement {
-  const onClick = MutationsApiWrapper.deleteProfilePic;
   return (
-    <Button danger icon={<DeleteOutlined />} onClick={onClick}>
+    <Button danger icon={<DeleteOutlined />} onClick={MutationsApiWrapper.deleteProfilePic}>
       Delete Profile Picture
     </Button>
   );
@@ -51,8 +51,8 @@ function DeleteProfilePicButton(): ReactElement {
 
 function NewProfilePicButton(): ReactElement {
   const [showUploadList, setShowUploadList] = useState<ShowUploadListInterface | boolean>({ showRemoveIcon: false });
-  const customRequest = async (data: RcCustomRequestOptions) => {
-    await RestApiWrapper.patchProfilePic(data.file);
+  const customRequest = async ({ file }: RcCustomRequestOptions) => {
+    await RestApiWrapper.patchProfilePic(file as File);
     setShowUploadList(false);
   };
   return (
@@ -143,7 +143,7 @@ function UpdatePasswordForm(): ReactElement {
     await MutationsApiWrapper.updateAccount({
       __typename: 'AccountUpdate',
       username: null,
-      password: password,
+      password,
       emailAddress: null,
       firstName: null,
       lastName: null,

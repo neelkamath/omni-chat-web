@@ -6,6 +6,8 @@ import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 
 export namespace AccountSlice {
+  const sliceName = 'account';
+
   export interface State {
     /** The user's {@link Account}. `undefined` if it hasn't been fetched yet. */
     readonly data?: Account;
@@ -20,7 +22,7 @@ export namespace AccountSlice {
     }, [dispatch]);
   }
 
-  export const fetchAccount = createAsyncThunk('account/fetchAccount', QueriesApiWrapper.readAccount, {
+  export const fetchAccount = createAsyncThunk(`${sliceName}/fetchAccount`, QueriesApiWrapper.readAccount, {
     condition: (_, { getState }) => {
       const { account } = getState() as { account: State };
       return account.data === undefined && !account.isLoading;
@@ -28,7 +30,7 @@ export namespace AccountSlice {
   });
 
   const slice = createSlice({
-    name: 'account',
+    name: sliceName,
     initialState: { isLoading: false } as State,
     reducers: {
       update: (state, { payload }: PayloadAction<UpdatedAccount>) => {
