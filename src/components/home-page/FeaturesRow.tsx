@@ -158,9 +158,9 @@ function PowerfulMessagesRow(): ReactElement {
           <List.Item>Delete messages.</List.Item>
           <List.Item>Star important messages to easily view them later.</List.Item>
           <List.Item>
-            Format messages using Markdown (e.g., "**Hello**" displays as "
+            Format messages using Markdown (e.g., &quot;**Hello**&quot; displays as &quot;
             <Typography.Text strong>Hello</Typography.Text>
-            ").
+            &quot;).
           </List.Item>
           <List.Item>Reply to a message to prevent context loss.</List.Item>
         </List>
@@ -207,7 +207,7 @@ function ExtensibleRow(): ReactElement {
               </List>
             </Typography.Paragraph>
             <Typography.Paragraph>
-              Here are the instructions to {' '}
+              Here are the instructions to{' '}
               <Typography.Link href='https://github.com/neelkamath/omni-chat-web' target='_blank'>
                 run your own instance
               </Typography.Link>
@@ -221,9 +221,8 @@ function ExtensibleRow(): ReactElement {
             reruns the CI/CD pipeline.
           </List.Item>
           <List.Item>
-            This project is open-source, and allows bots and UI integrations to be {' '}
-            <Typography.Link href='/developers'>built</Typography.Link>
-            .
+            This project is open-source, and allows bots and UI integrations to be{' '}
+            <Typography.Link href='/developers'>built</Typography.Link>.
           </List.Item>
         </List>
       </Col>

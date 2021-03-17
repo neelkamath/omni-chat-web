@@ -42,4 +42,3 @@ function ChatCard({ chat }: ChatCardProps): ReactElement {
     </Card>
   );
 }
-
