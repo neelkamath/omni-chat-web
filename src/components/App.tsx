@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import HomePage from './HomePage';
+import HomePage from './home-page/HomePage';
 import RegistrationPage from './registration-page/RegistrationPage';
 import SignInPage from './sign-in-page/SignInPage';
 import ChatPage from './chat-page/ChatPage';
@@ -16,7 +16,7 @@ export default function App(): ReactElement {
   );
 }
 
-export function Router(): ReactElement {
+function Router(): ReactElement {
   return (
     <BrowserRouter>
       <Switch>

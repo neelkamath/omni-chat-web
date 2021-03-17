@@ -10,7 +10,7 @@ export default function SignInSection(): ReactElement {
         <Typography.Title level={2}>Sign In</Typography.Title>
         <SignInForm />
       </Col>
-      <Col span={7}>
+      <Col span={7} push={1}>
         <Image preview={false} alt='Sign In' src={signInImage} />
       </Col>
     </Row>

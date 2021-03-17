@@ -6,12 +6,14 @@ import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
 export namespace BlockedUsersSlice {
   const adapter = createEntityAdapter<Account>();
 
+  const sliceName = 'blockedUsers';
+
   export interface State extends ReturnType<typeof adapter.getInitialState> {
     readonly status: FetchStatus;
   }
 
   export const fetchUsers = createAsyncThunk(
-    'blockedUsers/fetchUsers',
+    `${sliceName}/fetchUsers`,
     async () => {
       const users = await QueriesApiWrapper.readBlockedUsers();
       return users?.edges?.map(({ node }) => node);
@@ -25,12 +27,12 @@ export namespace BlockedUsersSlice {
   );
 
   const slice = createSlice({
-    name: 'blockedUsers',
+    name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: {
       updateAccount: (state, { payload }: PayloadAction<UpdatedAccount>) => {
         adapter.updateOne(state, {
-          id: payload.userId,
+          id: payload.id,
           changes: { ...payload, __typename: 'Account' },
         });
       },
@@ -67,7 +69,7 @@ export namespace BlockedUsersSlice {
 
   /** Whether the users have been fetched yet. */
   export const selectIsLoaded = createSelector(
-    (state: RootState) => state.blockedUsers,
-    (state: State) => state.status === 'LOADED',
+    (state: RootState) => state.blockedUsers.status,
+    (status: FetchStatus) => status === 'LOADED',
   );
 }

@@ -1,29 +1,20 @@
 import React, { ReactElement, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Card, Col, Row, Spin, Typography } from 'antd';
+import { Card, Col, Row, Typography } from 'antd';
 import ProfileModal from './ProfileModal';
 import { Account } from '@neelkamath/omni-chat';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { PicsSlice } from '../../store/slices/PicsSlice';
-import { RootState } from '../../store/store';
+import { RootState, useThunkDispatch } from '../../store/store';
+import CustomAvatar from './CustomAvatar';
 
 export interface UserCardProps {
   readonly account: Account;
-  /**
-   * A modal displaying the user's profile is shown when the card is clicked. This function is called whenever the modal
-   * is closed to perform any cleanup actions you may want to perform. For example, if a list of the user's contacts are
-   * being displayed, you can update the contacts list because the user may have deleted a contact via the modal.
-   */
-  readonly onModalClose?: () => void;
 }
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
-export default function UserCard({ account, onModalClose }: UserCardProps): ReactElement {
+export default function UserCard({ account }: UserCardProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
-  const onCancel = () => {
-    setVisible(false);
-    if (onModalClose !== undefined) onModalClose();
-  };
   return (
     <>
       <Card hoverable={true} onClick={() => setVisible(true)}>
@@ -36,7 +27,7 @@ export default function UserCard({ account, onModalClose }: UserCardProps): Reac
           </Col>
         </Row>
       </Card>
-      <ProfileModal account={account} isVisible={isVisible} onCancel={onCancel} hasChatButton={true} />
+      <ProfileModal account={account} isVisible={isVisible} onCancel={() => setVisible(false)} hasChatButton={true} />
     </>
   );
 }
@@ -51,12 +42,7 @@ function ProfilePic({ userId }: ProfilePicProps): ReactElement {
   between being searched, and having the profile pic displayed. Since this rarely ever happens, and no harm comes from
   leaving the search result up, we ignore this possibility.
    */
-  const pic = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
-  const dispatch = useDispatch();
-  dispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
-  return pic === undefined ? (
-    <Spin size='small' />
-  ) : (
-    <Avatar size='large' src={pic === null ? <UserOutlined /> : pic} />
-  );
+  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
+  useThunkDispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
+  return <CustomAvatar icon={<UserOutlined />} url={url} />;
 }

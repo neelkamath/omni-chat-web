@@ -2,10 +2,10 @@ import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@r
 import { Account, UpdatedAccount } from '@neelkamath/omni-chat';
 import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
 import { RootState } from '../store';
-import { useDispatch } from 'react-redux';
-import { useEffect } from 'react';
 
 export namespace AccountSlice {
+  const sliceName = 'account';
+
   export interface State {
     /** The user's {@link Account}. `undefined` if it hasn't been fetched yet. */
     readonly data?: Account;
@@ -13,14 +13,7 @@ export namespace AccountSlice {
     readonly isLoading: boolean;
   }
 
-  export function useFetchAccount(): void {
-    const dispatch = useDispatch();
-    useEffect(() => {
-      dispatch(AccountSlice.fetchAccount());
-    }, [dispatch]);
-  }
-
-  export const fetchAccount = createAsyncThunk('account/fetchAccount', QueriesApiWrapper.readAccount, {
+  export const fetchAccount = createAsyncThunk(`${sliceName}/fetchAccount`, QueriesApiWrapper.readAccount, {
     condition: (_, { getState }) => {
       const { account } = getState() as { account: State };
       return account.data === undefined && !account.isLoading;
@@ -28,11 +21,11 @@ export namespace AccountSlice {
   });
 
   const slice = createSlice({
-    name: 'account',
+    name: sliceName,
     initialState: { isLoading: false } as State,
     reducers: {
       update: (state, { payload }: PayloadAction<UpdatedAccount>) => {
-        state.data = { ...payload, __typename: 'Account', id: payload.id };
+        state.data = { ...payload, __typename: 'Account' };
       },
     },
     extraReducers: (builder) => {
@@ -40,10 +33,7 @@ export namespace AccountSlice {
         .addCase(fetchAccount.rejected, (account) => {
           account.isLoading = false;
         })
-        .addCase(fetchAccount.fulfilled, (_, { payload: data }) => ({
-          data,
-          isLoading: false,
-        }))
+        .addCase(fetchAccount.fulfilled, (_, { payload: data }) => ({ data, isLoading: false }))
         .addCase(fetchAccount.pending, (state) => {
           state.isLoading = true;
         });
@@ -56,7 +46,7 @@ export namespace AccountSlice {
 
   /** @returns `undefined` if the {@link Account} hasn't been fetched yet. */
   export const select = createSelector(
-    (state: RootState) => state.account,
-    ({ data }: State) => data,
+    (state: RootState) => state.account.data,
+    (data: Account | undefined) => data,
   );
 }

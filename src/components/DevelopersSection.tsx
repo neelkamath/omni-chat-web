@@ -20,7 +20,7 @@ function BotSection(): ReactElement {
         Read v{process.env.API_VERSION} of the{' '}
         <Typography.Link
           target='_blank'
-          href={`https://github.com/neelkamath/omni-chat/tree/v${process.env.API_VERSION}`}
+          href={`https://github.com/neelkamath/omni-chat-backend/tree/v${process.env.API_VERSION}`}
         >
           API docs
         </Typography.Link>{' '}

@@ -6,10 +6,10 @@ import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
 export default function ResendEmailAddressVerificationCodeSection(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
-      <Col span={5}>
+      <Col span={5} push={2}>
         <Image preview={false} alt='Happy news' src={happyNewsImage} />
       </Col>
-      <Col span={12}>
+      <Col span={12} push={2}>
         <Typography.Title level={2}>Resend Email Address Verification Code</Typography.Title>
         <Space direction='vertical'>
           Submit this form in case you lost your verification code email.

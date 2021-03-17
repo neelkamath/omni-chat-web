@@ -13,12 +13,14 @@ import { FetchStatus, RootState } from '../store';
 export namespace ContactsSlice {
   const adapter: EntityAdapter<Account> = createEntityAdapter();
 
+  const sliceName = 'contacts';
+
   export interface State extends ReturnType<typeof adapter.getInitialState> {
     readonly status: FetchStatus;
   }
 
   export const fetchContacts = createAsyncThunk(
-    'contacts/fetchContacts',
+    `${sliceName}/fetchContacts`,
     async () => {
       const contacts = await QueriesApiWrapper.readContacts();
       return contacts?.edges.map(({ node }) => node);
@@ -32,12 +34,12 @@ export namespace ContactsSlice {
   );
 
   const slice = createSlice({
-    name: 'contacts',
+    name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: {
       updateOne: (state, { payload }: PayloadAction<UpdatedAccount>) => {
         adapter.updateOne(state, {
-          id: payload.userId,
+          id: payload.id,
           changes: { ...payload, __typename: 'Account' },
         });
       },
@@ -72,7 +74,7 @@ export namespace ContactsSlice {
 
   /** Whether all the contacts have been fetched. */
   export const selectIsLoaded = createSelector(
-    (state: RootState) => state.contacts,
-    (contacts: State) => contacts.status === 'LOADED',
+    (state: RootState) => state.contacts.status,
+    (status: FetchStatus) => status === 'LOADED',
   );
 }

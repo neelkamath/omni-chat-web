@@ -11,15 +11,15 @@ import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
 import { FetchStatus, RootState } from '../store';
 
 export namespace OnlineStatusesSlice {
-  const adapter: EntityAdapter<OnlineStatus> = createEntityAdapter({
-    selectId: (model) => model.userId,
-  });
+  const adapter: EntityAdapter<OnlineStatus> = createEntityAdapter({ selectId: (model) => model.userId });
+
+  const sliceName = 'onlineStatuses';
 
   export interface State extends ReturnType<typeof adapter.getInitialState> {
     readonly status: FetchStatus;
   }
 
-  export const fetchStatuses = createAsyncThunk('onlineStatuses/fetchStatuses', QueriesApiWrapper.readOnlineStatuses, {
+  export const fetchStatuses = createAsyncThunk(`${sliceName}/fetchStatuses`, QueriesApiWrapper.readOnlineStatuses, {
     condition: (_, { getState }) => {
       const { onlineStatuses } = getState() as { onlineStatuses: State };
       return onlineStatuses.status === 'IDLE';
@@ -27,7 +27,7 @@ export namespace OnlineStatusesSlice {
   });
 
   const slice = createSlice({
-    name: 'onlineStatuses',
+    name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: { upsertOne: adapter.upsertOne },
     extraReducers: (builder) => {
@@ -49,6 +49,7 @@ export namespace OnlineStatusesSlice {
 
   export const { upsertOne } = slice.actions;
 
+  /** `undefined` if the status hasn't been fetched yet. */
   export const select = createSelector(
     [(state: RootState) => state.onlineStatuses.entities, (_: RootState, userId: number) => userId],
     (entities: Dictionary<OnlineStatus>, userId: number) => entities[userId],

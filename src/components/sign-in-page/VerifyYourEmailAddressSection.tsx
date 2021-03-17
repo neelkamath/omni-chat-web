@@ -6,10 +6,10 @@ import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
 export default function VerifyYourEmailAddressSection(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
-      <Col span={7}>
+      <Col span={7} push={5}>
         <Image preview={false} alt='Mail sent' src={mailSentImage} />
       </Col>
-      <Col span={12}>
+      <Col span={12} push={8}>
         <Typography.Title level={2}>Verify Your Email Address</Typography.Title>
         <VerifyYourEmailAddressForm />
       </Col>

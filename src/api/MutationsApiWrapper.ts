@@ -73,6 +73,8 @@ export namespace MutationsApiWrapper {
   export async function updateAccount(update: AccountUpdate): Promise<void> {
     const oldAccount = await QueriesApiWrapper.readAccount();
     if (oldAccount === undefined) return;
+    const isUpdatedAddress = update.emailAddress !== undefined && oldAccount.emailAddress !== update.emailAddress;
+    if (isUpdatedAddress) await MutationsApiWrapper.setOnline(false);
     try {
       await mutationsApi.updateAccount(Storage.readTokenSet()!.accessToken, update);
     } catch (error) {
@@ -80,7 +82,10 @@ export namespace MutationsApiWrapper {
       return;
     }
     message.success('Account updated.');
-    if (update.emailAddress !== undefined && oldAccount.emailAddress !== update.emailAddress) await logOut();
+    if (isUpdatedAddress) {
+      const mustSetOffline = false;
+      await logOut(mustSetOffline);
+    }
   }
 
   export async function resetPassword(
@@ -116,7 +121,8 @@ export namespace MutationsApiWrapper {
       await handleGraphQlApiError(error);
       return;
     }
-    await logOut();
+    const mustSetOffline = false;
+    await logOut(mustSetOffline);
   }
 
   export async function createContacts(userIdList: number[]): Promise<void> {
@@ -241,9 +247,8 @@ export namespace MutationsApiWrapper {
     } catch (error) {
       if (error instanceof InvalidUserIdError)
         message.error(
-          'You\'re the last admin, and there are participants other than ' +
-          'yourself. You\'ll need to first appoint a different user as an ' +
-          'admin.',
+          "You're the last admin, and there are participants other than yourself. You'll need to first appoint a " +
+            'different user as an admin.',
           10,
         );
       else await handleGraphQlApiError(error);

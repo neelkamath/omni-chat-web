@@ -34,8 +34,8 @@ export namespace SearchedUsersSlice {
         adapter.addMany(state, payload.edges);
       },
       update: (state, { payload }: PayloadAction<UpdatedAccount>) => {
-        const user = state.entities[payload.userId];
-        if (user !== undefined) user.node = { ...payload, __typename: 'Account', id: payload.userId };
+        const user = state.entities[payload.id];
+        if (user !== undefined) user.node = { ...payload, __typename: 'Account' };
       },
     },
   });
@@ -47,12 +47,12 @@ export namespace SearchedUsersSlice {
   export const { selectAll } = adapter.getSelectors((state: RootState) => state.searchedUsers);
 
   export const selectQuery = createSelector(
-    (state: RootState) => state.searchedUsers,
-    (state: State) => state.query,
+    (state: RootState) => state.searchedUsers.query,
+    (query: string | undefined) => query,
   );
 
   export const selectHasNextPage = createSelector(
-    (state: RootState) => state.searchedUsers,
-    (state: State) => (state.hasNextPage === undefined ? false : state.hasNextPage),
+    (state: RootState) => state.searchedUsers.hasNextPage,
+    (hasNextPage: boolean | undefined) => (hasNextPage === undefined ? false : hasNextPage),
   );
 }

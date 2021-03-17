@@ -1,13 +1,5 @@
 import React, { ReactElement } from 'react';
 import { Col, Divider, Image, List, Row, Space, Typography } from 'antd';
-import femaleAvatarImage from '../images/female-avatar.svg';
-import onlineDiscussionImage from '../images/online-discussion.svg';
-import groupChatImage from '../images/group-chat.svg';
-import videoCallImage from '../images/video-call.svg';
-import messagingFunImage from '../images/messaging-fun.svg';
-import securityImage from '../images/security.svg';
-import coverImage from '../images/cover.png';
-import HomeLayout from './HomeLayout';
 import {
   CommentOutlined,
   GroupOutlined,
@@ -16,40 +8,39 @@ import {
   RobotOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
+import femaleAvatarImage from '../../images/female-avatar.svg';
+import onlineDiscussionImage from '../../images/online-discussion.svg';
+import groupChatImage from '../../images/group-chat.svg';
+import videoCallImage from '../../images/video-call.svg';
+import messagingFunImage from '../../images/messaging-fun.svg';
+import securityImage from '../../images/security.svg';
 
-export default function HomePage(): ReactElement {
+export default function FeaturesRow(): ReactElement {
   return (
-    <HomeLayout>
-      <Space direction='vertical'>
-        <Image preview={false} src={coverImage} alt='Cover' />
-        <Row gutter={16} justify='space-around'>
-          <Col>
-            <Typography.Title level={2}>Trusted, Extensible, Better Chat</Typography.Title>
-          </Col>
-        </Row>
-        <Row gutter={16} style={{ padding: 16 }}>
-          <UsersRow />
-          <Divider />
-          <ChatsRow />
-          <Divider />
-          <GroupChatsRow />
-          <Divider />
-          <FreeCallsRow />
-          <Divider />
-          <PowerfulMessagesRow />
-          <Divider />
-          <ExtensibleRow />
-        </Row>
-      </Space>
-    </HomeLayout>
+    <>
+      <Divider>
+        <Typography.Title level={3}>Features</Typography.Title>
+      </Divider>
+      <UsersRow />
+      <Divider />
+      <ChatsRow />
+      <Divider />
+      <GroupChatsRow />
+      <Divider />
+      <FreeCallsRow />
+      <Divider />
+      <PowerfulMessagesRow />
+      <Divider />
+      <ExtensibleRow />
+    </>
   );
 }
 
 function UsersRow(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
-      <Col span={12}>
-        <Typography.Title level={3}>
+      <Col span={12} push={2}>
+        <Typography.Title level={4}>
           <Space>
             <TeamOutlined /> Users
           </Space>
@@ -57,11 +48,11 @@ function UsersRow(): ReactElement {
         <List>
           <List.Item>Search for your friends and family.</List.Item>
           <List.Item>Use on any device - no phone required.</List.Item>
-          <List.Item>Automatic online status.</List.Item>
+          <List.Item>See whether a user is online, or when they were last online.</List.Item>
           <List.Item>Block and unblock users without them knowing.</List.Item>
         </List>
       </Col>
-      <Col span={4}>
+      <Col span={4} push={2}>
         <Image preview={false} src={femaleAvatarImage} alt='Female avatar' />
       </Col>
     </Row>
@@ -75,7 +66,7 @@ function ChatsRow(): ReactElement {
         <Image preview={false} src={onlineDiscussionImage} alt='Online discussion' />
       </Col>
       <Col span={12}>
-        <Typography.Title level={3}>
+        <Typography.Title level={4}>
           <Space>
             <CommentOutlined /> Chats
           </Space>
@@ -92,6 +83,7 @@ function ChatsRow(): ReactElement {
             Public chats such as an official Android chat, random groups individuals have created, and a Mario Kart
             chat. People can search for, and view public chats without an account. Anyone with an account can join them.
           </List.Item>
+          <List.Item>See which users are currently typing in a chat.</List.Item>
         </List>
       </Col>
     </Row>
@@ -101,8 +93,8 @@ function ChatsRow(): ReactElement {
 function GroupChatsRow(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
-      <Col span={12}>
-        <Typography.Title level={3}>
+      <Col span={12} push={1}>
+        <Typography.Title level={4}>
           <Space>
             <GroupOutlined /> Group Chats
           </Space>
@@ -115,7 +107,7 @@ function GroupChatsRow(): ReactElement {
           <List.Item>Invite codes.</List.Item>
         </List>
       </Col>
-      <Col span={6}>
+      <Col span={6} pull={2}>
         <Image preview={false} src={groupChatImage} alt='Group chat' />
       </Col>
     </Row>
@@ -125,11 +117,11 @@ function GroupChatsRow(): ReactElement {
 function FreeCallsRow(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
-      <Col span={7}>
+      <Col span={7} push={2}>
         <Image preview={false} src={videoCallImage} alt='Video call' />
       </Col>
-      <Col span={12}>
-        <Typography.Title level={3}>
+      <Col span={12} push={5}>
+        <Typography.Title level={4}>
           <Space>
             <PhoneOutlined /> Free Calls
           </Space>
@@ -138,7 +130,7 @@ function FreeCallsRow(): ReactElement {
           <List.Item>Group audio calls.</List.Item>
           <List.Item>Group video calls.</List.Item>
           <List.Item>Screen sharing.</List.Item>
-          <List.Item>Background noise cancellation for both audio and video calls.</List.Item>
+          <List.Item>Background noise cancellation.</List.Item>
           <List.Item>Spatial audio calls for gamers.</List.Item>
         </List>
       </Col>
@@ -150,7 +142,7 @@ function PowerfulMessagesRow(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
       <Col span={12}>
-        <Typography.Title level={3}>
+        <Typography.Title level={4}>
           <Space>
             <MessageOutlined /> Powerful Messages
           </Space>
@@ -162,10 +154,14 @@ function PowerfulMessagesRow(): ReactElement {
           </List.Item>
           <List.Item>Forward messages.</List.Item>
           <List.Item>Search messages.</List.Item>
-          <List.Item>See when the message was sent, delivered, and read.</List.Item>
+          <List.Item>See when the message was sent, delivered, and read by each user.</List.Item>
           <List.Item>Delete messages.</List.Item>
-          <List.Item>Star messages.</List.Item>
-          <List.Item>Markdown support.</List.Item>
+          <List.Item>Star important messages to easily view them later.</List.Item>
+          <List.Item>
+            Format messages using Markdown (e.g., &quot;**Hello**&quot; displays as &quot;
+            <Typography.Text strong>Hello</Typography.Text>
+            &quot;).
+          </List.Item>
           <List.Item>Reply to a message to prevent context loss.</List.Item>
         </List>
       </Col>
@@ -183,22 +179,40 @@ function ExtensibleRow(): ReactElement {
         <Image preview={false} src={securityImage} alt='Security' />
       </Col>
       <Col span={12}>
-        <Typography.Title level={3}>
+        <Typography.Title level={4}>
           <Space>
             <RobotOutlined /> Extensible
           </Space>
         </Typography.Title>
-        <List>
+        <List itemLayout='vertical'>
           <List.Item>
-            Omni Chat can be deployed for private use as well. For example, a company may only want to use it as an
-            internal platform, in which case they can specify that only certain email address domains can create
-            accounts. This way, even if an intruder gets into the company&apos;s network, they won&apos;t be able to
-            create an account since they won&apos;t have a company issued email address. This feature also prevents
-            employees from creating an account with their personal email address. Here are the instructions to{' '}
-            <Typography.Link href='https://github.com/neelkamath/omni-chat-web' target='_blank'>
-              run your own instance
-            </Typography.Link>
-            .
+            <Typography.Paragraph>Omni Chat can be self-hosted.</Typography.Paragraph>
+            <Typography.Paragraph>
+              Citizens of countries which actively block foreign services (e.g., China, Pakistan) can still use it since
+              they can easily run their own server which will obviously be hosted on a different domain, port, etc.
+              which the government cannot easily block.
+            </Typography.Paragraph>
+            <Typography.Paragraph>
+              Organizations dealing with sensitive data can self-host. Signups can be restricted to users with email
+              address domains allowed by the admin (e.g., john@company.example.com could be allowed but not
+              john@gmail.com). The organization may choose to run the service behind their firewall which prevents the
+              following problems from arising:
+              <List size='small'>
+                <List.Item>Hackers getting access to the service.</List.Item>
+                <List.Item>Employees leaking information after-hours.</List.Item>
+                <List.Item>
+                  Employees being the target of identity theft after-hours. For example, an employee may have their
+                  laptop unlocked while they go to a café’s restroom, or a thief may steal their phone.
+                </List.Item>
+              </List>
+            </Typography.Paragraph>
+            <Typography.Paragraph>
+              Here are the instructions to{' '}
+              <Typography.Link href='https://github.com/neelkamath/omni-chat-web' target='_blank'>
+                run your own instance
+              </Typography.Link>
+              .
+            </Typography.Paragraph>
           </List.Item>
           <List.Item>
             Create and use bots which give power to restaurant owners, customer service representatives, DevOps teams,
@@ -206,7 +220,10 @@ function ExtensibleRow(): ReactElement {
             fails, a bot could message the specifics on the group with a button, which when clicked, automatically
             reruns the CI/CD pipeline.
           </List.Item>
-          <List.Item>This project is open-source, and allows bots and UI integrations to be built.</List.Item>
+          <List.Item>
+            This project is open-source, and allows bots and UI integrations to be{' '}
+            <Typography.Link href='/developers'>built</Typography.Link>.
+          </List.Item>
         </List>
       </Col>
     </Row>

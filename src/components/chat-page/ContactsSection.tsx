@@ -1,7 +1,6 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Empty, Form, Input, Space, Spin } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import { Storage } from '../../Storage';
 import UserCard from './UserCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchedContactsSlice } from '../../store/slices/SearchedContactsSlice';
@@ -27,11 +26,11 @@ function SearchContactsForm(): ReactElement {
   const query = useSelector(SearchedContactsSlice.selectQuery);
   const dispatch = useDispatch();
   const [isLoading, setLoading] = useState(false);
-  const onFinish = async (data: SearchContactsFormData) => {
+  const onFinish = async ({ query }: SearchContactsFormData) => {
     setLoading(true);
-    const response = await QueriesApiWrapper.searchContacts(data.query);
+    const contacts = await QueriesApiWrapper.searchContacts(query);
     setLoading(false);
-    if (response !== undefined) dispatch(SearchedContactsSlice.overwrite({ query: data.query, contacts: response }));
+    if (contacts !== undefined) dispatch(SearchedContactsSlice.overwrite({ query, contacts }));
   };
   return (
     <Form onFinish={onFinish} name='searchContacts' layout='inline'>
@@ -54,8 +53,6 @@ function Contacts(): ReactElement {
     });
     return <Spin />;
   }
-  const cards = contacts
-    .filter(({ node }) => node.id !== Storage.readUserId()!)
-    .map(({ node }) => <UserCard key={node.id} account={node} />);
+  const cards = contacts.map(({ node }) => <UserCard key={node.id} account={node} />);
   return cards.length === 0 ? <Empty /> : <Space direction='vertical'>{cards}</Space>;
 }
