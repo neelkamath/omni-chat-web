@@ -12,6 +12,7 @@ import { FetchStatus, RootState } from '../store';
 
 export namespace ContactsSlice {
   const adapter: EntityAdapter<Account> = createEntityAdapter();
+
   const sliceName = 'contacts';
 
   export interface State extends ReturnType<typeof adapter.getInitialState> {
@@ -73,7 +74,7 @@ export namespace ContactsSlice {
 
   /** Whether all the contacts have been fetched. */
   export const selectIsLoaded = createSelector(
-    (state: RootState) => state.contacts,
-    (contacts: State) => contacts.status === 'LOADED',
+    (state: RootState) => state.contacts.status,
+    (status: FetchStatus) => status === 'LOADED',
   );
 }

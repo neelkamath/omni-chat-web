@@ -1,6 +1,6 @@
 # Install
 
-1. Install [node.js 14](https://nodejs.org/en/download/).
+1. Install [Node.js 14](https://nodejs.org/en/download/).
 1. Clone the repo using one of the following methods:
    - SSH: `git clone git@github.com:neelkamath/omni-chat-web.git`
    - HTTPS: `git clone https://github.com/neelkamath/omni-chat-web.git`

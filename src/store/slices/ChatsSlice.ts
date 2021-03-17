@@ -6,7 +6,7 @@ import {
   Dictionary,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { Chat, PrivateChat } from '@neelkamath/omni-chat';
+import { BackwardPagination, Chat, ForwardPagination, PrivateChat, UpdatedAccount } from '@neelkamath/omni-chat';
 import { FetchStatus, RootState } from '../store';
 import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
 import { BlockedUsersSlice } from './BlockedUsersSlice';
@@ -16,14 +16,15 @@ import { BlockedUsersSlice } from './BlockedUsersSlice';
  * store their participants in {@link GroupChat.users}.
  */
 export namespace ChatsSlice {
-  const privateChatMessagesPagination = { last: 1 };
+  const privateChatMessagesPagination: BackwardPagination = { last: 1 };
 
-  const groupChatUsersPagination = { first: 0 };
+  const groupChatUsersPagination: ForwardPagination = { first: 0 };
 
-  const groupChatMessagesPagination = { last: 1 };
+  const groupChatMessagesPagination: BackwardPagination = { last: 1 };
 
   const sliceName = 'chats';
 
+  // TODO: Test once chat messages are implemented.
   const adapter = createEntityAdapter<Chat>({
     sortComparer: (a, b) => {
       const readSent = (chat: Chat) => {
@@ -89,6 +90,13 @@ export namespace ChatsSlice {
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: {
       removeOne: (state, { payload }: PayloadAction<number>) => adapter.removeOne(state, payload),
+      // TODO: Test once chat messages are implemented.
+      updateAccount: (state, { payload }: PayloadAction<UpdatedAccount>) => {
+        Object.values(state.entities).forEach((entity) => {
+          const node = entity?.messages.edges[0]?.node;
+          if (payload.username === node?.sender.username) node.sender = { ...payload, __typename: 'Account' };
+        });
+      },
     },
     extraReducers: (builder) => {
       builder
@@ -117,7 +125,7 @@ export namespace ChatsSlice {
 
   export const { reducer } = slice;
 
-  export const { removeOne } = slice.actions;
+  export const { removeOne, updateAccount } = slice.actions;
 
   const { selectAll } = adapter.getSelectors((state: RootState) => state.chats);
 
@@ -137,8 +145,8 @@ export namespace ChatsSlice {
 
   /** Whether the chats have been fetched. */
   export const selectIsLoaded = createSelector(
-    (state: RootState) => state.chats,
-    (state: State) => state.status === 'LOADED',
+    (state: RootState) => state.chats.status,
+    (status: FetchStatus) => status === 'LOADED',
   );
 
   /**

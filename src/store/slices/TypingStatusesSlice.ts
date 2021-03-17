@@ -34,10 +34,7 @@ export namespace TypingStatusesSlice {
     `${sliceName}/fetchStatuses`,
     async () => {
       const users = await QueriesApiWrapper.readTypingStatuses();
-      return users?.map((status) => ({
-        ...status,
-        id: generateId(status.userId, status.chatId),
-      }));
+      return users?.map((status) => ({ id: generateId(status.userId, status.chatId), ...status }));
     },
     {
       condition: (_, { getState }) => {
@@ -52,10 +49,7 @@ export namespace TypingStatusesSlice {
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: {
       upsertOne: (state, { payload }: PayloadAction<TypingStatus>) => {
-        const entity = {
-          ...payload,
-          id: generateId(payload.userId, payload.chatId),
-        };
+        const entity = { id: generateId(payload.userId, payload.chatId), ...payload };
         adapter.upsertOne(state, entity);
       },
     },

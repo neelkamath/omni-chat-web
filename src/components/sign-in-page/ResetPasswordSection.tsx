@@ -9,7 +9,7 @@ export default function ResetPasswordSection(): ReactElement {
       <Col span={9}>
         <Image preview={false} alt='Authentication' src={authenticationImage} />
       </Col>
-      <Col span={12}>
+      <Col span={12} push={1}>
         <Typography.Title level={2}>Reset Password</Typography.Title>
         <Space direction='vertical'>
           If you received an email with a password reset code, submit this form to reset your password.

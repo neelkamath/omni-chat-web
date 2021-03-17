@@ -32,7 +32,7 @@ export namespace BlockedUsersSlice {
     reducers: {
       updateAccount: (state, { payload }: PayloadAction<UpdatedAccount>) => {
         adapter.updateOne(state, {
-          id: payload.userId,
+          id: payload.id,
           changes: { ...payload, __typename: 'Account' },
         });
       },
@@ -69,7 +69,7 @@ export namespace BlockedUsersSlice {
 
   /** Whether the users have been fetched yet. */
   export const selectIsLoaded = createSelector(
-    (state: RootState) => state.blockedUsers,
-    (state: State) => state.status === 'LOADED',
+    (state: RootState) => state.blockedUsers.status,
+    (status: FetchStatus) => status === 'LOADED',
   );
 }

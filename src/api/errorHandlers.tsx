@@ -80,17 +80,19 @@ export async function handleRestApiError(error: Error): Promise<void> {
 async function handleCommonApiError(error: Error): Promise<void> {
   if (error instanceof ConnectionError) await displayConnectionError();
   else if (error instanceof InternalServerError) await displayBugReporter();
-  else if (error instanceof UnauthorizedError) await logOut();
-  else if (error instanceof UsernameScalarError)
+  else if (error instanceof UnauthorizedError) {
+    const mustSetOffline = false;
+    await logOut(mustSetOffline);
+  } else if (error instanceof UsernameScalarError)
     message.error('A username must not contain whitespace, must be lowercase, and must be 1-30 characters long.', 10);
   else if (error instanceof PasswordScalarError) message.error('A password must contain non-whitespace characters.');
   else if (error instanceof NameScalarError)
     message.error('A name must neither contain whitespace nor exceed 30 characters.');
   else if (error instanceof BioScalarError) message.error('A bio cannot exceed 2,500 characters.');
   else if (error instanceof GroupChatDescriptionScalarError)
-    message.error("A group chat's description must be at most 1,000 characters.");
+    message.error('A group chat\'s description must be at most 1,000 characters.');
   else if (error instanceof MessageTextScalarError)
-    message.error("The text must be 1-10,000 characters, of which at least one isn't whitespace.", 10);
+    message.error('The text must be 1-10,000 characters, of which at least one isn\'t whitespace.', 10);
   else if (error instanceof GroupChatTitleScalarError)
     message.error("A group chat's title must be 1-70 characters, of which at least one isn't whitespace.", 10);
   else throw error;
@@ -102,6 +104,7 @@ export async function displayConnectionError(): Promise<void> {
   message.error('The server is currently unreachable.');
 }
 
+// TODO: Automatically send back the error report instead, and show a ConnectionError instead.
 export async function displayBugReporter(): Promise<void> {
   notification.error({
     message: 'Something Went Wrong',

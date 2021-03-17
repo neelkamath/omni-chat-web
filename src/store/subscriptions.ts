@@ -12,7 +12,8 @@ import { TypingStatusesSlice } from './slices/TypingStatusesSlice';
 import { ContactsSlice } from './slices/ContactsSlice';
 import { OnSocketClose } from '@neelkamath/omni-chat';
 
-// TODO: Create web notifications of new messages, group chats added to, etc.
+// TODO: Test every LOC once the app is complete.
+// TODO: Create web notifications of new messages, group chats added to, etc. once the app is complete.
 
 /** `undefined` if no subscription is running. */
 type OnSubscriptionClose = OnSocketClose | undefined;
@@ -28,6 +29,7 @@ let onOnlineStatusesSubscriptionClose: OnSubscriptionClose;
 let onTypingStatusesSubscriptionClose: OnSubscriptionClose;
 
 function verifyCreation(onSubscriptionClose: OnSubscriptionClose): void {
+  // TODO: Automatically send back the error report instead, and show a ConnectionError instead.
   if (onSubscriptionClose !== undefined) throw new Error("Previous subscription hasn't been closed.");
 }
 
@@ -62,23 +64,18 @@ async function setUpAccountsSubscription(): Promise<void> {
     onAccountsSubscriptionClose = SubscriptionsApiWrapper.subscribeToAccounts((message) => {
       switch (message.__typename) {
         case 'CreatedSubscription':
-          resolve(undefined);
+          resolve();
           break;
         case 'UpdatedAccount':
           if (message.id === Storage.readUserId()!) store.dispatch(AccountSlice.update(message));
           store.dispatch(BlockedUsersSlice.updateAccount(message));
+          store.dispatch(ChatsSlice.updateAccount(message));
           store.dispatch(ContactsSlice.updateOne(message));
           store.dispatch(SearchedContactsSlice.updateAccount(message));
           store.dispatch(SearchedUsersSlice.update(message));
           break;
         case 'UpdatedProfilePic':
-          store.dispatch(
-            PicsSlice.fetchPic({
-              id: message.id,
-              type: 'PROFILE_PIC',
-              shouldUpdateOnly: true,
-            }),
-          );
+          store.dispatch(PicsSlice.fetchPic({ id: message.id, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
           break;
         case 'BlockedAccount':
           store.dispatch(BlockedUsersSlice.upsertOne(message));
@@ -115,13 +112,7 @@ async function setUpGroupChatsSubscription(): Promise<void> {
           store.dispatch(ChatsSlice.fetchChat(message.chatId));
           break;
         case 'UpdatedGroupChatPic':
-          store.dispatch(
-            PicsSlice.fetchPic({
-              id: message.id,
-              type: 'GROUP_CHAT_PIC',
-              shouldUpdateOnly: true,
-            }),
-          );
+          store.dispatch(PicsSlice.fetchPic({ id: message.id, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
       }
     });
   });
@@ -164,13 +155,7 @@ async function setUpOnlineStatusesSubscription(): Promise<void> {
           resolve();
           break;
         case 'UpdatedOnlineStatus':
-          store.dispatch(
-            OnlineStatusesSlice.upsertOne({
-              ...message,
-              __typename: 'OnlineStatus',
-              lastOnline: new Date().toISOString(),
-            }),
-          );
+          store.dispatch(OnlineStatusesSlice.upsertOne({ ...message, __typename: 'OnlineStatus' }));
       }
     });
   });

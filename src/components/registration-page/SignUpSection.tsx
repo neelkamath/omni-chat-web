@@ -6,11 +6,11 @@ import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
 export default function SignUpSection(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
-      <Col span={12}>
+      <Col span={11}>
         <Typography.Title level={2}>Sign Up</Typography.Title>
         <SignUpForm />
       </Col>
-      <Col span={12}>
+      <Col span={11}>
         <Image preview={false} alt='Completing' src={completingImage} />
       </Col>
     </Row>
@@ -30,10 +30,7 @@ function SignUpForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const onFinish = async (data: SignUpFormData) => {
     setLoading(true);
-    await MutationsApiWrapper.createAccount({
-      __typename: 'AccountInput',
-      ...data,
-    });
+    await MutationsApiWrapper.createAccount({ __typename: 'AccountInput', ...data });
     setLoading(false);
   };
   return (

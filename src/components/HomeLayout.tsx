@@ -11,7 +11,7 @@ export interface HomeLayoutProps {
 
 export default function HomeLayout({ children }: HomeLayoutProps): ReactElement {
   return (
-    <Layout>
+    <Layout style={{ minHeight: '100%' }}>
       <Layout.Header>
         <HeaderMenu />
       </Layout.Header>

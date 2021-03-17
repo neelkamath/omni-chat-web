@@ -1,4 +1,4 @@
-import { Layout, Row, Spin } from 'antd';
+import { Layout, message, Row, Spin } from 'antd';
 import React, { ReactElement, useEffect, useState } from 'react';
 import ChatPageMenu from './ChatPageMenu';
 import { ChatPageLayoutContext, useChatPageLayoutContext } from '../../chatPageLayoutContext';
@@ -12,6 +12,10 @@ export default function ChatPage(): ReactElement {
     QueriesApiWrapper.refreshTokenSet().then(async () => {
       await MutationsApiWrapper.setOnline(true);
       await setUpSubscriptions();
+      addEventListener('online', () => {
+        if (location.pathname === '/chat')
+          message.warn('Refresh the page to view updates you missed while offline.', 5);
+      });
       setPage(<ChatPageLayout />);
     });
     Notification.requestPermission();
@@ -30,9 +34,9 @@ function LoadingPage(): ReactElement {
 function ChatPageLayout(): ReactElement {
   const context = useChatPageLayoutContext();
   return (
-    <Layout style={{ height: '100%' }}>
+    <Layout style={{ minHeight: '100%' }}>
       <ChatPageLayoutContext.Provider value={context}>
-        <Layout.Sider theme='light'>
+        <Layout.Sider theme='light' width={425}>
           <ChatPageMenu />
         </Layout.Sider>
         <Layout.Content>{context.content}</Layout.Content>

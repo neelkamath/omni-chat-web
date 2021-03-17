@@ -1,14 +1,15 @@
 import React, { ReactElement, useContext, useState } from 'react';
 import { Button, List, Modal, Spin, Typography } from 'antd';
 import { ChatPageLayoutContext } from '../../chatPageLayoutContext';
-import ChatSection from './ChatSection';
+import ChatSection from './chat-section/ChatSection';
 import { Account } from '@neelkamath/omni-chat';
 import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import { useSelector } from 'react-redux';
+import { RootState, useThunkDispatch } from '../../store/store';
 import { ContactsSlice } from '../../store/slices/ContactsSlice';
 import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
 import { PicsSlice } from '../../store/slices/PicsSlice';
+import OriginalProfilePic from './OriginalProfilePic';
 
 export interface ProfileModalProps {
   readonly account: Account;
@@ -37,22 +38,25 @@ interface ProfileSectionProps {
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function ProfileSection({ account, hasChatButton }: ProfileSectionProps) {
-  const pic = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.id, 'ORIGINAL'));
-  const dispatch = useDispatch();
-  dispatch(PicsSlice.fetchPic({ id: account.id, type: 'PROFILE_PIC' }));
-  const name = `${account.firstName} ${account.lastName}`;
+  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.id, 'ORIGINAL'));
+  useThunkDispatch(PicsSlice.fetchPic({ id: account.id, type: 'PROFILE_PIC' }));
+  const name = `${account.firstName} ${account.lastName}`.trim();
   return (
     <List>
-      {pic === undefined && (
+      {url === undefined && (
         <List.Item>
           <Spin />
         </List.Item>
       )}
-      {pic !== undefined && pic !== null && <List.Item>{pic}</List.Item>}
+      {url !== undefined && url !== null && (
+        <List.Item>
+          <OriginalProfilePic url={url} />
+        </List.Item>
+      )}
       <List.Item>
         <Typography.Text strong>Username</Typography.Text>: {account.username}
       </List.Item>
-      {name.trim().length > 0 && (
+      {name.length > 0 && (
         <List.Item>
           <Typography.Text strong>Name</Typography.Text>: {name}
         </List.Item>
@@ -66,8 +70,8 @@ function ProfileSection({ account, hasChatButton }: ProfileSectionProps) {
         </List.Item>
       )}
       <List.Item>
-        {hasChatButton && <ChatButton userId={account.id} />}
         <ContactButton userId={account.id} />
+        {hasChatButton && <ChatButton userId={account.id} />}
         <BlockButton userId={account.id} />
       </List.Item>
     </List>
@@ -102,11 +106,10 @@ interface ContactButtonProps {
 }
 
 function ContactButton({ userId }: ContactButtonProps): ReactElement {
-  const isButtonLoading = useSelector(ContactsSlice.selectIsLoaded);
+  const isButtonLoading = !useSelector(ContactsSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
   const isContact = useSelector((state: RootState) => ContactsSlice.selectIsContact(state, userId));
-  const dispatch = useDispatch();
-  dispatch(ContactsSlice.fetchContacts());
+  useThunkDispatch(ContactsSlice.fetchContacts());
   if (isButtonLoading) return <Spin size='small' />;
   const onClick = async () => {
     setLoading(true);
@@ -128,10 +131,9 @@ interface BlockButtonProps {
 
 function BlockButton({ userId }: BlockButtonProps): ReactElement {
   const isBlocked = useSelector((state: RootState) => BlockedUsersSlice.selectIsBlocked(state, userId));
-  const isButtonLoading = useSelector(BlockedUsersSlice.selectIsLoaded);
+  const isButtonLoading = !useSelector(BlockedUsersSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
-  const dispatch = useDispatch();
-  dispatch(BlockedUsersSlice.fetchUsers());
+  useThunkDispatch(BlockedUsersSlice.fetchUsers());
   if (isButtonLoading) return <Spin size='small' />;
   const onClick = async () => {
     setLoading(true);

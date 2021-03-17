@@ -6,14 +6,14 @@ import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
 export default function EmailPasswordResetCodeSection(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
-      <Col span={12}>
+      <Col span={12} pull={1}>
         <Typography.Title level={2}>Email Password Reset Code</Typography.Title>
         <Space direction='vertical'>
           If you forgot your password, submit this form to receive an email containing a password reset code.
           <EmailPasswordResetCodeForm />
         </Space>
       </Col>
-      <Col span={4}>
+      <Col span={4} pull={2}>
         <Image preview={false} alt='Forgot password' src={forgotPasswordImage} />
       </Col>
     </Row>

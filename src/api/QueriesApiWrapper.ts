@@ -47,7 +47,8 @@ export namespace QueriesApiWrapper {
   export async function refreshTokenSet(): Promise<void> {
     const refreshToken = Storage.readTokenSet()?.refreshToken;
     if (refreshToken === undefined) {
-      await logOut();
+      const mustSetOffline = false;
+      await logOut(mustSetOffline);
       return;
     }
     let tokenSet;

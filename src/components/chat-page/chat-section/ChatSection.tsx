@@ -3,7 +3,7 @@ import { Spin } from 'antd';
 import PrivateChatSection from './PrivateChatSection';
 import GroupChatSection from './GroupChatSection';
 import { Chat, GroupChat, PrivateChat } from '@neelkamath/omni-chat';
-import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
+import { QueriesApiWrapper } from '../../../api/QueriesApiWrapper';
 
 export interface ChatSectionProps {
   readonly chatId: number;

@@ -10,8 +10,6 @@ import {
 import { NonexistentChatError, NonexistentUserIdError, PicType } from '@neelkamath/omni-chat';
 import { RestApiWrapper } from '../../api/RestApiWrapper';
 import { RootState } from '../store';
-import { useDispatch } from 'react-redux';
-import { useEffect } from 'react';
 import EntityType = PicsSlice.EntityType;
 
 /** Generates the {@link Entity.id}. */
@@ -52,13 +50,6 @@ export namespace PicsSlice {
 
   const adapter: EntityAdapter<Entity> = createEntityAdapter();
 
-  export function useFetchPic(data: PicData): void {
-    const dispatch = useDispatch();
-    useEffect(() => {
-      dispatch(PicsSlice.fetchPic(data));
-    }, [dispatch, data]);
-  }
-
   export const fetchPic = createAsyncThunk(
     `${sliceName}/fetchPic`,
     async ({ id, type }: PicData) => {
@@ -86,6 +77,7 @@ export namespace PicsSlice {
         const { pics } = getState() as { pics: EntityState<Entity> };
         const pic = pics.entities[generateId(type, id)];
         if (pic === undefined) return shouldUpdateOnly !== true;
+        if (shouldUpdateOnly === true) return true;
         return (pic.originalUrl === undefined || pic.thumbnailUrl === undefined) && !pic.isLoading;
       },
     },
@@ -124,9 +116,9 @@ export namespace PicsSlice {
       const entity = entities[generateId(type, id)];
       switch (picType) {
         case 'THUMBNAIL':
-          return entity?.originalUrl;
-        case 'ORIGINAL':
           return entity?.thumbnailUrl;
+        case 'ORIGINAL':
+          return entity?.originalUrl;
       }
     },
   );

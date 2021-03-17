@@ -1,15 +1,17 @@
 import React, { ReactElement, useContext, useState } from 'react';
-import { Avatar, Button, Col, Empty, Layout, message, Row, Spin, Typography } from 'antd';
+import { Button, Col, Empty, Layout, message, Row, Tag, Typography } from 'antd';
 import { InfoCircleOutlined, UserOutlined } from '@ant-design/icons';
-import ProfileModal from './ProfileModal';
-import { ChatPageLayoutContext } from '../../chatPageLayoutContext';
+import ProfileModal from '../ProfileModal';
+import { ChatPageLayoutContext } from '../../../chatPageLayoutContext';
 import ChatMessage from './ChatMessage';
 import { Account, NonexistentUserIdError, PrivateChat } from '@neelkamath/omni-chat';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
-import { OnlineStatusesSlice } from '../../store/slices/OnlineStatusesSlice';
-import { TypingStatusesSlice } from '../../store/slices/TypingStatusesSlice';
-import { PicsSlice } from '../../store/slices/PicsSlice';
+import { useSelector } from 'react-redux';
+import { RootState, useThunkDispatch } from '../../../store/store';
+import { OnlineStatusesSlice } from '../../../store/slices/OnlineStatusesSlice';
+import { TypingStatusesSlice } from '../../../store/slices/TypingStatusesSlice';
+import { PicsSlice } from '../../../store/slices/PicsSlice';
+import CustomAvatar from '../CustomAvatar';
+import TimeAgo from 'timeago-react';
 
 export interface PrivateChatSectionProps {
   readonly chat: PrivateChat;
@@ -55,6 +57,7 @@ function Header({ user, chatId }: HeaderProps): ReactElement {
       <OnlineStatusSection userId={user.id} />
       <TypingStatusSection userId={user.id} chatId={chatId} />
       <Col>
+        <Tag color='orange'>Private</Tag>
         <Button ghost onClick={() => setVisible(true)} icon={<InfoCircleOutlined />} />
         <ProfileModal account={user} hasChatButton={false} isVisible={isVisible} onCancel={onCancel} />
       </Col>
@@ -68,18 +71,22 @@ interface OnlineStatusSectionProps {
 
 function OnlineStatusSection({ userId }: OnlineStatusSectionProps): ReactElement {
   const onlineStatus = useSelector((state: RootState) => OnlineStatusesSlice.select(state, userId));
-  const dispatch = useDispatch();
-  dispatch(OnlineStatusesSlice.fetchStatuses());
-  const wrap = (element: ReactElement) => <Col>{element}</Col>;
-  if (onlineStatus === undefined) return wrap(<Spin size='small' />);
+  useThunkDispatch(OnlineStatusesSlice.fetchStatuses());
+  if (onlineStatus === undefined) return <></>;
   let status;
   if (onlineStatus.isOnline) status = 'online';
   else if (onlineStatus.lastOnline === null) status = 'offline';
-  else {
-    const lastOnline = new Date(onlineStatus.lastOnline).toLocaleString();
-    status = `last online ${lastOnline}`;
-  }
-  return wrap(<Typography.Text style={{ color: 'white' }}>{status}</Typography.Text>);
+  else
+    status = (
+      <>
+        last online <TimeAgo datetime={onlineStatus.lastOnline} opts={{ minInterval: 60 }} />
+      </>
+    );
+  return (
+    <Col>
+      <Typography.Text style={{ color: 'white' }}>{status}</Typography.Text>
+    </Col>
+  );
 }
 
 interface TypingStatusSectionProps {
@@ -88,8 +95,7 @@ interface TypingStatusSectionProps {
 }
 
 function TypingStatusSection({ userId, chatId }: TypingStatusSectionProps): ReactElement {
-  const dispatch = useDispatch();
-  dispatch(TypingStatusesSlice.fetchStatuses());
+  useThunkDispatch(TypingStatusesSlice.fetchStatuses());
   const isTyping = useSelector((state: RootState) => TypingStatusesSlice.selectIsTyping(state, userId, chatId));
   return <Col flex='auto'>{isTyping ? '·typing...' : ''}</Col>;
 }
@@ -101,12 +107,11 @@ interface ProfilePicProps {
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function ProfilePic({ userId }: ProfilePicProps): ReactElement {
   const { setContent } = useContext(ChatPageLayoutContext)!;
-  const dispatch = useDispatch();
-  const pic = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
+  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
   const error = useSelector((state: RootState) => PicsSlice.selectError(state, 'PROFILE_PIC', userId));
-  dispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
+  useThunkDispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
   if (error instanceof NonexistentUserIdError)
+    // TODO: Test once Omni Chat Backend 0.17.0 is released because there's a bug preventing us from testing it in v0.16.0
     message.warning('That user just deleted their account.').then(() => setContent(<Empty style={{ padding: 16 }} />));
-  if (pic === undefined || pic === null) return <UserOutlined />;
-  return <Avatar size='large' src={pic} />;
+  return <CustomAvatar icon={<UserOutlined />} url={url} />;
 }

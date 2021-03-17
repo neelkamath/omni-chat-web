@@ -12,14 +12,14 @@ const QUERY_COUNT = 10;
 
 /** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function SearchUsersSection(): ReactElement {
-  const hasNextPage = useSelector(SearchedUsersSlice.selectHasNextPage);
+  const query = useSelector(SearchedUsersSlice.selectQuery);
   return (
     <Space direction='vertical' style={{ padding: 16 }}>
       Search users by their name, username, or email address.
       <Space direction='vertical'>
         <SearchUsersForm />
         <Users />
-        {hasNextPage && <LoadMoreUsersButton />}
+        {query !== undefined && <LoadMoreUsersButton />}
       </Space>
     </Space>
   );
@@ -34,9 +34,7 @@ function SearchUsersForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const onFinish = async ({ query }: SearchUsersFormData) => {
     setLoading(true);
-    const users = await QueriesApiWrapper.searchUsers(query, {
-      first: QUERY_COUNT,
-    });
+    const users = await QueriesApiWrapper.searchUsers(query, { first: QUERY_COUNT });
     if (users !== undefined) dispatch(SearchedUsersSlice.replace({ query, users }));
     setLoading(false);
   };
@@ -69,11 +67,8 @@ function LoadMoreUsersButton(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const onClick = async () => {
     setLoading(true);
-    const after = users[users.length - 1]!.cursor;
-    const connection = await QueriesApiWrapper.searchUsers(query, {
-      first: QUERY_COUNT,
-      after,
-    });
+    const after = users[users.length - 1]?.cursor;
+    const connection = await QueriesApiWrapper.searchUsers(query, { first: QUERY_COUNT, after });
     if (connection !== undefined) dispatch(SearchedUsersSlice.add(connection));
     setLoading(false);
   };
