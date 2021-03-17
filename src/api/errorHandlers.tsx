@@ -90,9 +90,9 @@ async function handleCommonApiError(error: Error): Promise<void> {
     message.error('A name must neither contain whitespace nor exceed 30 characters.');
   else if (error instanceof BioScalarError) message.error('A bio cannot exceed 2,500 characters.');
   else if (error instanceof GroupChatDescriptionScalarError)
-    message.error('A group chat\'s description must be at most 1,000 characters.');
+    message.error("A group chat's description must be at most 1,000 characters.");
   else if (error instanceof MessageTextScalarError)
-    message.error('The text must be 1-10,000 characters, of which at least one isn\'t whitespace.', 10);
+    message.error("The text must be 1-10,000 characters, of which at least one isn't whitespace.", 10);
   else if (error instanceof GroupChatTitleScalarError)
     message.error("A group chat's title must be 1-70 characters, of which at least one isn't whitespace.", 10);
   else throw error;
