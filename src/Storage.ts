@@ -12,12 +12,26 @@ export namespace Storage {
     localStorage.setItem('refreshToken', tokenSet.refreshToken);
   }
 
-  /** @return {@link TokenSet} if the user has already signed in, and `undefined` otherwise. */
+  /**
+   * @return {@link TokenSet} if the user has already signed in, and `undefined` otherwise.
+   * @see {@link readAccessToken}
+   * @see {@link readRefreshToken}
+   */
   export function readTokenSet(): TokenSet | undefined {
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
     if (accessToken === null || refreshToken === null) return undefined;
     return { __typename: 'TokenSet', accessToken, refreshToken };
+  }
+
+  /** @see {@link readTokenSet} */
+  export function readAccessToken(): string | undefined {
+    return readTokenSet()?.accessToken;
+  }
+
+  /** @see {@link readTokenSet} */
+  export function readRefreshToken(): string | undefined {
+    return readTokenSet()?.refreshToken;
   }
 
   /** Deletes the tokens from {@link localStorage}. */

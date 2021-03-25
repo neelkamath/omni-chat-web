@@ -3,7 +3,10 @@ import { Button, Form, Input, message, Space, Spin } from 'antd';
 import { useSelector } from 'react-redux';
 import { AccountSlice } from '../../../store/slices/AccountSlice';
 import { useThunkDispatch } from '../../../store/store';
-import { MutationsApiWrapper } from '../../../api/MutationsApiWrapper';
+import { httpApiConfig, operateGraphQlApi } from '../../../api';
+import { Storage } from '../../../Storage';
+import { deleteAccount } from '@neelkamath/omni-chat';
+import logOut from '../../../logOut';
 
 export default function DeleteAccountSection(): ReactElement {
   return (
@@ -27,7 +30,7 @@ function DeleteAccountForm(): ReactElement {
   if (username === undefined) return <Spin />;
   const onFinish = async (data: DeleteAccountFormData) => {
     setLoading(true);
-    data.username === username ? await MutationsApiWrapper.deleteAccount() : message.error('Incorrect username.');
+    data.username === username ? await operateDeleteAccount() : message.error('Incorrect username.', 3);
     setLoading(false);
   };
   return (
@@ -46,4 +49,19 @@ function DeleteAccountForm(): ReactElement {
       </Form.Item>
     </Form>
   );
+}
+
+// TODO: Test once group chats have been implemented.
+async function operateDeleteAccount(): Promise<void> {
+  const result = await operateGraphQlApi(() => deleteAccount(httpApiConfig, Storage.readAccessToken()!));
+  if (result?.deleteAccount?.__typename === 'CannotDeleteAccount')
+    message.error(
+      'You can\'t delete your account yet because you\'re the last admin of an otherwise nonempty group chat. ' +
+      'You must first assign another user as the admin.',
+      12.5,
+    );
+  else {
+    const setOffline = false;
+    await logOut(setOffline);
+  }
 }

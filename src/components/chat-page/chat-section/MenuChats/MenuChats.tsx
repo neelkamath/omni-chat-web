@@ -11,7 +11,6 @@ import LastChatMessage from './LastChatMessage';
 
 // TODO: Test every LOC in this file once group chats can be created.
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function MenuChats(): ReactElement {
   const chats = useSelector(ChatsSlice.selectChats);
   const isLoading = !useSelector(ChatsSlice.selectIsLoaded);
@@ -26,7 +25,6 @@ interface ChatCardProps {
 }
 
 // TODO: Make chats with new messages stand out, perhaps with a card glow.
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function ChatCard({ chat }: ChatCardProps): ReactElement {
   const { setContent } = useContext(ChatPageLayoutContext)!;
   return (

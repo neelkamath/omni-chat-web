@@ -1,7 +1,8 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, Col, Form, Image, Input, Row, Space, Typography } from 'antd';
+import { Button, Col, Form, Image, Input, message, Row, Space, Typography } from 'antd';
 import happyNewsImage from '../../images/happy-news.svg';
-import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
+import { emailEmailAddressVerification } from '@neelkamath/omni-chat';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export default function ResendEmailAddressVerificationCodeSection(): ReactElement {
   return (
@@ -28,7 +29,7 @@ function ResendEmailAddressVerificationCodeForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const onFinish = async ({ emailAddress }: ResendEmailAddressVerificationCodeFormData) => {
     setLoading(true);
-    await MutationsApiWrapper.emailEmailAddressVerification(emailAddress);
+    await operateEmailEmailAddressVerification(emailAddress);
     setLoading(false);
   };
   return (
@@ -47,4 +48,13 @@ function ResendEmailAddressVerificationCodeForm(): ReactElement {
       </Form.Item>
     </Form>
   );
+}
+
+async function operateEmailEmailAddressVerification(emailAddress: string): Promise<void> {
+  const result = await operateGraphQlApi(() => emailEmailAddressVerification(httpApiConfig, emailAddress));
+  if (result?.emailEmailAddressVerification === null) message.success('Resent verification code.', 3);
+  else if (result?.emailEmailAddressVerification?.__typename === 'EmailAddressVerified')
+    message.warn('The account has already been verified.', 5);
+  else if (result?.emailEmailAddressVerification?.__typename === 'UnregisteredEmailAddress')
+    message.error('There\'s no account associated with that email address.', 5);
 }

@@ -12,7 +12,6 @@ export interface UserCardProps {
   readonly account: Account;
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function UserCard({ account }: UserCardProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
   return (

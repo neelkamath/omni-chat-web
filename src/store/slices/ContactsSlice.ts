@@ -6,9 +6,10 @@ import {
   EntityAdapter,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
-import { Account, DeletedContact, NewContact, UpdatedAccount } from '@neelkamath/omni-chat';
+import { Account, DeletedContact, NewContact, readContacts, UpdatedAccount } from '@neelkamath/omni-chat';
 import { FetchStatus, RootState } from '../store';
+import { Storage } from '../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export namespace ContactsSlice {
   const adapter: EntityAdapter<Account> = createEntityAdapter();
@@ -22,8 +23,8 @@ export namespace ContactsSlice {
   export const fetchContacts = createAsyncThunk(
     `${sliceName}/fetchContacts`,
     async () => {
-      const contacts = await QueriesApiWrapper.readContacts();
-      return contacts?.edges.map(({ node }) => node);
+      const result = await operateGraphQlApi(() => readContacts(httpApiConfig, Storage.readAccessToken()!));
+      return result?.readContacts.edges.map(({ node }) => node);
     },
     {
       condition: (_, { getState }) => {

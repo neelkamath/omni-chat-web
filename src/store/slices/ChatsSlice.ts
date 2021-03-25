@@ -6,22 +6,52 @@ import {
   Dictionary,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { BackwardPagination, Chat, ForwardPagination, PrivateChat, UpdatedAccount } from '@neelkamath/omni-chat';
+import {
+  BackwardPagination,
+  Chat,
+  ForwardPagination,
+  PrivateChat,
+  readChat,
+  readChats,
+  UpdatedAccount,
+} from '@neelkamath/omni-chat';
 import { FetchStatus, RootState } from '../store';
-import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
 import { BlockedUsersSlice } from './BlockedUsersSlice';
+import { Storage } from '../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
+
+const privateChatMessagesPagination: BackwardPagination = { last: 1 };
+const groupChatUsersPagination: ForwardPagination = { first: 0 };
+const groupChatMessagesPagination: BackwardPagination = { last: 1 };
+
+async function operateReadChat(id: number): Promise<Chat | undefined> {
+  const result = await operateGraphQlApi(() => readChat(
+    httpApiConfig,
+    Storage.readAccessToken()!,
+    id,
+    privateChatMessagesPagination,
+    groupChatUsersPagination,
+    groupChatMessagesPagination,
+  ));
+  return result?.readChat.__typename === 'InvalidChatId' ? undefined : result?.readChat;
+}
+
+async function operateReadChats(): Promise<Chat[] | undefined> {
+  const result = await operateGraphQlApi(() => readChats(
+    httpApiConfig,
+    Storage.readAccessToken()!,
+    privateChatMessagesPagination,
+    groupChatUsersPagination,
+    groupChatMessagesPagination,
+  ));
+  return result?.readChats;
+}
 
 /**
  * Stores every chat the user is in. Only the last message sent in ({@link Chat.messages}) is stored. Group chats don't
  * store their participants in {@link GroupChat.users}.
  */
 export namespace ChatsSlice {
-  const privateChatMessagesPagination: BackwardPagination = { last: 1 };
-
-  const groupChatUsersPagination: ForwardPagination = { first: 0 };
-
-  const groupChatMessagesPagination: BackwardPagination = { last: 1 };
-
   const sliceName = 'chats';
 
   // TODO: Test once chat messages are implemented.
@@ -46,48 +76,27 @@ export namespace ChatsSlice {
     /** {@link fetchChats} status. */
     readonly status: FetchStatus;
     /** The IDs of chats currently being fetched via {@link fetchChat}. */
-    readonly fetching: Set<number>;
+    readonly fetching: number[];
   }
 
   /** Fetches/updates the specified chat. */
-  export const fetchChat = createAsyncThunk(
-    `${sliceName}/fetchChat`,
-    async (id: number) => {
-      return await QueriesApiWrapper.readChat(
-        id,
-        privateChatMessagesPagination,
-        groupChatUsersPagination,
-        groupChatMessagesPagination,
-      );
+  export const fetchChat = createAsyncThunk(`${sliceName}/fetchChat`, operateReadChat, {
+    condition: (id, { getState }) => {
+      const { chats } = getState() as { chats: State };
+      return chats.entities[id] === undefined && !chats.fetching.includes(id);
     },
-    {
-      condition: (id, { getState }) => {
-        const { chats } = getState() as { chats: State };
-        return chats.entities[id] === undefined && !chats.fetching.has(id);
-      },
-    },
-  );
+  });
 
-  export const fetchChats = createAsyncThunk(
-    `${sliceName}/fetchChats`,
-    async () => {
-      return await QueriesApiWrapper.readChats(
-        privateChatMessagesPagination,
-        groupChatUsersPagination,
-        groupChatMessagesPagination,
-      );
+  export const fetchChats = createAsyncThunk(`${sliceName}/fetchChats`, operateReadChats, {
+    condition: (_, { getState }) => {
+      const { chats } = getState() as { chats: State };
+      return chats.status === 'IDLE';
     },
-    {
-      condition: (_, { getState }) => {
-        const { chats } = getState() as { chats: State };
-        return chats.status === 'IDLE';
-      },
-    },
-  );
+  });
 
   const slice = createSlice({
     name: sliceName,
-    initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
+    initialState: adapter.getInitialState({ status: 'IDLE', fetching: [] }) as State,
     reducers: {
       removeOne: (state, { payload }: PayloadAction<number>) => adapter.removeOne(state, payload),
       // TODO: Test once chat messages are implemented.
@@ -101,13 +110,13 @@ export namespace ChatsSlice {
     extraReducers: (builder) => {
       builder
         .addCase(fetchChat.pending, (state, { meta }) => {
-          state.fetching.add(meta.arg);
+          state.fetching.push(meta.arg);
         })
         .addCase(fetchChat.rejected, (state, { meta }) => {
-          state.fetching.delete(meta.arg);
+          state.fetching = state.fetching.filter((id) => id !== meta.arg);
         })
         .addCase(fetchChat.fulfilled, (state, { meta, payload }) => {
-          state.fetching.delete(meta.arg);
+          state.fetching = state.fetching.filter((id) => id !== meta.arg);
           if (payload !== undefined) adapter.upsertOne(state, payload);
         })
         .addCase(fetchChats.fulfilled, (state, { payload }) => {

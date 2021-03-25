@@ -195,16 +195,13 @@ function ExtensibleRow(): ReactElement {
             <Typography.Paragraph>
               Organizations dealing with sensitive data can self-host. Signups can be restricted to users with email
               address domains allowed by the admin (e.g., john@company.example.com could be allowed but not
-              john@gmail.com). The organization may choose to run the service behind their firewall which prevents the
-              following problems from arising:
-              <List size='small'>
-                <List.Item>Hackers getting access to the service.</List.Item>
-                <List.Item>Employees leaking information after-hours.</List.Item>
-                <List.Item>
-                  Employees being the target of identity theft after-hours. For example, an employee may have their
-                  laptop unlocked while they go to a café’s restroom, or a thief may steal their phone.
-                </List.Item>
-              </List>
+              john@gmail.com).
+            </Typography.Paragraph>
+            <Typography.Paragraph>
+              The organization may choose to run the service behind their firewall for additional security. This way,
+              employees can't leak information after-hours, hackers won't get access to the service, and employees can't
+              be the target of identity theft (e.g., they may have their laptop unlocked while they go to a café’s
+              restroom, or a thief may steal their phone).
             </Typography.Paragraph>
             <Typography.Paragraph>
               Here are the instructions to{' '}

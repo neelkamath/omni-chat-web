@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
 import store, { useThunkDispatch } from '../../store/store';
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function BlockedUsersSection(): ReactElement {
   const isLoading = !useSelector(BlockedUsersSlice.selectIsLoaded);
   /*

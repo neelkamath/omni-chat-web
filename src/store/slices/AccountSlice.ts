@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Account, UpdatedAccount } from '@neelkamath/omni-chat';
-import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
+import { Account, readAccount, UpdatedAccount } from '@neelkamath/omni-chat';
 import { RootState } from '../store';
+import { Storage } from '../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export namespace AccountSlice {
   const sliceName = 'account';
@@ -13,12 +14,19 @@ export namespace AccountSlice {
     readonly isLoading: boolean;
   }
 
-  export const fetchAccount = createAsyncThunk(`${sliceName}/fetchAccount`, QueriesApiWrapper.readAccount, {
-    condition: (_, { getState }) => {
-      const { account } = getState() as { account: State };
-      return account.data === undefined && !account.isLoading;
+  export const fetchAccount = createAsyncThunk(
+    `${sliceName}/fetchAccount`,
+    async () => {
+      const result = await operateGraphQlApi(() => readAccount(httpApiConfig, Storage.readAccessToken()!));
+      return result?.readAccount;
     },
-  });
+    {
+      condition: (_, { getState }) => {
+        const { account } = getState() as { account: State };
+        return account.data === undefined && !account.isLoading;
+      },
+    },
+  );
 
   const slice = createSlice({
     name: sliceName,
@@ -30,8 +38,8 @@ export namespace AccountSlice {
     },
     extraReducers: (builder) => {
       builder
-        .addCase(fetchAccount.rejected, (account) => {
-          account.isLoading = false;
+        .addCase(fetchAccount.rejected, (state) => {
+          state.isLoading = false;
         })
         .addCase(fetchAccount.fulfilled, (_, { payload: data }) => ({ data, isLoading: false }))
         .addCase(fetchAccount.pending, (state) => {

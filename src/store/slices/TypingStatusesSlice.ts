@@ -7,9 +7,10 @@ import {
   EntityAdapter,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { TypingStatus } from '@neelkamath/omni-chat';
+import { readTypingUsers, TypingStatus } from '@neelkamath/omni-chat';
 import { FetchStatus, RootState } from '../store';
-import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
+import { Storage } from '../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 /** Generates the {@link TypingStatusesSlice.Entity.id} */
 function generateId(userId: number, chatId: number): string {
@@ -33,8 +34,10 @@ export namespace TypingStatusesSlice {
   export const fetchStatuses = createAsyncThunk(
     `${sliceName}/fetchStatuses`,
     async () => {
-      const users = await QueriesApiWrapper.readTypingStatuses();
-      return users?.map((status) => ({ id: generateId(status.userId, status.chatId), ...status }));
+      const chats = await operateGraphQlApi(() => readTypingUsers(httpApiConfig, Storage.readAccessToken()!));
+      return chats?.readTypingUsers.flatMap(({ chatId, users }) =>
+        users.map(({ id }) => ({ id: generateId(id, chatId), isTyping: true })),
+      );
     },
     {
       condition: (_, { getState }) => {
@@ -78,8 +81,7 @@ export namespace TypingStatusesSlice {
       (_: RootState, userId: number) => userId,
       (_state: RootState, _userId: number, chatId: number) => chatId,
     ],
-    (entities: Dictionary<Entity>, userId: number, chatId: number) => {
-      return entities[generateId(userId, chatId)]?.isTyping === true;
-    },
+    (entities: Dictionary<Entity>, userId: number, chatId: number) =>
+      entities[generateId(userId, chatId)]?.isTyping === true,
   );
 }

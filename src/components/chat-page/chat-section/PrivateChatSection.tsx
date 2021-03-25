@@ -1,10 +1,9 @@
-import React, { ReactElement, useContext, useState } from 'react';
-import { Button, Col, Empty, Layout, message, Row, Tag, Typography } from 'antd';
+import React, { ReactElement, useState } from 'react';
+import { Button, Col, Layout, Row, Tag, Typography } from 'antd';
 import { InfoCircleOutlined, UserOutlined } from '@ant-design/icons';
 import ProfileModal from '../ProfileModal';
-import { ChatPageLayoutContext } from '../../../chatPageLayoutContext';
 import ChatMessage from './ChatMessage';
-import { Account, NonexistentUserIdError, PrivateChat } from '@neelkamath/omni-chat';
+import { Account, PrivateChat } from '@neelkamath/omni-chat';
 import { useSelector } from 'react-redux';
 import { RootState, useThunkDispatch } from '../../../store/store';
 import { OnlineStatusesSlice } from '../../../store/slices/OnlineStatusesSlice';
@@ -18,7 +17,6 @@ export interface PrivateChatSectionProps {
 }
 
 // TODO: Create and read messages.
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function PrivateChatSection({ chat }: PrivateChatSectionProps): ReactElement {
   return (
     <Layout>
@@ -40,7 +38,6 @@ interface HeaderProps {
   readonly chatId: number;
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function Header({ user, chatId }: HeaderProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
   const onCancel = () => setVisible(false);
@@ -71,7 +68,7 @@ interface OnlineStatusSectionProps {
 
 function OnlineStatusSection({ userId }: OnlineStatusSectionProps): ReactElement {
   const onlineStatus = useSelector((state: RootState) => OnlineStatusesSlice.select(state, userId));
-  useThunkDispatch(OnlineStatusesSlice.fetchStatuses());
+  useThunkDispatch(OnlineStatusesSlice.fetchStatus(userId));
   if (onlineStatus === undefined) return <></>;
   let status;
   if (onlineStatus.isOnline) status = 'online';
@@ -104,14 +101,9 @@ interface ProfilePicProps {
   readonly userId: number;
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function ProfilePic({ userId }: ProfilePicProps): ReactElement {
-  const { setContent } = useContext(ChatPageLayoutContext)!;
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
-  const error = useSelector((state: RootState) => PicsSlice.selectError(state, 'PROFILE_PIC', userId));
+  // A <NonexistentUserIdError> can occur but the parent element must handle the other user deleting their account.
   useThunkDispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
-  if (error instanceof NonexistentUserIdError)
-    // TODO: Test once Omni Chat Backend 0.17.0 is released because there's a bug preventing us from testing it in v0.16.0
-    message.warning('That user just deleted their account.').then(() => setContent(<Empty style={{ padding: 16 }} />));
   return <CustomAvatar icon={<UserOutlined />} url={url} />;
 }

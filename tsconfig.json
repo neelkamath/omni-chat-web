@@ -2,6 +2,10 @@
   "compilerOptions": {
     "jsx": "react",
     "target": "ES2016",
+    "lib": [
+      "DOM",
+      "ES2020"
+    ],
     "moduleResolution": "Node",
     "strict": true,
     "esModuleInterop": true,

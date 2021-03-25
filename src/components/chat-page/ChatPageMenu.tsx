@@ -9,7 +9,7 @@ import {
   LogoutOutlined,
   SearchOutlined,
   StopOutlined,
-  UserDeleteOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import AccountEditor from './account-editor/AccountEditor';
 import SearchUsersSection from './SearchUsersSection';
@@ -24,9 +24,8 @@ import { PicsSlice } from '../../store/slices/PicsSlice';
 import { RootState, useThunkDispatch } from '../../store/store';
 import { Storage } from '../../Storage';
 import CustomAvatar from './CustomAvatar';
-import { NonexistentUserError } from '@neelkamath/omni-chat';
+import { NonexistentUserIdError } from '@neelkamath/omni-chat';
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function ChatPageMenu(): ReactElement {
   useThunkDispatch(PicsSlice.fetchPic({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
   return (
@@ -45,7 +44,6 @@ export default function ChatPageMenu(): ReactElement {
   );
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function EditAccountCol(): ReactElement {
   const { setContent } = useContext(ChatPageLayoutContext)!;
   useThunkDispatch(PicsSlice.fetchPic({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
@@ -53,15 +51,15 @@ function EditAccountCol(): ReactElement {
     PicsSlice.selectPic(state, 'PROFILE_PIC', Storage.readUserId()!, 'THUMBNAIL'),
   );
   const error = useSelector((state: RootState) => PicsSlice.selectError(state, 'PROFILE_PIC', Storage.readUserId()!));
-  if (error instanceof NonexistentUserError) {
-    const mustSetOffline = false;
-    logOut(mustSetOffline);
+  if (error instanceof NonexistentUserIdError) {
+    const setOffline = false;
+    logOut(setOffline);
   }
   return (
     <Col>
       <Tooltip title='Edit account'>
         <Button
-          icon={<CustomAvatar icon={<UserDeleteOutlined />} url={url} size='small' />}
+          icon={<CustomAvatar icon={<UserOutlined />} url={url} size='small' />}
           onClick={() => setContent(<AccountEditor />)}
         />
       </Tooltip>
@@ -69,7 +67,6 @@ function EditAccountCol(): ReactElement {
   );
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function ContactsCol(): ReactElement {
   const { setContent } = useContext(ChatPageLayoutContext)!;
   const dispatch = useDispatch();
@@ -93,7 +90,6 @@ function ContactsCol(): ReactElement {
   );
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function SearchUsersCol(): ReactElement {
   const { setContent } = useContext(ChatPageLayoutContext)!;
   return (
@@ -105,7 +101,6 @@ function SearchUsersCol(): ReactElement {
   );
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function BlockedUsersCol(): ReactElement {
   const { setContent } = useContext(ChatPageLayoutContext)!;
   return (
@@ -117,7 +112,6 @@ function BlockedUsersCol(): ReactElement {
   );
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function SupportCol(): ReactElement {
   const { setContent } = useContext(ChatPageLayoutContext)!;
   return (
@@ -129,7 +123,6 @@ function SupportCol(): ReactElement {
   );
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function DevelopersCol(): ReactElement {
   const { setContent } = useContext(ChatPageLayoutContext)!;
   return (

@@ -1,15 +1,23 @@
 import React, { ReactElement, useContext, useState } from 'react';
-import { Button, List, Modal, Spin, Typography } from 'antd';
+import { Button, List, message, Modal, Spin, Typography } from 'antd';
 import { ChatPageLayoutContext } from '../../chatPageLayoutContext';
 import ChatSection from './chat-section/ChatSection';
-import { Account } from '@neelkamath/omni-chat';
-import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
+import {
+  Account,
+  blockUser,
+  createContacts,
+  createPrivateChat,
+  deleteContacts,
+  unblockUser,
+} from '@neelkamath/omni-chat';
 import { useSelector } from 'react-redux';
 import { RootState, useThunkDispatch } from '../../store/store';
 import { ContactsSlice } from '../../store/slices/ContactsSlice';
 import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
 import { PicsSlice } from '../../store/slices/PicsSlice';
 import OriginalProfilePic from './OriginalProfilePic';
+import { Storage } from '../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export interface ProfileModalProps {
   readonly account: Account;
@@ -21,7 +29,6 @@ export interface ProfileModalProps {
   readonly onCancel: () => void;
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function ProfileModal({ account, hasChatButton, isVisible, onCancel }: ProfileModalProps): ReactElement {
   return (
     <Modal footer={null} visible={isVisible} onCancel={onCancel}>
@@ -36,7 +43,6 @@ interface ProfileSectionProps {
   readonly hasChatButton: boolean;
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function ProfileSection({ account, hasChatButton }: ProfileSectionProps) {
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.id, 'ORIGINAL'));
   useThunkDispatch(PicsSlice.fetchPic({ id: account.id, type: 'PROFILE_PIC' }));
@@ -64,7 +70,7 @@ function ProfileSection({ account, hasChatButton }: ProfileSectionProps) {
       <List.Item>
         <Typography.Text strong>Email address</Typography.Text>: {account.emailAddress}
       </List.Item>
-      {account.bio.trim().length > 0 && (
+      {account.bio.length > 0 && (
         <List.Item>
           <Typography.Text strong>Bio</Typography.Text>: {account.bio}
         </List.Item>
@@ -83,13 +89,12 @@ interface ChatButtonProps {
   readonly userId: number;
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function ChatButton({ userId }: ChatButtonProps): ReactElement {
   const { setContent } = useContext(ChatPageLayoutContext)!;
   const [isLoading, setLoading] = useState(false);
   const onClick = async () => {
     setLoading(true);
-    const chatId = await MutationsApiWrapper.createPrivateChat(userId);
+    const chatId = await operateCreatePrivateChat(userId);
     setLoading(false);
     if (chatId !== undefined) setContent(<ChatSection chatId={chatId} />);
   };
@@ -98,6 +103,15 @@ function ChatButton({ userId }: ChatButtonProps): ReactElement {
       Chat
     </Button>
   );
+}
+
+async function operateCreatePrivateChat(userId: number): Promise<number | undefined> {
+  const result = await operateGraphQlApi(() => createPrivateChat(httpApiConfig, Storage.readAccessToken()!, userId));
+  if (result?.createPrivateChat.__typename === 'InvalidUserId') {
+    message.warning('The user just deleted their account.', 5);
+    return undefined;
+  }
+  return result?.createPrivateChat.id;
 }
 
 interface ContactButtonProps {
@@ -113,8 +127,7 @@ function ContactButton({ userId }: ContactButtonProps): ReactElement {
   if (isButtonLoading) return <Spin size='small' />;
   const onClick = async () => {
     setLoading(true);
-    if (isContact) await MutationsApiWrapper.deleteContacts([userId]);
-    else await MutationsApiWrapper.createContacts([userId]);
+    isContact ? await operateDeleteContacts(userId) : await operateCreateContacts(userId);
     setLoading(false);
   };
   return (
@@ -122,6 +135,16 @@ function ContactButton({ userId }: ContactButtonProps): ReactElement {
       {isContact ? 'Delete' : 'Create'} Contact
     </Button>
   );
+}
+
+async function operateCreateContacts(userId: number): Promise<void> {
+  const result = await operateGraphQlApi(() => createContacts(httpApiConfig, Storage.readAccessToken()!, [userId]));
+  if (result !== undefined) message.success('Contact created.', 3);
+}
+
+async function operateDeleteContacts(userId: number): Promise<void> {
+  const result = await operateGraphQlApi(() => deleteContacts(httpApiConfig, Storage.readAccessToken()!, [userId]));
+  if (result !== undefined) message.success('Contact deleted', 3);
 }
 
 interface BlockButtonProps {
@@ -137,7 +160,7 @@ function BlockButton({ userId }: BlockButtonProps): ReactElement {
   if (isButtonLoading) return <Spin size='small' />;
   const onClick = async () => {
     setLoading(true);
-    isBlocked ? await MutationsApiWrapper.unblockUser(userId) : await MutationsApiWrapper.blockUser(userId);
+    isBlocked ? await operateUnblockUser(userId) : await operateBlockUser(userId);
     setLoading(false);
   };
   return (
@@ -145,4 +168,14 @@ function BlockButton({ userId }: BlockButtonProps): ReactElement {
       {isBlocked ? 'Unblock' : 'Block'}
     </Button>
   );
+}
+
+async function operateUnblockUser(userId: number): Promise<void> {
+  const result = await operateGraphQlApi(() => unblockUser(httpApiConfig, Storage.readAccessToken()!, userId));
+  if (result !== undefined) message.success('User unblocked.');
+}
+
+async function operateBlockUser(userId: number): Promise<void> {
+  const result = await operateGraphQlApi(() => blockUser(httpApiConfig, Storage.readAccessToken()!, userId));
+  if (result !== undefined) message.success('User blocked.');
 }

@@ -5,12 +5,9 @@ import { Storage } from '../../Storage';
 import UserCard from './UserCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
-import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
+import { searchUsers } from '@neelkamath/omni-chat';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
-/** Number of users to query for at a time. */
-const QUERY_COUNT = 10;
-
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 export default function SearchUsersSection(): ReactElement {
   const query = useSelector(SearchedUsersSlice.selectQuery);
   return (
@@ -34,8 +31,8 @@ function SearchUsersForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const onFinish = async ({ query }: SearchUsersFormData) => {
     setLoading(true);
-    const users = await QueriesApiWrapper.searchUsers(query, { first: QUERY_COUNT });
-    if (users !== undefined) dispatch(SearchedUsersSlice.replace({ query, users }));
+    const result = await operateGraphQlApi(() => searchUsers(httpApiConfig, query, { first: 10 }));
+    if (result !== undefined) dispatch(SearchedUsersSlice.replace({ query, users: result.searchUsers }));
     setLoading(false);
   };
   return (
@@ -50,7 +47,6 @@ function SearchUsersForm(): ReactElement {
   );
 }
 
-/** Must be placed inside a {@link ChatPageLayoutContext.Provider}. */
 function Users(): ReactElement {
   const users = useSelector(SearchedUsersSlice.selectAll);
   const cards = users
@@ -68,8 +64,8 @@ function LoadMoreUsersButton(): ReactElement {
   const onClick = async () => {
     setLoading(true);
     const after = users[users.length - 1]?.cursor;
-    const connection = await QueriesApiWrapper.searchUsers(query, { first: QUERY_COUNT, after });
-    if (connection !== undefined) dispatch(SearchedUsersSlice.add(connection));
+    const connection = await operateGraphQlApi(() => searchUsers(httpApiConfig, query, { after }));
+    if (connection !== undefined) dispatch(SearchedUsersSlice.add(connection.searchUsers));
     setLoading(false);
   };
   return (

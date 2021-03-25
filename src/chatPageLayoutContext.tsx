@@ -1,6 +1,8 @@
 import React, { createContext, ReactElement, useState } from 'react';
 import { Empty } from 'antd';
 
+// TODO: Maybe use Redux instead so that you needn't have weird comments stating to wrap provider everywhere.
+
 export interface ChatPageLayoutContextData {
   /** The {@link ReactElement} to display in the page's content section. */
   readonly content: ReactElement;

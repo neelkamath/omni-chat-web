@@ -10,19 +10,19 @@
 
 ## Development
 
-1. Either run the Omni Chat 0.16.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.16.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.16.0/docs/cloud.md).
+1. Either run the Omni Chat 0.17.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.17.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.17.0/docs/cloud.md).
 1. Run on http://localhost:1234: `npm run dev`
 
 ## Linting
 
 - Check: `npm run lint`
-- Fix: `npm run fix`
+- Check and fix: `npm run fix`
 
 ## Production
 
 Here's how to test the production build:
 
-1. Either run the Omni Chat 0.16.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.16.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.16.0/docs/cloud.md).
+1. Either run the Omni Chat 0.17.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.17.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.17.0/docs/cloud.md).
 1. Save a production build to `dist/`: `npm run build`
 1. Serve the website which has been saved to `dist/`.
 
@@ -53,7 +53,7 @@ Here's how to test the production build:
   import happyNewsImage from './happy-news.svg';
   ```
 
-- Name TypeScript files having a main `export` the same as the export (e.g., [`logOut.ts`](../src/logOut.ts), [`App.tsx`](../src/components/App.tsx). Name other TypeScript files using _camelCase_.
+- Name TypeScript files having a main `export` the same as the export (e.g., [`logOut.ts`](../src/logOut.ts), [`App.tsx`](../src/components/App.tsx)). Name other TypeScript files using _camelCase_.
 - Name directories and non-TypeScript files using _kebab-case_.
 - Directories in [`src/components/`](../src/components) have a file named after the directory (e.g., [`src/components/chat-page`](../src/components/chat-page) contains [`ChatPage.tsx`](../src/component/chat-page/ChatPage.tsx)) which exports the only file needed outside its directory. The rest of the directory's files are only used within the directory.
 
@@ -63,5 +63,4 @@ This app supports the latest version of Chrome, Firefox, Safari, and Edge on des
 
 ## Omni Chat API
 
-- Never use the `@neelkamath/omni-chat` NPM package directly. Always use it through its wrapper ([`src/api/`](../src/api)) or the state manager ([`src/store/`](../src/store)).
-- When the user is signed in, the access token can be assumed to be valid because it's automatically refreshed periodically in the background. This means that if an API call results in an unauthorized error, either the user deleted their account, or an edge case which couldn't be handled occurred (e.g., the access token was deleted from `localStorage` because the browser's history was deleted). In such cases, the user must be logged out using [`logOut.ts`](../src/logOut.ts).
+When the user is signed in, the access token can be assumed to be valid because it's automatically refreshed periodically in the background. This means that if an API call results in an unauthorized error, either the user deleted their account, or an edge case which couldn't be handled occurred (e.g., the access token was deleted from `localStorage` because the browser's history was deleted). In such cases, the user must be logged out using [`logOut.ts`](../src/logOut.ts).

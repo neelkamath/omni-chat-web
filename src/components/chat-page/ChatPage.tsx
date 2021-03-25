@@ -2,19 +2,25 @@ import { Layout, message, Row, Spin } from 'antd';
 import React, { ReactElement, useEffect, useState } from 'react';
 import ChatPageMenu from './ChatPageMenu';
 import { ChatPageLayoutContext, useChatPageLayoutContext } from '../../chatPageLayoutContext';
-import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
-import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
 import { setUpSubscriptions } from '../../store/subscriptions';
+import { Storage } from '../../Storage';
+import { refreshTokenSet, setOnline } from '@neelkamath/omni-chat';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export default function ChatPage(): ReactElement {
   const [page, setPage] = useState(<LoadingPage />);
   useEffect(() => {
-    QueriesApiWrapper.refreshTokenSet().then(async () => {
-      await MutationsApiWrapper.setOnline(true);
+    operateGraphQlApi(() => refreshTokenSet(httpApiConfig, Storage.readRefreshToken()!)).then(async (result) => {
+      if (result === undefined) {
+        location.href = '/sign-in';
+        return;
+      }
+      Storage.saveTokenSet(result.refreshTokenSet);
+      await operateGraphQlApi(() => setOnline(httpApiConfig, Storage.readAccessToken()!, true)); // TODO: Test.
       await setUpSubscriptions();
       addEventListener('online', () => {
         if (location.pathname === '/chat')
-          message.warn('Refresh the page to view updates you missed while offline.', 5);
+          message.warning('Refresh the page to view updates you missed while offline.', 5);
       });
       setPage(<ChatPageLayout />);
     });

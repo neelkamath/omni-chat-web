@@ -1,4 +1,4 @@
-import { OnlineStatus } from '@neelkamath/omni-chat';
+import { OnlineStatus, readOnlineStatus } from '@neelkamath/omni-chat';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -7,8 +7,13 @@ import {
   Dictionary,
   EntityAdapter,
 } from '@reduxjs/toolkit';
-import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
-import { FetchStatus, RootState } from '../store';
+import { RootState } from '../store';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
+
+async function operateReadOnlineStatus(userId: number): Promise<OnlineStatus | undefined> {
+  const result = await operateGraphQlApi(() => readOnlineStatus(httpApiConfig, userId));
+  return result?.readOnlineStatus.__typename === 'InvalidUserId' ? undefined : result?.readOnlineStatus;
+}
 
 export namespace OnlineStatusesSlice {
   const adapter: EntityAdapter<OnlineStatus> = createEntityAdapter({ selectId: (model) => model.userId });
@@ -16,31 +21,32 @@ export namespace OnlineStatusesSlice {
   const sliceName = 'onlineStatuses';
 
   export interface State extends ReturnType<typeof adapter.getInitialState> {
-    readonly status: FetchStatus;
+    /** The IDs of users whose statuses are currently being fetched. */
+    readonly fetching: number[];
   }
 
-  export const fetchStatuses = createAsyncThunk(`${sliceName}/fetchStatuses`, QueriesApiWrapper.readOnlineStatuses, {
-    condition: (_, { getState }) => {
+  export const fetchStatus = createAsyncThunk(`${sliceName}/fetchStatus`, operateReadOnlineStatus, {
+    condition: (userId, { getState }) => {
       const { onlineStatuses } = getState() as { onlineStatuses: State };
-      return onlineStatuses.status === 'IDLE';
+      return !onlineStatuses.ids.includes(userId) && !onlineStatuses.fetching.includes(userId);
     },
   });
 
   const slice = createSlice({
     name: sliceName,
-    initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
+    initialState: adapter.getInitialState({ fetching: [] }) as State,
     reducers: { upsertOne: adapter.upsertOne },
     extraReducers: (builder) => {
       builder
-        .addCase(fetchStatuses.fulfilled, (state, { payload }) => {
-          state.status = 'LOADED';
-          if (payload !== undefined) adapter.upsertMany(state, payload);
+        .addCase(fetchStatus.fulfilled, (state, { payload, meta }) => {
+          state.fetching = state.fetching.filter((userId) => userId !== meta.arg);
+          if (payload !== undefined) adapter.upsertOne(state, payload);
         })
-        .addCase(fetchStatuses.pending, (state) => {
-          state.status = 'LOADING';
+        .addCase(fetchStatus.pending, (state, { meta }) => {
+          state.fetching.push(meta.arg);
         })
-        .addCase(fetchStatuses.rejected, (state) => {
-          state.status = 'IDLE';
+        .addCase(fetchStatus.rejected, (state, { meta }) => {
+          state.fetching = state.fetching.filter((userId) => userId !== meta.arg);
         });
     },
   });

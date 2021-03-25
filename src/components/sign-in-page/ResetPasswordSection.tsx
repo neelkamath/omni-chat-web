@@ -1,7 +1,8 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, Col, Form, Image, Input, Row, Space, Typography } from 'antd';
+import { Button, Col, Form, Image, Input, message, Row, Space, Typography } from 'antd';
 import authenticationImage from '../../images/authentication.svg';
-import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
+import { isValidPasswordScalar, resetPassword } from '@neelkamath/omni-chat';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export default function ResetPasswordSection(): ReactElement {
   return (
@@ -28,9 +29,9 @@ interface ResetPasswordFormData {
 
 function ResetPasswordForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
-  const onFinish = async ({ emailAddress, passwordResetCode, newPassword }: ResetPasswordFormData) => {
+  const onFinish = async (data: ResetPasswordFormData) => {
     setLoading(true);
-    await MutationsApiWrapper.resetPassword(emailAddress, passwordResetCode, newPassword);
+    if (validatePassword(data.newPassword)) await operateResetPassword(data);
     setLoading(false);
   };
   return (
@@ -59,4 +60,26 @@ function ResetPasswordForm(): ReactElement {
       </Form.Item>
     </Form>
   );
+}
+
+function validatePassword(password: string): boolean {
+  if (!isValidPasswordScalar(password)) {
+    message.error('Password must contain characters other than spaces.', 5);
+    return false;
+  }
+  return true;
+}
+
+async function operateResetPassword({
+                                      emailAddress,
+                                      passwordResetCode,
+                                      newPassword,
+                                    }: ResetPasswordFormData): Promise<void> {
+  const result = await operateGraphQlApi(() =>
+    resetPassword(httpApiConfig, emailAddress, passwordResetCode, newPassword),
+  );
+  if (result?.resetPassword === null) message.success('Password reset.', 3);
+  else if (result?.resetPassword?.__typename === 'UnregisteredEmailAddress')
+    message.error('That email address isn\'t registered.', 5);
+  else if (result?.resetPassword?.__typename === 'InvalidPasswordResetCode') message.error('Incorrect reset code.', 3);
 }

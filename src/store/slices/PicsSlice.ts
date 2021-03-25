@@ -7,9 +7,16 @@ import {
   EntityAdapter,
   EntityState,
 } from '@reduxjs/toolkit';
-import { NonexistentChatError, NonexistentUserIdError, PicType } from '@neelkamath/omni-chat';
-import { RestApiWrapper } from '../../api/RestApiWrapper';
+import {
+  getGroupChatPic,
+  getProfilePic,
+  NonexistentChatError,
+  NonexistentUserIdError,
+  PicType,
+} from '@neelkamath/omni-chat';
 import { RootState } from '../store';
+import { Storage } from '../../Storage';
+import { httpApiConfig, operateRestApi } from '../../api';
 import EntityType = PicsSlice.EntityType;
 
 /** Generates the {@link Entity.id}. */
@@ -37,7 +44,7 @@ export namespace PicsSlice {
     readonly error?: NonexistentUserIdError | NonexistentChatError;
   }
 
-  export interface PicData {
+  export interface FetchPicData {
     /**
      * - A user ID if the {@link type} is a `'PROFILE_PIC'`.
      * - A group chat ID if the {@link type} is a`'GROUP_CHAT_PIC'`.
@@ -50,20 +57,36 @@ export namespace PicsSlice {
 
   const adapter: EntityAdapter<Entity> = createEntityAdapter();
 
+  type PicData = Blob | null | undefined;
+
+  interface Pic {
+    readonly thumbnail: PicData;
+    readonly original: PicData;
+  }
+
+  async function getPic({ id, type }: FetchPicData): Promise<Pic> {
+    let thumbnail, original;
+    switch (type) {
+      case 'GROUP_CHAT_PIC':
+        thumbnail = await operateRestApi(() =>
+          getGroupChatPic(httpApiConfig, Storage.readAccessToken()!, id, 'THUMBNAIL'),
+        );
+        original = await operateRestApi(() =>
+          getGroupChatPic(httpApiConfig, Storage.readAccessToken()!, id, 'ORIGINAL'),
+        );
+        break;
+      case 'PROFILE_PIC':
+        thumbnail = await operateRestApi(() => getProfilePic(httpApiConfig, id, 'THUMBNAIL'));
+        original = await operateRestApi(() => getProfilePic(httpApiConfig, id, 'ORIGINAL'));
+    }
+    return { thumbnail, original };
+  }
+
   export const fetchPic = createAsyncThunk(
     `${sliceName}/fetchPic`,
-    async ({ id, type }: PicData) => {
-      let thumbnail, original;
-      switch (type) {
-        case 'GROUP_CHAT_PIC':
-          thumbnail = await RestApiWrapper.getGroupChatPic(id, 'THUMBNAIL');
-          original = await RestApiWrapper.getGroupChatPic(id, 'ORIGINAL');
-          break;
-        case 'PROFILE_PIC':
-          thumbnail = await RestApiWrapper.getProfilePic(id, 'THUMBNAIL');
-          original = await RestApiWrapper.getProfilePic(id, 'ORIGINAL');
-      }
-      const generateUrl = (pic: Blob | null | undefined) => (pic instanceof Blob ? URL.createObjectURL(pic) : pic);
+    async ({ id, type }: FetchPicData) => {
+      const { thumbnail, original } = await getPic({ id, type });
+      const generateUrl = (data: PicData) => (data instanceof Blob ? URL.createObjectURL(data) : data);
       return {
         id: generateId(type, id),
         type,

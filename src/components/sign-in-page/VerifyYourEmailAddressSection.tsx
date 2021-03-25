@@ -1,7 +1,8 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, Col, Form, Image, Input, Row, Typography } from 'antd';
+import { Button, Col, Form, Image, Input, message, Row, Typography } from 'antd';
 import mailSentImage from '../../images/mail-sent.svg';
-import { MutationsApiWrapper } from '../../api/MutationsApiWrapper';
+import { verifyEmailAddress } from '@neelkamath/omni-chat';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export default function VerifyYourEmailAddressSection(): ReactElement {
   return (
@@ -24,9 +25,9 @@ interface VerifyYourEmailAddressFormData {
 
 function VerifyYourEmailAddressForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
-  const onFinish = async ({ emailAddress, verificationCode }: VerifyYourEmailAddressFormData) => {
+  const onFinish = async (data: VerifyYourEmailAddressFormData) => {
     setLoading(true);
-    await MutationsApiWrapper.verifyEmailAddress(emailAddress, verificationCode);
+    await operateVerifyEmailAddress(data);
     setLoading(false);
   };
   return (
@@ -52,4 +53,16 @@ function VerifyYourEmailAddressForm(): ReactElement {
       </Form.Item>
     </Form>
   );
+}
+
+async function operateVerifyEmailAddress({
+                                           emailAddress,
+                                           verificationCode,
+                                         }: VerifyYourEmailAddressFormData): Promise<void> {
+  const result = await operateGraphQlApi(() => verifyEmailAddress(httpApiConfig, emailAddress, verificationCode));
+  if (result?.verifyEmailAddress === null) message.success('Email address verified.', 3);
+  else if (result?.verifyEmailAddress?.__typename === 'UnregisteredEmailAddress')
+    message.error('That email address isn\'t registered.', 5);
+  else if (result?.verifyEmailAddress?.__typename === 'InvalidVerificationCode')
+    message.error('Incorrect verification code.', 3);
 }

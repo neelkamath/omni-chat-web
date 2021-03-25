@@ -1,7 +1,8 @@
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Account, BlockedAccount, UnblockedAccount, UpdatedAccount } from '@neelkamath/omni-chat';
+import { Account, BlockedAccount, readBlockedUsers, UnblockedAccount, UpdatedAccount } from '@neelkamath/omni-chat';
 import { FetchStatus, RootState } from '../store';
-import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
+import { Storage } from '../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export namespace BlockedUsersSlice {
   const adapter = createEntityAdapter<Account>();
@@ -15,8 +16,8 @@ export namespace BlockedUsersSlice {
   export const fetchUsers = createAsyncThunk(
     `${sliceName}/fetchUsers`,
     async () => {
-      const users = await QueriesApiWrapper.readBlockedUsers();
-      return users?.edges?.map(({ node }) => node);
+      const users = await operateGraphQlApi(() => readBlockedUsers(httpApiConfig, Storage.readAccessToken()!));
+      return users?.readBlockedUsers?.edges?.map(({ node }) => node);
     },
     {
       condition: (_, { getState }) => {

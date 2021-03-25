@@ -22,7 +22,7 @@ interface ChatTagsProps {
   readonly chat: GroupChat;
 }
 
-// TODO: Test.
+// TODO: Test once group chats have been implemented.
 function ChatTags({ chat }: ChatTagsProps): ReactElement {
   const tags = [];
   tags.push(

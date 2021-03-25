@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react';
 import { Col, Divider, Image, Row, Space, Typography } from 'antd';
 import { AimOutlined, ControlOutlined, PhoneOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import winnersImage from '../../images/winners.svg';
-import ninjaImage from '../../images/ninja.svg';
+import videoGameNightImage from '../../images/video-game-night.svg';
 import upgradeImage from '../../images/upgrade.svg';
 import makeupArtistImage from '../../images/makeup-artist.svg';
 
@@ -63,8 +63,8 @@ function OverachieverOtisRow(): ReactElement {
 function GamerGlendaRow(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
-      <Col span={9}>
-        <Image preview={false} src={ninjaImage} alt='Ninja' />
+      <Col span={7} push={1}>
+        <Image preview={false} src={videoGameNightImage} alt='Video game night' />
       </Col>
       <Col span={12}>
         <Typography.Title level={4}>

@@ -4,7 +4,9 @@ import { SearchOutlined } from '@ant-design/icons';
 import UserCard from './UserCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchedContactsSlice } from '../../store/slices/SearchedContactsSlice';
-import { QueriesApiWrapper } from '../../api/QueriesApiWrapper';
+import { Storage } from '../../Storage';
+import { readContacts, searchContacts } from '@neelkamath/omni-chat';
+import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export default function ContactsSection(): ReactElement {
   return (
@@ -28,9 +30,9 @@ function SearchContactsForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const onFinish = async ({ query }: SearchContactsFormData) => {
     setLoading(true);
-    const contacts = await QueriesApiWrapper.searchContacts(query);
+    const result = await operateGraphQlApi(() => searchContacts(httpApiConfig, Storage.readAccessToken()!, query));
     setLoading(false);
-    if (contacts !== undefined) dispatch(SearchedContactsSlice.overwrite({ query, contacts }));
+    if (result !== undefined) dispatch(SearchedContactsSlice.overwrite({ query, contacts: result.searchContacts }));
   };
   return (
     <Form onFinish={onFinish} name='searchContacts' layout='inline'>
@@ -48,8 +50,8 @@ function Contacts(): ReactElement {
   const contacts = useSelector(SearchedContactsSlice.selectContacts);
   const dispatch = useDispatch();
   if (contacts === undefined) {
-    QueriesApiWrapper.readContacts().then((response) => {
-      if (response !== undefined) dispatch(SearchedContactsSlice.overwrite({ contacts: response }));
+    operateGraphQlApi(() => readContacts(httpApiConfig, Storage.readAccessToken()!)).then((response) => {
+      if (response !== undefined) dispatch(SearchedContactsSlice.overwrite({ contacts: response.readContacts }));
     });
     return <Spin />;
   }

@@ -3,8 +3,8 @@
   "scripts": {
     "dev": "parcel src/index.html",
     "build": "NODE_ENV=prod parcel build src/index.html",
-    "lint": "eslint . && prettier -c .",
-    "fix": "eslint --fix . && prettier -w ."
+    "lint": "eslint . && prettier -c . && tsc --noEmit",
+    "fix": "eslint --fix . && prettier -w . && tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "14.14.34",
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "4.5.0",
-    "@neelkamath/omni-chat": "0.7.0",
+    "@neelkamath/omni-chat": "0.10.0",
     "@reduxjs/toolkit": "1.5.0",
     "antd": "4.14.0",
     "jwt-decode": "3.1.2",

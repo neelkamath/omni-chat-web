@@ -130,7 +130,7 @@ function LastMessageStatus({ chatId }: LastMessageStatusProps): ReactElement {
   return (
     <>
       {/*
-      TODO: Implement this once Omni Chat Backend 0.17.0 is released.
+      TODO:
        - Show sent/delivered/read status.
        - Use a tooltip to tell the user which status which icon means:
         - Blue ClockCircleTwoTone = sending
