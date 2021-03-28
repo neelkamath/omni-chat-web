@@ -1,44 +1,23 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, Col, Layout, Row, Tag, Typography } from 'antd';
+import { Button, Col, Row, Tag, Typography } from 'antd';
 import { InfoCircleOutlined, UserOutlined } from '@ant-design/icons';
-import ProfileModal from '../ProfileModal';
-import ChatMessage from './ChatMessage';
-import { Account, PrivateChat } from '@neelkamath/omni-chat';
+import ProfileModal from '../../ProfileModal';
 import { useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../store/store';
-import { OnlineStatusesSlice } from '../../../store/slices/OnlineStatusesSlice';
-import { TypingStatusesSlice } from '../../../store/slices/TypingStatusesSlice';
-import { PicsSlice } from '../../../store/slices/PicsSlice';
-import CustomAvatar from '../CustomAvatar';
+import { RootState, useThunkDispatch } from '../../../../store/store';
+import { PicsSlice } from '../../../../store/slices/PicsSlice';
+import CustomAvatar from '../../CustomAvatar';
+import { OnlineStatusesSlice } from '../../../../store/slices/OnlineStatusesSlice';
 import TimeAgo from 'timeago-react';
+import { Account } from '@neelkamath/omni-chat';
+import { TypingStatusesSlice } from '../../../../store/slices/TypingStatusesSlice';
 
-export interface PrivateChatSectionProps {
-  readonly chat: PrivateChat;
-}
-
-// TODO: Create and read messages.
-export default function PrivateChatSection({ chat }: PrivateChatSectionProps): ReactElement {
-  return (
-    <Layout>
-      <Layout.Header>
-        <Header user={chat.user} chatId={chat.id} />
-      </Layout.Header>
-      <Layout.Content>
-        {chat.messages.edges.map(({ node }) => (
-          <ChatMessage key={node.messageId} message={node} />
-        ))}
-      </Layout.Content>
-    </Layout>
-  );
-}
-
-interface HeaderProps {
+export interface HeaderProps {
   /** The user being chatted with. */
   readonly user: Account;
   readonly chatId: number;
 }
 
-function Header({ user, chatId }: HeaderProps): ReactElement {
+export default function Header({ user, chatId }: HeaderProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
   const onCancel = () => setVisible(false);
   return (
@@ -60,6 +39,17 @@ function Header({ user, chatId }: HeaderProps): ReactElement {
       </Col>
     </Row>
   );
+}
+
+interface ProfilePicProps {
+  readonly userId: number;
+}
+
+function ProfilePic({ userId }: ProfilePicProps): ReactElement {
+  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
+  // A <NonexistentUserIdError> can occur but the parent element must handle the other user deleting their account.
+  useThunkDispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
+  return <CustomAvatar icon={<UserOutlined />} url={url} />;
 }
 
 interface OnlineStatusSectionProps {
@@ -95,15 +85,4 @@ function TypingStatusSection({ userId, chatId }: TypingStatusSectionProps): Reac
   useThunkDispatch(TypingStatusesSlice.fetchStatuses());
   const isTyping = useSelector((state: RootState) => TypingStatusesSlice.selectIsTyping(state, userId, chatId));
   return <Col flex='auto'>{isTyping ? '·typing...' : ''}</Col>;
-}
-
-interface ProfilePicProps {
-  readonly userId: number;
-}
-
-function ProfilePic({ userId }: ProfilePicProps): ReactElement {
-  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
-  // A <NonexistentUserIdError> can occur but the parent element must handle the other user deleting their account.
-  useThunkDispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
-  return <CustomAvatar icon={<UserOutlined />} url={url} />;
 }

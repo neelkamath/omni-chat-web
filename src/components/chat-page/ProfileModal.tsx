@@ -1,7 +1,5 @@
-import React, { ReactElement, useContext, useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { Button, List, message, Modal, Spin, Typography } from 'antd';
-import { ChatPageLayoutContext } from '../../chatPageLayoutContext';
-import ChatSection from './chat-section/ChatSection';
 import {
   Account,
   blockUser,
@@ -10,7 +8,7 @@ import {
   deleteContacts,
   unblockUser,
 } from '@neelkamath/omni-chat';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState, useThunkDispatch } from '../../store/store';
 import { ContactsSlice } from '../../store/slices/ContactsSlice';
 import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
@@ -18,6 +16,7 @@ import { PicsSlice } from '../../store/slices/PicsSlice';
 import OriginalProfilePic from './OriginalProfilePic';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
+import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 
 export interface ProfileModalProps {
   readonly account: Account;
@@ -90,13 +89,13 @@ interface ChatButtonProps {
 }
 
 function ChatButton({ userId }: ChatButtonProps): ReactElement {
-  const { setContent } = useContext(ChatPageLayoutContext)!;
   const [isLoading, setLoading] = useState(false);
+  const dispatch = useDispatch();
   const onClick = async () => {
     setLoading(true);
     const chatId = await operateCreatePrivateChat(userId);
     setLoading(false);
-    if (chatId !== undefined) setContent(<ChatSection chatId={chatId} />);
+    if (chatId !== undefined) dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_SECTION', chatId }));
   };
   return (
     <Button loading={isLoading} onClick={onClick}>
@@ -119,6 +118,7 @@ interface ContactButtonProps {
   readonly userId: number;
 }
 
+// TODO: Once Omni Chat Backend 0.18.0 releases, update this to state whether the user deleted their account.
 function ContactButton({ userId }: ContactButtonProps): ReactElement {
   const isButtonLoading = !useSelector(ContactsSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
@@ -152,6 +152,7 @@ interface BlockButtonProps {
   readonly userId: number;
 }
 
+// TODO: Once Omni Chat Backend 0.18.0 releases, update this to state whether the user deleted their account.
 function BlockButton({ userId }: BlockButtonProps): ReactElement {
   const isBlocked = useSelector((state: RootState) => BlockedUsersSlice.selectIsBlocked(state, userId));
   const isButtonLoading = !useSelector(BlockedUsersSlice.selectIsLoaded);

@@ -10,6 +10,7 @@ import { TypingStatusesSlice } from './slices/TypingStatusesSlice';
 import { ContactsSlice } from './slices/ContactsSlice';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
+import { ChatPageLayoutSlice } from './slices/ChatPageLayoutSlice';
 
 /**
  * - `'IDLE'` indicates that either the entities have never been fetched or an error occurred during the last fetch.
@@ -29,6 +30,7 @@ const store = configureStore({
     searchedContacts: SearchedContactsSlice.reducer,
     searchedUsers: SearchedUsersSlice.reducer,
     typingStatuses: TypingStatusesSlice.reducer,
+    chatPageLayout: ChatPageLayoutSlice.reducer,
   },
 });
 

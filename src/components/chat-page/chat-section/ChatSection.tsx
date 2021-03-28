@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import { Empty, message, Spin } from 'antd';
-import PrivateChatSection from './PrivateChatSection';
+import PrivateChatSection from './private-chat-section/PrivateChatSection';
 import GroupChatSection from './GroupChatSection';
 import { Chat, GroupChat, PrivateChat, readChat } from '@neelkamath/omni-chat';
 import { Storage } from '../../../Storage';

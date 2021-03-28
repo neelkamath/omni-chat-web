@@ -36,10 +36,8 @@ async function operateHttpApi<T>(operation: () => Promise<T>): Promise<T | undef
   try {
     return await operation();
   } catch (error) {
-    if (error instanceof UnauthorizedError) {
-      const setOffline = false;
-      await logOut(setOffline);
-    } else if (error instanceof ConnectionError) message.error('The server is currently unreachable.');
+    if (error instanceof UnauthorizedError) await logOut();
+    else if (error instanceof ConnectionError) message.error('The server is currently unreachable.');
     else if (error instanceof InternalServerError) await displayBugReporter(error);
     else throw error;
     console.error(error);

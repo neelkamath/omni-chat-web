@@ -1,7 +1,5 @@
 import { Button, Col, Row, Tooltip } from 'antd';
-import React, { ReactElement, useContext } from 'react';
-import ChatPageSupportSection from './ChatPageSupportSection';
-import { ChatPageLayoutContext } from '../../chatPageLayoutContext';
+import React, { ReactElement } from 'react';
 import {
   CodeOutlined,
   ContactsOutlined,
@@ -11,13 +9,8 @@ import {
   StopOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import AccountEditor from './account-editor/AccountEditor';
-import SearchUsersSection from './SearchUsersSection';
 import logOut from '../../logOut';
-import DevelopersSection from '../DevelopersSection';
-import ContactsSection from './ContactsSection';
-import BlockedUsersSection from './BlockedUsersSection';
-import MenuChats from './chat-section/MenuChats/MenuChats';
+import MenuChats from './chat-section/menu-chats/MenuChats';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchedContactsSlice } from '../../store/slices/SearchedContactsSlice';
 import { PicsSlice } from '../../store/slices/PicsSlice';
@@ -25,6 +18,7 @@ import { RootState, useThunkDispatch } from '../../store/store';
 import { Storage } from '../../Storage';
 import CustomAvatar from './CustomAvatar';
 import { NonexistentUserIdError } from '@neelkamath/omni-chat';
+import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 
 export default function ChatPageMenu(): ReactElement {
   useThunkDispatch(PicsSlice.fetchPic({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
@@ -45,22 +39,19 @@ export default function ChatPageMenu(): ReactElement {
 }
 
 function EditAccountCol(): ReactElement {
-  const { setContent } = useContext(ChatPageLayoutContext)!;
   useThunkDispatch(PicsSlice.fetchPic({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
+  const dispatch = useDispatch();
   const url = useSelector((state: RootState) =>
     PicsSlice.selectPic(state, 'PROFILE_PIC', Storage.readUserId()!, 'THUMBNAIL'),
   );
   const error = useSelector((state: RootState) => PicsSlice.selectError(state, 'PROFILE_PIC', Storage.readUserId()!));
-  if (error instanceof NonexistentUserIdError) {
-    const setOffline = false;
-    logOut(setOffline);
-  }
+  if (error instanceof NonexistentUserIdError) logOut();
   return (
     <Col>
       <Tooltip title='Edit account'>
         <Button
           icon={<CustomAvatar icon={<UserOutlined />} url={url} size='small' />}
-          onClick={() => setContent(<AccountEditor />)}
+          onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'ACCOUNT_EDITOR' }))}
         />
       </Tooltip>
     </Col>
@@ -68,7 +59,6 @@ function EditAccountCol(): ReactElement {
 }
 
 function ContactsCol(): ReactElement {
-  const { setContent } = useContext(ChatPageLayoutContext)!;
   const dispatch = useDispatch();
   return (
     <Col>
@@ -82,7 +72,7 @@ function ContactsCol(): ReactElement {
             clearing the state, the page is forced to fetch the contacts instead of using preexisting stale data.
              */
             dispatch(SearchedContactsSlice.clear());
-            setContent(<ContactsSection />);
+            dispatch(ChatPageLayoutSlice.update({ type: 'CONTACTS_SECTION' }));
           }}
         />
       </Tooltip>
@@ -91,44 +81,56 @@ function ContactsCol(): ReactElement {
 }
 
 function SearchUsersCol(): ReactElement {
-  const { setContent } = useContext(ChatPageLayoutContext)!;
+  const dispatch = useDispatch();
   return (
     <Col>
       <Tooltip title='Search users'>
-        <Button icon={<SearchOutlined />} onClick={() => setContent(<SearchUsersSection />)} />
+        <Button
+          icon={<SearchOutlined />}
+          onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'SEARCH_USERS_SECTION' }))}
+        />
       </Tooltip>
     </Col>
   );
 }
 
 function BlockedUsersCol(): ReactElement {
-  const { setContent } = useContext(ChatPageLayoutContext)!;
+  const dispatch = useDispatch();
   return (
     <Col>
       <Tooltip title='Blocked users'>
-        <Button icon={<StopOutlined />} onClick={() => setContent(<BlockedUsersSection />)} />
+        <Button
+          icon={<StopOutlined />}
+          onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'BLOCKED_USERS_SECTION' }))}
+        />
       </Tooltip>
     </Col>
   );
 }
 
 function SupportCol(): ReactElement {
-  const { setContent } = useContext(ChatPageLayoutContext)!;
+  const dispatch = useDispatch();
   return (
     <Col>
       <Tooltip title='Support'>
-        <Button icon={<CustomerServiceOutlined />} onClick={() => setContent(<ChatPageSupportSection />)} />
+        <Button
+          icon={<CustomerServiceOutlined />}
+          onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_PAGE_SUPPORT_SECTION' }))}
+        />
       </Tooltip>
     </Col>
   );
 }
 
 function DevelopersCol(): ReactElement {
-  const { setContent } = useContext(ChatPageLayoutContext)!;
+  const dispatch = useDispatch();
   return (
     <Col>
       <Tooltip title='Developers'>
-        <Button icon={<CodeOutlined />} onClick={() => setContent(<DevelopersSection />)} />
+        <Button
+          icon={<CodeOutlined />}
+          onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'DEVELOPERS_SECTION' }))}
+        />
       </Tooltip>
     </Col>
   );

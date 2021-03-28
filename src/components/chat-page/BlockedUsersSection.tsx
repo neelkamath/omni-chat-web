@@ -5,6 +5,8 @@ import { useSelector } from 'react-redux';
 import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
 import store, { useThunkDispatch } from '../../store/store';
 
+// TODO: Implement searching once Omni Chat Backend 0.18.0 releases.
+
 export default function BlockedUsersSection(): ReactElement {
   const isLoading = !useSelector(BlockedUsersSlice.selectIsLoaded);
   /*

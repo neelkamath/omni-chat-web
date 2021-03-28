@@ -14,6 +14,7 @@ import {
 } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
 import logOut from '../../../logOut';
+import GfmFormItem from '../GfmFormItem';
 
 export default function UpdateAccountSection(): ReactElement {
   return (
@@ -33,22 +34,26 @@ interface UpdateAccountFormData {
   readonly bio: string;
 }
 
-// TODO: State bio uses CommonMark, and display as such.
 function UpdateAccountForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
+  const [bio, setBio] = useState<string | undefined>();
   const account = useSelector(AccountSlice.select);
   useThunkDispatch(AccountSlice.fetchAccount());
   if (account === undefined) return <Spin />;
   const onFinish = async (data: UpdateAccountFormData) => {
     setLoading(true);
-    const update = buildAccountUpdate(data);
+    const update = buildAccountUpdate({ ...data, bio: bio! });
     if (validateAccountUpdate(update)) await operateUpdateAccount(account.emailAddress, update);
     setLoading(false);
   };
   return (
     <Form onFinish={onFinish} name='updateAccount' layout='vertical'>
-      <Form.Item name='username' label='Username' initialValue={account.username}
-                 rules={[{ required: true, message: 'Enter your email address.' }]}>
+      <Form.Item
+        name='username'
+        label='Username'
+        initialValue={account.username}
+        rules={[{ required: true, message: 'Enter your email address.' }]}
+      >
         <Input maxLength={30} />
       </Form.Item>
       <Form.Item
@@ -65,9 +70,7 @@ function UpdateAccountForm(): ReactElement {
       <Form.Item name='lastName' label='Last name' initialValue={account.lastName}>
         <Input maxLength={30} />
       </Form.Item>
-      <Form.Item name='bio' label='Bio' initialValue={account.bio}>
-        <Input.TextArea />
-      </Form.Item>
+      <GfmFormItem initialValue={account.bio} onChange={setBio} maxLength={2500} name='bio' label='Bio' />
       <Form.Item>
         <Button type='primary' htmlType='submit' loading={isLoading}>
           Submit
@@ -108,10 +111,7 @@ async function operateUpdateAccount(currentEmailAddress: string, update: Account
   const result = await operateGraphQlApi(() => updateAccount(httpApiConfig, Storage.readAccessToken()!, update));
   if (result?.updateAccount === null) {
     message.success('Account updated.', 3);
-    if (isUpdatedAddress) {
-      const setOffline = false;
-      await logOut(setOffline);
-    }
+    if (isUpdatedAddress) await logOut();
   } else if (result?.updateAccount?.__typename === 'UsernameTaken')
     message.error('That username has already been taken.', 5);
   else if (result?.updateAccount?.__typename === 'EmailAddressTaken')

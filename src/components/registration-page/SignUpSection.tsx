@@ -1,14 +1,7 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, Col, Form, Image, Input, message, Row, Typography } from 'antd';
+import { Button, Col, Form, Image, Input, message, Row, Space, Typography } from 'antd';
 import completingImage from '../../images/completing.svg';
-import {
-  AccountInput,
-  createAccount,
-  isValidNameScalar,
-  isValidPasswordScalar,
-  isValidUsernameScalar,
-  Name,
-} from '@neelkamath/omni-chat';
+import { AccountInput, createAccount, isValidPasswordScalar, isValidUsernameScalar } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export default function SignUpSection(): ReactElement {
@@ -16,7 +9,10 @@ export default function SignUpSection(): ReactElement {
     <Row gutter={16} justify='space-around' align='middle'>
       <Col span={11}>
         <Typography.Title level={2}>Sign Up</Typography.Title>
-        <SignUpForm />
+        <Space direction='vertical'>
+          You can edit your username, profile picture, etc. once you've signed in.
+          <SignUpForm />
+        </Space>
       </Col>
       <Col span={11}>
         <Image preview={false} alt='Completing' src={completingImage} />
@@ -29,12 +25,8 @@ interface SignUpFormData {
   readonly username: string;
   readonly password: string;
   readonly emailAddress: string;
-  readonly firstName: string;
-  readonly lastName: string;
-  readonly bio: string;
 }
 
-// TODO: State that the bio uses CommonMark. Display it as such as well.
 function SignUpForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const onFinish = async (data: SignUpFormData) => {
@@ -58,15 +50,6 @@ function SignUpForm(): ReactElement {
       >
         <Input type='email' />
       </Form.Item>
-      <Form.Item name='firstName' label='First name' initialValue=''>
-        <Input maxLength={30} />
-      </Form.Item>
-      <Form.Item name='lastName' label='Last name' initialValue=''>
-        <Input maxLength={30} />
-      </Form.Item>
-      <Form.Item name='bio' label='Bio' initialValue=''>
-        <Input.TextArea maxLength={2500} />
-      </Form.Item>
       <Form.Item>
         <Button type='primary' htmlType='submit' loading={isLoading}>
           Submit
@@ -76,30 +59,26 @@ function SignUpForm(): ReactElement {
   );
 }
 
+// TODO: Delete the empty string fields once you get a reply to https://github.com/graphql-java/graphql-java/commit/5bc917f7fafa3b942c7093556efb4ec64e728907#commitcomment-48746393.
 function buildAccountInput(data: SignUpFormData): AccountInput {
   return {
     __typename: 'AccountInput',
     username: data.username.trim(),
     password: data.password,
     emailAddress: data.emailAddress,
-    firstName: data.firstName.trim(),
-    lastName: data.lastName.trim(),
-    bio: data.bio.trim(),
+    firstName: '',
+    lastName: '',
+    bio: '',
   };
 }
 
-function validateAccountInput({ username, password, firstName, lastName }: AccountInput): boolean {
+function validateAccountInput({ username, password }: AccountInput): boolean {
   if (!isValidUsernameScalar(username)) {
     message.error('Username must be lowercase and not contain spaces.', 5);
     return false;
   }
   if (!isValidPasswordScalar(password)) {
     message.error('Password must contain characters other than spaces.', 5);
-    return false;
-  }
-  const isInvalidName = (name: Name | null) => name !== null && !isValidNameScalar(name);
-  if (isInvalidName(firstName) || isInvalidName(lastName)) {
-    message.error('Names mustn\'t contain spaces.', 5);
     return false;
   }
   return true;

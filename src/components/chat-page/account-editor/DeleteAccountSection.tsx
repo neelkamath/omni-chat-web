@@ -60,8 +60,5 @@ async function operateDeleteAccount(): Promise<void> {
       'You must first assign another user as the admin.',
       12.5,
     );
-  else {
-    const setOffline = false;
-    await logOut(setOffline);
-  }
+  else await logOut();
 }

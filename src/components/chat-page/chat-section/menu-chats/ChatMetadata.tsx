@@ -8,21 +8,21 @@ import {
   TextMessage,
 } from '@neelkamath/omni-chat';
 import React, { ReactElement } from 'react';
-import { Col, Row, Typography } from 'antd';
+import { Col, Row, Tooltip, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import { RootState, useThunkDispatch } from '../../../../store/store';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import TimeAgo from 'timeago-react';
 import { CheckCircleTwoTone, ClockCircleTwoTone } from '@ant-design/icons';
 
-export interface LastChatMessageProps {
+export interface ChatMetadataProps {
   readonly chat: Chat;
 }
 
-export default function LastChatMessage({ chat }: LastChatMessageProps): ReactElement {
+export default function ChatMetadata({ chat }: ChatMetadataProps): ReactElement {
   return (
     <>
-      <Row gutter={16}>
+      <Row gutter={16} justify='space-between'>
         <Col>
           <ChatName chat={chat} />
         </Col>
@@ -30,7 +30,7 @@ export default function LastChatMessage({ chat }: LastChatMessageProps): ReactEl
           <LastMessageTimeAgo chatId={chat.id} />
         </Col>
       </Row>
-      <Row gutter={16}>
+      <Row gutter={16} justify='space-between'>
         <Col>
           <LastChatMessageText chatId={chat.id} />
         </Col>
@@ -80,6 +80,7 @@ interface LastChatMessageTextProps {
   readonly chatId: number;
 }
 
+// TODO: Test once all message types have been implemented.
 function LastChatMessageText({ chatId }: LastChatMessageTextProps): ReactElement {
   const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
   useThunkDispatch(ChatsSlice.fetchChat(chatId));
@@ -114,7 +115,7 @@ function LastChatMessageText({ chatId }: LastChatMessageTextProps): ReactElement
       message = <Typography.Text strong>Sent a video.</Typography.Text>;
   }
   return (
-    <Typography.Text ellipsis={true}>
+    <Typography.Text ellipsis={true} style={{ width: 300 }}>
       {lastMessage.sender.username}: {message}
     </Typography.Text>
   );
@@ -125,21 +126,27 @@ interface LastMessageStatusProps {
 }
 
 function LastMessageStatus({ chatId }: LastMessageStatusProps): ReactElement {
-  const dateTimes = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId))?.dateTimes;
-  if (dateTimes === undefined) return <></>;
-  return (
-    <>
-      {/*
-      TODO:
-       - Show sent/delivered/read status.
-       - Use a tooltip to tell the user which status which icon means:
-        - Blue ClockCircleTwoTone = sending
-        - Green ClockCircleTwoTone = sent
-        - Blue CheckCircleTwoTone = delivered
-        - Green CheckCircleTwoTone = read
-      */}
-      <ClockCircleTwoTone twoToneColor='#53C51A' />
-      <CheckCircleTwoTone />
-    </>
-  );
+  const state = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId))?.state;
+  switch (state) {
+    case undefined:
+      return <></>;
+    case 'SENT':
+      return (
+        <Tooltip title='Sent'>
+          <ClockCircleTwoTone twoToneColor='#53C51A' />
+        </Tooltip>
+      );
+    case 'DELIVERED':
+      return (
+        <Tooltip title='Delivered'>
+          <CheckCircleTwoTone twoToneColor='#41A8FE' />
+        </Tooltip>
+      );
+    case 'READ':
+      return (
+        <Tooltip title='Read'>
+          <CheckCircleTwoTone twoToneColor='#53C51A' />
+        </Tooltip>
+      );
+  }
 }

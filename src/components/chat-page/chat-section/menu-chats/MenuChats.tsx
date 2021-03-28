@@ -1,13 +1,12 @@
-import React, { ReactElement, useContext } from 'react';
-import { useSelector } from 'react-redux';
+import React, { ReactElement } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import { Card, Col, Row, Spin } from 'antd';
 import { Chat } from '@neelkamath/omni-chat';
-import { ChatPageLayoutContext } from '../../../../chatPageLayoutContext';
-import ChatSection from '../ChatSection';
 import { useThunkDispatch } from '../../../../store/store';
 import ChatPic from './ChatPic';
-import LastChatMessage from './LastChatMessage';
+import ChatMetadata from './ChatMetadata';
+import { ChatPageLayoutSlice } from '../../../../store/slices/ChatPageLayoutSlice';
 
 // TODO: Test every LOC in this file once group chats can be created.
 
@@ -26,15 +25,19 @@ interface ChatCardProps {
 
 // TODO: Make chats with new messages stand out, perhaps with a card glow.
 function ChatCard({ chat }: ChatCardProps): ReactElement {
-  const { setContent } = useContext(ChatPageLayoutContext)!;
+  const dispatch = useDispatch();
   return (
-    <Card size='small' hoverable={true} onClick={() => setContent(<ChatSection chatId={chat.id} />)}>
+    <Card
+      size='small'
+      hoverable={true}
+      onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_SECTION', chatId: chat.id }))}
+    >
       <Row gutter={16}>
         <Col>
           <ChatPic chat={chat} />
         </Col>
         <Col>
-          <LastChatMessage chat={chat} />
+          <ChatMetadata chat={chat} />
         </Col>
       </Row>
     </Card>

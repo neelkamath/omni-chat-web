@@ -1,6 +1,5 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, Empty, Form, Input, Space } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { Button, Empty, Input, Space } from 'antd';
 import { Storage } from '../../Storage';
 import UserCard from './UserCard';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,29 +21,16 @@ export default function SearchUsersSection(): ReactElement {
   );
 }
 
-interface SearchUsersFormData {
-  readonly query: string;
-}
-
 function SearchUsersForm(): ReactElement {
   const dispatch = useDispatch();
   const [isLoading, setLoading] = useState(false);
-  const onFinish = async ({ query }: SearchUsersFormData) => {
+  const onSearch = async (query: string) => {
     setLoading(true);
     const result = await operateGraphQlApi(() => searchUsers(httpApiConfig, query, { first: 10 }));
     if (result !== undefined) dispatch(SearchedUsersSlice.replace({ query, users: result.searchUsers }));
     setLoading(false);
   };
-  return (
-    <Form onFinish={onFinish} name='searchUsers' layout='inline'>
-      <Form.Item name='query' initialValue=''>
-        <Input />
-      </Form.Item>
-      <Form.Item>
-        <Button loading={isLoading} type='primary' htmlType='submit' icon={<SearchOutlined />} />
-      </Form.Item>
-    </Form>
-  );
+  return <Input.Search loading={isLoading} onSearch={onSearch} enterButton />;
 }
 
 function Users(): ReactElement {
