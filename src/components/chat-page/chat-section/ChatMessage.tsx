@@ -8,5 +8,5 @@ export interface ChatMessageProps {
 
 // TODO
 export default function ChatMessage({ message }: ChatMessageProps): ReactElement {
-  return <Comment content={(message as TextMessage).textMessage} datetime={message.dateTimes.sent} />;
+  return <Comment content={(message as TextMessage).textMessage} datetime={message.sent} />;
 }

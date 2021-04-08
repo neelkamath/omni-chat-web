@@ -2,8 +2,6 @@ import { Storage } from '../Storage';
 import store from './store';
 import { AccountSlice } from './slices/AccountSlice';
 import { PicsSlice } from './slices/PicsSlice';
-import { SearchedContactsSlice } from './slices/SearchedContactsSlice';
-import { SearchedUsersSlice } from './slices/SearchedUsersSlice';
 import { BlockedUsersSlice } from './slices/BlockedUsersSlice';
 import { ChatsSlice } from './slices/ChatsSlice';
 import { OnlineStatusesSlice } from './slices/OnlineStatusesSlice';
@@ -87,8 +85,6 @@ async function setUpAccountsSubscription(): Promise<void> {
             store.dispatch(BlockedUsersSlice.updateAccount(message));
             store.dispatch(ChatsSlice.updateAccount(message));
             store.dispatch(ContactsSlice.updateOne(message));
-            store.dispatch(SearchedContactsSlice.updateAccount(message));
-            store.dispatch(SearchedUsersSlice.update(message));
             break;
           case 'UpdatedProfilePic':
             store.dispatch(PicsSlice.fetchPic({ id: message.id, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
@@ -97,13 +93,20 @@ async function setUpAccountsSubscription(): Promise<void> {
             store.dispatch(BlockedUsersSlice.upsertOne(message));
             break;
           case 'DeletedContact':
-            store.dispatch(ContactsSlice.removeOne(message));
+            store.dispatch(ContactsSlice.removeOne(message.id));
             break;
           case 'NewContact':
             store.dispatch(ContactsSlice.upsertOne(message));
             break;
           case 'UnblockedAccount':
-            store.dispatch(BlockedUsersSlice.removeOne(message));
+            store.dispatch(BlockedUsersSlice.removeOne(message.id));
+            break;
+          case 'DeletedAccount':
+            store.dispatch(BlockedUsersSlice.removeOne(message.id));
+            store.dispatch(ChatsSlice.removePrivateChat(message.id));
+            store.dispatch(OnlineStatusesSlice.removeOne(message.id));
+            store.dispatch(PicsSlice.removeAccount(message.id));
+            store.dispatch(TypingStatusesSlice.removeUser(message.id));
         }
       },
       onError,

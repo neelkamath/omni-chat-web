@@ -12,13 +12,13 @@ import {
 import logOut from '../../logOut';
 import MenuChats from './chat-section/menu-chats/MenuChats';
 import { useDispatch, useSelector } from 'react-redux';
-import { SearchedContactsSlice } from '../../store/slices/SearchedContactsSlice';
 import { PicsSlice } from '../../store/slices/PicsSlice';
 import { RootState, useThunkDispatch } from '../../store/store';
 import { Storage } from '../../Storage';
 import CustomAvatar from './CustomAvatar';
 import { NonexistentUserIdError } from '@neelkamath/omni-chat';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
+import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
 
 export default function ChatPageMenu(): ReactElement {
   useThunkDispatch(PicsSlice.fetchPic({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
@@ -66,12 +66,7 @@ function ContactsCol(): ReactElement {
         <Button
           icon={<ContactsOutlined />}
           onClick={() => {
-            /*
-            The contacts page displays each of the user's contacts the first time it's opened. Since the state is
-            persisted in Redux, subsequent page opens will display the stale contacts, which is incorrect. By
-            clearing the state, the page is forced to fetch the contacts instead of using preexisting stale data.
-             */
-            dispatch(SearchedContactsSlice.clear());
+            dispatch(SearchedUsersSlice.clear());
             dispatch(ChatPageLayoutSlice.update({ type: 'CONTACTS_SECTION' }));
           }}
         />
@@ -87,7 +82,10 @@ function SearchUsersCol(): ReactElement {
       <Tooltip title='Search users'>
         <Button
           icon={<SearchOutlined />}
-          onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'SEARCH_USERS_SECTION' }))}
+          onClick={() => {
+            dispatch(SearchedUsersSlice.clear());
+            dispatch(ChatPageLayoutSlice.update({ type: 'SEARCH_USERS_SECTION' }));
+          }}
         />
       </Tooltip>
     </Col>
@@ -101,7 +99,10 @@ function BlockedUsersCol(): ReactElement {
       <Tooltip title='Blocked users'>
         <Button
           icon={<StopOutlined />}
-          onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'BLOCKED_USERS_SECTION' }))}
+          onClick={() => {
+            dispatch(SearchedUsersSlice.clear());
+            dispatch(ChatPageLayoutSlice.update({ type: 'BLOCKED_USERS_SECTION' }));
+          }}
         />
       </Tooltip>
     </Col>

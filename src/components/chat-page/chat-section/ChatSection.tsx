@@ -5,6 +5,9 @@ import GroupChatSection from './GroupChatSection';
 import { Chat, GroupChat, PrivateChat, readChat } from '@neelkamath/omni-chat';
 import { Storage } from '../../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
+import { useSelector } from 'react-redux';
+import { ChatsSlice } from '../../../store/slices/ChatsSlice';
+import { RootState } from '../../../store/store';
 
 export interface ChatSectionProps {
   readonly chatId: number;
@@ -12,6 +15,14 @@ export interface ChatSectionProps {
 
 export default function ChatSection({ chatId }: ChatSectionProps): ReactElement {
   const [section, setSection] = useState(<Spin style={{ padding: 16 }} />);
+  const isDeletedPrivateChat = useSelector((state: RootState) => ChatsSlice.selectIsDeletedPrivateChat(state, chatId));
+  const onDeletedChat = () => {
+    message.warning('This chat has just been deleted.', 5);
+    setSection(<Empty />);
+  };
+  useEffect(() => {
+    if (isDeletedPrivateChat) onDeletedChat();
+  }, [isDeletedPrivateChat]);
   useEffect(() => {
     operateReadChat(chatId).then((chat) => {
       switch (chat?.__typename) {
@@ -22,8 +33,7 @@ export default function ChatSection({ chatId }: ChatSectionProps): ReactElement 
           setSection(<GroupChatSection chat={chat as GroupChat} />);
           break;
         case undefined:
-          message.warning('This chat has just been deleted.', 5);
-          setSection(<Empty />);
+          onDeletedChat();
       }
     });
   }, [chatId]);

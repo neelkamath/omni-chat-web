@@ -199,9 +199,9 @@ function ExtensibleRow(): ReactElement {
             </Typography.Paragraph>
             <Typography.Paragraph>
               The organization may choose to run the service behind their firewall for additional security. This way,
-              employees can't leak information after-hours, hackers won't get access to the service, and employees can't
-              be the target of identity theft (e.g., they may have their laptop unlocked while they go to a café’s
-              restroom, or a thief may steal their phone).
+              employees can&apos;t leak information after-hours, hackers won&apos;t get access to the service, and
+              employees can&apos;t be the target of identity theft (e.g., they may have their laptop unlocked while they
+              go to a café’s restroom, or a thief may steal their phone).
             </Typography.Paragraph>
             <Typography.Paragraph>
               Here are the instructions to{' '}

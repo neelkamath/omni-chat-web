@@ -10,7 +10,7 @@
 
 ## Development
 
-1. Either run the Omni Chat 0.17.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.17.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.17.0/docs/cloud.md).
+1. Either run the Omni Chat 0.18.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.18.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.18.0/docs/cloud.md).
 1. Run on http://localhost:1234: `npm run dev`
 
 ## Linting
@@ -22,7 +22,7 @@
 
 Here's how to test the production build:
 
-1. Either run the Omni Chat 0.17.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.17.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.17.0/docs/cloud.md).
+1. Either run the Omni Chat 0.18.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.18.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.18.0/docs/cloud.md).
 1. Save a production build to `dist/`: `npm run build`
 1. Serve the website which has been saved to `dist/`.
 
@@ -48,9 +48,9 @@ Here's how to test the production build:
 
 - Never use dynamic version ranges for dependencies because packages often break in newer versions. For example, when `npm install`ing a dependency, remove the caret from the version number it saved to `package.json`.
 - Always use Redux instead of [React Context](https://reactjs.org/docs/context.html) for the following reasons:
-    - It's consistent to store state only in one state manager.
-    - Redux is faster.
-    - When using React Context, you need to remember to keep the React component using it nested inside of it.
+  - It's consistent to store state only in one state manager.
+  - Redux is faster.
+  - When using React Context, you need to remember to keep the React component using it nested inside of it.
 - TypeScript interfaces which specify Ant Design form fields (e.g., [`interface ResetPasswordFormData`](src/components/sign-in-page/ResetPasswordSection.tsx)) must be named using the format `<FORM>FormData`, where `<FORM>` is the name of the form.
 - Here's an example of how to name images when importing them in TypeScript: To import `happy-news.svg`, write:
 

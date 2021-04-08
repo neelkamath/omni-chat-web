@@ -10,7 +10,7 @@ export default function SignUpSection(): ReactElement {
       <Col span={11}>
         <Typography.Title level={2}>Sign Up</Typography.Title>
         <Space direction='vertical'>
-          You can edit your username, profile picture, etc. once you've signed in.
+          You can edit your username, profile picture, etc. once you&apos;ve signed in.
           <SignUpForm />
         </Space>
       </Col>
@@ -59,7 +59,7 @@ function SignUpForm(): ReactElement {
   );
 }
 
-// TODO: Delete the empty string fields once you get a reply to https://github.com/graphql-java/graphql-java/commit/5bc917f7fafa3b942c7093556efb4ec64e728907#commitcomment-48746393.
+// TODO: Delete the empty string fields once GraphQL Java 16.3 (currently unreleased) is used by Omni Chat Backend.
 function buildAccountInput(data: SignUpFormData): AccountInput {
   return {
     __typename: 'AccountInput',

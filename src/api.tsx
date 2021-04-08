@@ -4,6 +4,7 @@ import React from 'react';
 import {
   ConnectionError,
   GraphQlResponse,
+  GraphQlResponseValue,
   HttpApiConfig,
   HttpProtocol,
   InternalServerError,
@@ -19,9 +20,7 @@ export const httpApiConfig: HttpApiConfig = {
 
 export const wsApiConfig: WsApiConfig = { apiUrl: process.env.API_URL!, protocol: process.env.WS as WebSocketProtocol };
 
-export async function operateGraphQlApi<T>(
-  operation: () => Promise<GraphQlResponse<T>>,
-): Promise<T | undefined> {
+export async function operateGraphQlApi<T>(operation: () => Promise<GraphQlResponse<T>>): Promise<T | undefined> {
   const response = await operateHttpApi(operation);
   if (response === undefined) return undefined;
   if (response.errors !== undefined) await displayBugReporter(response.errors);
@@ -46,7 +45,7 @@ async function operateHttpApi<T>(operation: () => Promise<T>): Promise<T | undef
 }
 
 // TODO: Automatically send back the error report instead, and show a ConnectionError instead.
-export async function displayBugReporter(error: any): Promise<void> {
+export async function displayBugReporter(error: Error | GraphQlResponseValue[]): Promise<void> {
   console.error(error);
   notification.error({
     message: 'Something Went Wrong',

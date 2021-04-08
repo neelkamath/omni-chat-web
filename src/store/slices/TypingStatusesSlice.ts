@@ -12,11 +12,6 @@ import { FetchStatus, RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 
-/** Generates the {@link TypingStatusesSlice.Entity.id} */
-function generateId(userId: number, chatId: number): string {
-  return `${userId}_${chatId}`;
-}
-
 export namespace TypingStatusesSlice {
   const sliceName = 'typingStatuses';
 
@@ -30,6 +25,11 @@ export namespace TypingStatusesSlice {
   }
 
   const adapter: EntityAdapter<Entity> = createEntityAdapter();
+
+  /** Generates the {@link TypingStatusesSlice.Entity.id} */
+  function generateId(userId: number, chatId: number): string {
+    return `${userId}_${chatId}`;
+  }
 
   export const fetchStatuses = createAsyncThunk(
     `${sliceName}/fetchStatuses`,
@@ -55,6 +55,12 @@ export namespace TypingStatusesSlice {
         const entity = { id: generateId(payload.userId, payload.chatId), ...payload };
         adapter.upsertOne(state, entity);
       },
+      // TODO: Test once typing statuses have been implemented.
+      /** Removes the specified user ID's statuses. */
+      removeUser: (state, { payload }: PayloadAction<number>) =>
+        Object.values(state.entities).forEach((entity) => {
+          if (entity !== undefined && entity.id.startsWith(`${payload}_`)) adapter.removeOne(state, entity.id);
+        }),
     },
     extraReducers: (builder) => {
       builder
@@ -73,7 +79,7 @@ export namespace TypingStatusesSlice {
 
   export const { reducer } = slice;
 
-  export const { upsertOne } = slice.actions;
+  export const { upsertOne, removeUser } = slice.actions;
 
   export const selectIsTyping = createSelector(
     [

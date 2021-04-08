@@ -36,7 +36,7 @@ interface UpdateAccountFormData {
 
 function UpdateAccountForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
-  const [bio, setBio] = useState<string | undefined>();
+  const [bio, setBio] = useState('');
   const account = useSelector(AccountSlice.select);
   useThunkDispatch(AccountSlice.fetchAccount());
   if (account === undefined) return <Spin />;
@@ -80,21 +80,31 @@ function UpdateAccountForm(): ReactElement {
   );
 }
 
-function buildAccountUpdate(data: UpdateAccountFormData): AccountUpdate {
+function buildAccountUpdate({
+                              username,
+                              emailAddress,
+                              firstName,
+                              lastName,
+                              bio,
+                            }: UpdateAccountFormData): AccountUpdate {
   return {
     __typename: 'AccountUpdate',
-    username: data.username.trim(),
+    username: username.trim(),
     password: null,
-    emailAddress: data.emailAddress,
-    firstName: data.firstName.trim(),
-    lastName: data.lastName.trim(),
-    bio: data.bio.trim(),
+    emailAddress: emailAddress,
+    firstName: firstName.trim(),
+    lastName: lastName.trim(),
+    bio: bio.trim(),
   };
 }
 
 function validateAccountUpdate({ username, firstName, lastName }: AccountUpdate): boolean {
   if (username !== null && !isValidUsernameScalar(username)) {
-    message.error('Username must be lowercase and not contains spaces.', 5);
+    message.error(
+      'A username must be 1-30 characters long. Only lowercase English letters (a-z), English numbers (0-9), ' +
+      'periods, and underscores are allowed.',
+      10,
+    );
     return false;
   }
   const isInvalidName = (name: Name | null) => name !== null && !isValidNameScalar(name);

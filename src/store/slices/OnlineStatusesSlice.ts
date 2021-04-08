@@ -10,11 +10,6 @@ import {
 import { RootState } from '../store';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 
-async function operateReadOnlineStatus(userId: number): Promise<OnlineStatus | undefined> {
-  const result = await operateGraphQlApi(() => readOnlineStatus(httpApiConfig, userId));
-  return result?.readOnlineStatus.__typename === 'InvalidUserId' ? undefined : result?.readOnlineStatus;
-}
-
 export namespace OnlineStatusesSlice {
   const adapter: EntityAdapter<OnlineStatus> = createEntityAdapter({ selectId: (model) => model.userId });
 
@@ -23,6 +18,11 @@ export namespace OnlineStatusesSlice {
   export interface State extends ReturnType<typeof adapter.getInitialState> {
     /** The IDs of users whose statuses are currently being fetched. */
     readonly fetching: number[];
+  }
+
+  async function operateReadOnlineStatus(userId: number): Promise<OnlineStatus | undefined> {
+    const result = await operateGraphQlApi(() => readOnlineStatus(httpApiConfig, userId));
+    return result?.readOnlineStatus.__typename === 'InvalidUserId' ? undefined : result?.readOnlineStatus;
   }
 
   export const fetchStatus = createAsyncThunk(`${sliceName}/fetchStatus`, operateReadOnlineStatus, {
@@ -35,7 +35,8 @@ export namespace OnlineStatusesSlice {
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState({ fetching: [] }) as State,
-    reducers: { upsertOne: adapter.upsertOne },
+    // TODO: Test <removeOne()> once Omni Chat Backend 0.19.0 releases.
+    reducers: { upsertOne: adapter.upsertOne, removeOne: adapter.removeOne },
     extraReducers: (builder) => {
       builder
         .addCase(fetchStatus.fulfilled, (state, { payload, meta }) => {
@@ -53,7 +54,7 @@ export namespace OnlineStatusesSlice {
 
   export const { reducer } = slice;
 
-  export const { upsertOne } = slice.actions;
+  export const { upsertOne, removeOne } = slice.actions;
 
   /** `undefined` if the status hasn't been fetched yet. */
   export const select = createSelector(

@@ -2,7 +2,6 @@ import { AsyncThunkAction, configureStore } from '@reduxjs/toolkit';
 import { PicsSlice } from './slices/PicsSlice';
 import { AccountSlice } from './slices/AccountSlice';
 import { SearchedUsersSlice } from './slices/SearchedUsersSlice';
-import { SearchedContactsSlice } from './slices/SearchedContactsSlice';
 import { BlockedUsersSlice } from './slices/BlockedUsersSlice';
 import { ChatsSlice } from './slices/ChatsSlice';
 import { OnlineStatusesSlice } from './slices/OnlineStatusesSlice';
@@ -27,7 +26,6 @@ const store = configureStore({
     contacts: ContactsSlice.reducer,
     onlineStatuses: OnlineStatusesSlice.reducer,
     pics: PicsSlice.reducer,
-    searchedContacts: SearchedContactsSlice.reducer,
     searchedUsers: SearchedUsersSlice.reducer,
     typingStatuses: TypingStatusesSlice.reducer,
     chatPageLayout: ChatPageLayoutSlice.reducer,

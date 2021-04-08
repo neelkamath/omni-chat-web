@@ -28,8 +28,12 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
     setLoading(false);
   };
   return (
-    <Form style={{ position: 'fixed', width: '100%', bottom: 16 }} onFinish={onFinish} name='createMessage'
-          layout='inline'>
+    <Form
+      style={{ position: 'fixed', width: '100%', bottom: 16 }}
+      onFinish={onFinish}
+      name='createMessage'
+      layout='inline'
+    >
       <GfmFormItem initialValue={value} onChange={setValue} maxLength={10_000} name='text' onPressEnter={onFinish} />
       <Form.Item>
         <Button loading={isLoading} type='primary' htmlType='submit' icon={<SendOutlined />} />

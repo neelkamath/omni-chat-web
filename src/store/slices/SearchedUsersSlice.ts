@@ -1,7 +1,21 @@
 import { createEntityAdapter, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AccountEdge, AccountsConnection, UpdatedAccount } from '@neelkamath/omni-chat';
+import { AccountEdge, AccountsConnection } from '@neelkamath/omni-chat';
 import { RootState } from '../store';
 
+// TODO: Handle deleted accounts even if it glitches the UI.
+/**
+ * The results of a search for blocked users, contacts, or users registered on the Omni Chat instance being used.
+ *
+ * We don't remove users who have been unblocked, are no longer a contact, or deleted their account after they've
+ * appeared in the search results for the following reasons:
+ * - The UI would glitch. For example, if the user is viewing a search result, and then it gets removed from the state,
+ * then the displayed user would suddenly disappear.
+ * - The user may have accidentally unblocked a user, or deleted a contact. In this case, the specified user should
+ * still be displayed so that they can blocked or added as a contact again.
+ * - If the user has updated the users they've blocked outside this page (e.g., on another device they're using Omni
+ * Chat on at the same time), then they'll refresh the page if they really want to see the updated search results
+ * immediately. This is a rare and harmless case since this page will only be viewed for short periods of time.
+ */
 export namespace SearchedUsersSlice {
   const adapter = createEntityAdapter<AccountEdge>({
     selectId: (model) => model.cursor,
@@ -33,16 +47,17 @@ export namespace SearchedUsersSlice {
         state.hasNextPage = payload.pageInfo.hasNextPage;
         adapter.addMany(state, payload.edges);
       },
-      update: (state, { payload }: PayloadAction<UpdatedAccount>) => {
-        const user = state.entities[payload.id];
-        if (user !== undefined) user.node = { ...payload, __typename: 'Account' };
+      clear: (state) => {
+        state.query = undefined;
+        state.hasNextPage = undefined;
+        adapter.removeAll(state);
       },
     },
   });
 
   export const { reducer } = slice;
 
-  export const { replace, add, update } = slice.actions;
+  export const { replace, add, clear } = slice.actions;
 
   export const { selectAll } = adapter.getSelectors((state: RootState) => state.searchedUsers);
 

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Account, BlockedAccount, readBlockedUsers, UnblockedAccount, UpdatedAccount } from '@neelkamath/omni-chat';
+import { Account, BlockedAccount, readBlockedUsers, UpdatedAccount } from '@neelkamath/omni-chat';
 import { FetchStatus, RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
@@ -40,7 +40,7 @@ export namespace BlockedUsersSlice {
       upsertOne: (state, { payload }: PayloadAction<BlockedAccount>) => {
         adapter.upsertOne(state, { ...payload, __typename: 'Account' });
       },
-      removeOne: (state, { payload }: PayloadAction<UnblockedAccount>) => adapter.removeOne(state, payload.id),
+      removeOne: adapter.removeOne,
     },
     extraReducers: (builder) => {
       builder

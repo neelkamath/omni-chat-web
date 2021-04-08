@@ -9,6 +9,7 @@ import {
 import {
   BackwardPagination,
   Chat,
+  ChatsConnection,
   ForwardPagination,
   PrivateChat,
   readChat,
@@ -20,45 +21,50 @@ import { BlockedUsersSlice } from './BlockedUsersSlice';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 
-const privateChatMessagesPagination: BackwardPagination = { last: 1 };
-const groupChatUsersPagination: ForwardPagination = { first: 0 };
-const groupChatMessagesPagination: BackwardPagination = { last: 1 };
-
-async function operateReadChat(id: number): Promise<Chat | undefined> {
-  const result = await operateGraphQlApi(() => readChat(
-    httpApiConfig,
-    Storage.readAccessToken()!,
-    id,
-    privateChatMessagesPagination,
-    groupChatUsersPagination,
-    groupChatMessagesPagination,
-  ));
-  return result?.readChat.__typename === 'InvalidChatId' ? undefined : result?.readChat;
-}
-
-async function operateReadChats(): Promise<Chat[] | undefined> {
-  const result = await operateGraphQlApi(() => readChats(
-    httpApiConfig,
-    Storage.readAccessToken()!,
-    privateChatMessagesPagination,
-    groupChatUsersPagination,
-    groupChatMessagesPagination,
-  ));
-  return result?.readChats;
-}
-
 /**
  * Stores every chat the user is in. Only the last message sent in ({@link Chat.messages}) is stored. Group chats don't
  * store their participants in {@link GroupChat.users}.
  */
 export namespace ChatsSlice {
   const sliceName = 'chats';
+  const pagination: ForwardPagination = {}; // TODO: Retrieve only 15 at a time.
+  const privateChatMessagesPagination: BackwardPagination = { last: 1 };
+  const groupChatUsersPagination: ForwardPagination = { first: 0 };
+  const groupChatMessagesPagination: BackwardPagination = { last: 1 };
+
+  async function operateReadChat(id: number): Promise<Chat | undefined> {
+    const result = await operateGraphQlApi(() =>
+      readChat(
+        httpApiConfig,
+        Storage.readAccessToken()!,
+        id,
+        privateChatMessagesPagination,
+        groupChatUsersPagination,
+        groupChatMessagesPagination,
+      ),
+    );
+    return result?.readChat.__typename === 'InvalidChatId' ? undefined : result?.readChat;
+  }
+
+  async function operateReadChats(): Promise<ChatsConnection | undefined> {
+    const result = await operateGraphQlApi(() =>
+      readChats(
+        httpApiConfig,
+        Storage.readAccessToken()!,
+        pagination,
+        privateChatMessagesPagination,
+        groupChatUsersPagination,
+        groupChatMessagesPagination,
+      ),
+    );
+    return result?.readChats;
+  }
 
   // TODO: Test once chat messages are implemented.
   const adapter = createEntityAdapter<Chat>({
     sortComparer: (a, b) => {
       const readSent = (chat: Chat) => {
-        const sent = chat.messages.edges[0]?.node.dateTimes.sent;
+        const sent = chat.messages.edges[0]?.node.sent;
         return sent === undefined ? undefined : Date.parse(sent);
       };
       const aLast = readSent(a);
@@ -77,6 +83,8 @@ export namespace ChatsSlice {
     readonly status: FetchStatus;
     /** The IDs of chats currently being fetched via {@link fetchChat}. */
     readonly fetching: number[];
+    /** The IDs of private chats which were deleted because the user being chatted with deleted their account. */
+    readonly deletePrivateChatIdList: number[];
   }
 
   /** Fetches/updates the specified chat. */
@@ -96,9 +104,19 @@ export namespace ChatsSlice {
 
   const slice = createSlice({
     name: sliceName,
-    initialState: adapter.getInitialState({ status: 'IDLE', fetching: [] }) as State,
+    initialState: adapter.getInitialState({ status: 'IDLE', fetching: [], deletePrivateChatIdList: [] }) as State,
     reducers: {
-      removeOne: (state, { payload }: PayloadAction<number>) => adapter.removeOne(state, payload),
+      removeOne: adapter.removeOne,
+      /** If there's a private chat with the specified user ID, then it'll be removed. */
+      removePrivateChat: (state, { payload }: PayloadAction<number>) => {
+        const chat = Object.values(state.entities).find(
+          (entity) => entity?.__typename === 'PrivateChat' && (entity as PrivateChat).user.id === payload,
+        );
+        if (chat !== undefined) {
+          state.deletePrivateChatIdList.push(chat.id);
+          adapter.removeOne(state, chat.id);
+        }
+      },
       // TODO: Test once chat messages are implemented.
       updateAccount: (state, { payload }: PayloadAction<UpdatedAccount>) => {
         Object.values(state.entities).forEach((entity) => {
@@ -121,7 +139,11 @@ export namespace ChatsSlice {
         })
         .addCase(fetchChats.fulfilled, (state, { payload }) => {
           state.status = 'LOADED';
-          if (payload !== undefined) adapter.upsertMany(state, payload);
+          if (payload !== undefined)
+            adapter.upsertMany(
+              state,
+              payload.edges.map(({ node }) => node),
+            );
         })
         .addCase(fetchChats.rejected, (state) => {
           state.status = 'IDLE';
@@ -134,7 +156,7 @@ export namespace ChatsSlice {
 
   export const { reducer } = slice;
 
-  export const { removeOne, updateAccount } = slice.actions;
+  export const { removeOne, updateAccount, removePrivateChat } = slice.actions;
 
   const { selectAll } = adapter.getSelectors((state: RootState) => state.chats);
 
@@ -165,5 +187,11 @@ export namespace ChatsSlice {
   export const selectLastMessage = createSelector(
     [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
     (chats: Dictionary<Chat>, chatId: number) => chats[chatId]?.messages.edges[0]?.node,
+  );
+
+  /** Whether the specified private chat belongs to a user who deleted their account, and therefore deleted the chat. */
+  export const selectIsDeletedPrivateChat = createSelector(
+    [(state: RootState) => state.chats.deletePrivateChatIdList, (_: RootState, chatId: number) => chatId],
+    (chatIdList: number[], chatId: number) => chatIdList.includes(chatId),
   );
 }

@@ -6,6 +6,7 @@ import {
   Dictionary,
   EntityAdapter,
   EntityState,
+  PayloadAction,
 } from '@reduxjs/toolkit';
 import {
   getGroupChatPic,
@@ -17,12 +18,6 @@ import {
 import { RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateRestApi } from '../../api';
-import EntityType = PicsSlice.EntityType;
-
-/** Generates the {@link Entity.id}. */
-function generateId(type: EntityType, id: number): string {
-  return `${type}_${id}`;
-}
 
 /** Profile and group chat pics. */
 export namespace PicsSlice {
@@ -57,6 +52,11 @@ export namespace PicsSlice {
 
   const adapter: EntityAdapter<Entity> = createEntityAdapter();
 
+  /**
+   * - A {@link Blob} is indicative of the pic.
+   * - `null` indicates the entity doesn't have an associated pic.
+   * - `undefined` indicates the pic hasn't been fetched; perhaps due to an error.
+   */
   type PicData = Blob | null | undefined;
 
   interface Pic {
@@ -64,8 +64,13 @@ export namespace PicsSlice {
     readonly original: PicData;
   }
 
+  /** Generates the {@link Entity.id}. The `id` is the ID of either the user or group chat. */
+  function generateId(type: EntityType, id: number): string {
+    return `${type}_${id}`;
+  }
+
   async function getPic({ id, type }: FetchPicData): Promise<Pic> {
-    let thumbnail, original;
+    let thumbnail: PicData, original: PicData;
     switch (type) {
       case 'GROUP_CHAT_PIC':
         thumbnail = await operateRestApi(() =>
@@ -109,7 +114,11 @@ export namespace PicsSlice {
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState(),
-    reducers: {},
+    reducers: {
+      /** Removes the profile pic of the specified user. */
+      removeAccount: (state, { payload }: PayloadAction<number>) =>
+        adapter.removeOne(state, generateId('PROFILE_PIC', payload)),
+    },
     extraReducers: (builder) => {
       builder
         .addCase(fetchPic.rejected, ({ entities }, { meta, error }) => {
@@ -127,6 +136,8 @@ export namespace PicsSlice {
   });
 
   export const { reducer } = slice;
+
+  export const { removeAccount } = slice.actions;
 
   export const selectPic = createSelector(
     [

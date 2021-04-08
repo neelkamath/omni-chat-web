@@ -60,5 +60,8 @@ async function operateDeleteAccount(): Promise<void> {
       'You must first assign another user as the admin.',
       12.5,
     );
-  else await logOut();
+  else {
+    Storage.deleteTokenSet();
+    await logOut();
+  }
 }

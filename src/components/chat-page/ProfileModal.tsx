@@ -3,9 +3,9 @@ import { Button, List, message, Modal, Spin, Typography } from 'antd';
 import {
   Account,
   blockUser,
-  createContacts,
+  createContact,
   createPrivateChat,
-  deleteContacts,
+  deleteContact,
   unblockUser,
 } from '@neelkamath/omni-chat';
 import { useDispatch, useSelector } from 'react-redux';
@@ -118,7 +118,6 @@ interface ContactButtonProps {
   readonly userId: number;
 }
 
-// TODO: Once Omni Chat Backend 0.18.0 releases, update this to state whether the user deleted their account.
 function ContactButton({ userId }: ContactButtonProps): ReactElement {
   const isButtonLoading = !useSelector(ContactsSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
@@ -127,7 +126,7 @@ function ContactButton({ userId }: ContactButtonProps): ReactElement {
   if (isButtonLoading) return <Spin size='small' />;
   const onClick = async () => {
     setLoading(true);
-    isContact ? await operateDeleteContacts(userId) : await operateCreateContacts(userId);
+    isContact ? await operateDeleteContact(userId) : await operateCreateContact(userId);
     setLoading(false);
   };
   return (
@@ -137,14 +136,16 @@ function ContactButton({ userId }: ContactButtonProps): ReactElement {
   );
 }
 
-async function operateCreateContacts(userId: number): Promise<void> {
-  const result = await operateGraphQlApi(() => createContacts(httpApiConfig, Storage.readAccessToken()!, [userId]));
-  if (result !== undefined) message.success('Contact created.', 3);
+async function operateCreateContact(userId: number): Promise<void> {
+  const result = await operateGraphQlApi(() => createContact(httpApiConfig, Storage.readAccessToken()!, userId));
+  if (result?.createContact === true) message.success('Contact created.', 3);
+  else if (result?.createContact === false) message.warning('That user just deleted their account.', 5);
 }
 
-async function operateDeleteContacts(userId: number): Promise<void> {
-  const result = await operateGraphQlApi(() => deleteContacts(httpApiConfig, Storage.readAccessToken()!, [userId]));
-  if (result !== undefined) message.success('Contact deleted', 3);
+async function operateDeleteContact(userId: number): Promise<void> {
+  const result = await operateGraphQlApi(() => deleteContact(httpApiConfig, Storage.readAccessToken()!, userId));
+  if (result?.deleteContact === true) message.success('Contact deleted', 3);
+  else if (result?.deleteContact === false) message.warning('That user just deleted their account', 5);
 }
 
 interface BlockButtonProps {
@@ -152,7 +153,6 @@ interface BlockButtonProps {
   readonly userId: number;
 }
 
-// TODO: Once Omni Chat Backend 0.18.0 releases, update this to state whether the user deleted their account.
 function BlockButton({ userId }: BlockButtonProps): ReactElement {
   const isBlocked = useSelector((state: RootState) => BlockedUsersSlice.selectIsBlocked(state, userId));
   const isButtonLoading = !useSelector(BlockedUsersSlice.selectIsLoaded);
@@ -173,10 +173,12 @@ function BlockButton({ userId }: BlockButtonProps): ReactElement {
 
 async function operateUnblockUser(userId: number): Promise<void> {
   const result = await operateGraphQlApi(() => unblockUser(httpApiConfig, Storage.readAccessToken()!, userId));
-  if (result !== undefined) message.success('User unblocked.');
+  if (result?.unblockUser === true) message.success('User unblocked.');
+  else if (result?.unblockUser === false) message.warning('That user just deleted their account.', 5);
 }
 
 async function operateBlockUser(userId: number): Promise<void> {
   const result = await operateGraphQlApi(() => blockUser(httpApiConfig, Storage.readAccessToken()!, userId));
-  if (result !== undefined) message.success('User blocked.');
+  if (result?.blockUser?.__typename === 'InvalidUserId') message.warning('That user just deleted their account.', 5);
+  else if (result !== undefined) message.success('User blocked.');
 }

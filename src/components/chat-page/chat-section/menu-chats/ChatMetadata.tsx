@@ -7,7 +7,7 @@ import {
   PrivateChat,
   TextMessage,
 } from '@neelkamath/omni-chat';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { Col, Row, Tooltip, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import { RootState, useThunkDispatch } from '../../../../store/store';
@@ -47,7 +47,7 @@ interface ChatNameProps {
 }
 
 function ChatName({ chat }: ChatNameProps): ReactElement {
-  let name;
+  let name: string;
   switch (chat.__typename) {
     case 'GroupChat':
       name = (chat as GroupChat).title;
@@ -71,7 +71,7 @@ function LastMessageTimeAgo({ chatId }: LastMessageTimeAgoProps): ReactElement {
   if (lastMessage === undefined) return <></>;
   return (
     <Typography.Text type='secondary'>
-      <TimeAgo datetime={lastMessage.dateTimes.sent} opts={{ minInterval: 60 }} />
+      <TimeAgo datetime={lastMessage.sent} opts={{ minInterval: 60 }} />
     </Typography.Text>
   );
 }
@@ -85,7 +85,7 @@ function LastChatMessageText({ chatId }: LastChatMessageTextProps): ReactElement
   const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
   useThunkDispatch(ChatsSlice.fetchChat(chatId));
   if (lastMessage === undefined) return <></>;
-  let message;
+  let message: ReactNode;
   switch (lastMessage.__typename) {
     case 'TextMessage':
       message = (lastMessage as TextMessage).textMessage;

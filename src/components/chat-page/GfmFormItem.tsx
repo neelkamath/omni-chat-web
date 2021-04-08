@@ -47,7 +47,7 @@ export default function GfmFormItem({
           />
         </Tabs.TabPane>
         <Tabs.TabPane style={{ width: 300 }} tab={<ViewTab />} key={2}>
-          <ReactMarkdown plugins={[gfm]} children={value === undefined ? '' : value} />
+          <ReactMarkdown plugins={[gfm]}>{value === undefined ? '' : value}</ReactMarkdown>
         </Tabs.TabPane>
       </Tabs>
     </Form.Item>

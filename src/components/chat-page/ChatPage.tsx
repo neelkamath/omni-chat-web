@@ -7,10 +7,8 @@ import { refreshTokenSet, setOnline } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { useSelector } from 'react-redux';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
-import BlockedUsersSection from './BlockedUsersSection';
 import AccountEditor from './account-editor/AccountEditor';
-import ContactsSection from './ContactsSection';
-import SearchUsersSection from './SearchUsersSection';
+import SearchUsersSection from './search-users-section/SearchUsersSection';
 import ChatPageSupportSection from './ChatPageSupportSection';
 import DevelopersSection from '../DevelopersSection';
 import ChatSection from './chat-section/ChatSection';
@@ -24,7 +22,7 @@ export default function ChatPage(): ReactElement {
         return;
       }
       Storage.saveTokenSet(result.refreshTokenSet);
-      // TODO: Test once Omni Chat Backend 0.18.0 releases.
+      // TODO: Test once Omni Chat Backend 0.19.0 releases.
       await operateGraphQlApi(() => setOnline(httpApiConfig, Storage.readAccessToken()!, true));
       await setUpSubscriptions();
       addEventListener('online', () => {
@@ -48,7 +46,7 @@ function LoadingPage(): ReactElement {
 
 function ChatPageLayout(): ReactElement {
   return (
-    <Layout style={{ height: '100%' }}>
+    <Layout style={{ minHeight: '100%' }}>
       <Layout.Sider theme='light' width={425}>
         <ChatPageMenu />
       </Layout.Sider>
@@ -65,13 +63,13 @@ function LayoutContent(): ReactElement {
     case 'EMPTY':
       return <Empty style={{ padding: 24 }} />;
     case 'BLOCKED_USERS_SECTION':
-      return <BlockedUsersSection />;
+      return <SearchUsersSection type='BLOCKED_USERS' />;
     case 'ACCOUNT_EDITOR':
       return <AccountEditor />;
     case 'CONTACTS_SECTION':
-      return <ContactsSection />;
+      return <SearchUsersSection type='CONTACTS' />;
     case 'SEARCH_USERS_SECTION':
-      return <SearchUsersSection />;
+      return <SearchUsersSection type='USERS' />;
     case 'CHAT_PAGE_SUPPORT_SECTION':
       return <ChatPageSupportSection />;
     case 'DEVELOPERS_SECTION':

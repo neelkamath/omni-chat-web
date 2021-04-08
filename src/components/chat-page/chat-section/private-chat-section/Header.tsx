@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, ReactNode, useState } from 'react';
 import { Button, Col, Row, Tag, Typography } from 'antd';
 import { InfoCircleOutlined, UserOutlined } from '@ant-design/icons';
 import ProfileModal from '../../ProfileModal';
@@ -60,7 +60,7 @@ function OnlineStatusSection({ userId }: OnlineStatusSectionProps): ReactElement
   const onlineStatus = useSelector((state: RootState) => OnlineStatusesSlice.select(state, userId));
   useThunkDispatch(OnlineStatusesSlice.fetchStatus(userId));
   if (onlineStatus === undefined) return <></>;
-  let status;
+  let status: ReactNode;
   if (onlineStatus.isOnline) status = 'online';
   else if (onlineStatus.lastOnline === null) status = 'offline';
   else

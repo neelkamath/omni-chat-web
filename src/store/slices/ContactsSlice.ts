@@ -6,7 +6,7 @@ import {
   EntityAdapter,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { Account, DeletedContact, NewContact, readContacts, UpdatedAccount } from '@neelkamath/omni-chat';
+import { Account, NewContact, readContacts, UpdatedAccount } from '@neelkamath/omni-chat';
 import { FetchStatus, RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
@@ -44,7 +44,7 @@ export namespace ContactsSlice {
           changes: { ...payload, __typename: 'Account' },
         });
       },
-      removeOne: (state, { payload }: PayloadAction<DeletedContact>) => adapter.removeOne(state, payload.id),
+      removeOne: adapter.removeOne,
       upsertOne: (state, { payload }: PayloadAction<NewContact>) => {
         adapter.upsertOne(state, { ...payload, __typename: 'Account' });
       },
