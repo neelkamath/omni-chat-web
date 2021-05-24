@@ -14,13 +14,13 @@ export interface GfmFormItemProps {
 }
 
 export default function GfmFormItem({
-                                      initialValue,
-                                      onChange,
-                                      maxLength,
-                                      name,
-                                      label,
-                                      onPressEnter,
-                                    }: GfmFormItemProps): ReactElement {
+  initialValue,
+  onChange,
+  maxLength,
+  name,
+  label,
+  onPressEnter,
+}: GfmFormItemProps): ReactElement {
   const [value, setValue] = useState(initialValue);
   const [isShiftDown, setShiftDown] = useState(false);
   return (

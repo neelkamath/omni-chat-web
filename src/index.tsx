@@ -9,7 +9,6 @@ TODO: Once context messages have been implemented, test that if the context has 
  it no longer display the context, and that a message being created in reply to it has the context disappear with an
  appropriate warning message.
  */
-// TODO: Maybe use Relay, Apollo, etc.
 
 ReactDOM.render(<App />, document.querySelector('#root'));
 /*

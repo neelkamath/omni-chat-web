@@ -51,7 +51,7 @@ async function operatePatchProfilePic(file: File): Promise<void> {
     await operateRestApi(() => patchProfilePic(httpApiConfig, Storage.readAccessToken()!, file));
     message.success('Profile picture updated.', 3);
   } catch (error) {
-    if (error instanceof InvalidPicError) message.error('The picture mustn\'t exceed 5 MB.', 5);
+    if (error instanceof InvalidPicError) message.error("The picture mustn't exceed 5 MB.", 5);
     else throw error;
   }
 }

@@ -74,7 +74,7 @@ async function operateResetPassword(data: ResetPasswordFormData): Promise<void> 
   const result = await resetPassword(data);
   if (result?.resetPassword === null) message.success('Password reset.', 3);
   else if (result?.resetPassword?.__typename === 'UnregisteredEmailAddress')
-    message.error('That email address isn\'t registered.', 5);
+    message.error("That email address isn't registered.", 5);
   else if (result?.resetPassword?.__typename === 'InvalidPasswordResetCode') message.error('Incorrect reset code.', 3);
 }
 
@@ -91,10 +91,10 @@ interface UnregisteredEmailAddress {
 }
 
 async function resetPassword({
-                               emailAddress,
-                               passwordResetCode,
-                               newPassword,
-                             }: ResetPasswordFormData): Promise<ResetPasswordResult | undefined> {
+  emailAddress,
+  passwordResetCode,
+  newPassword,
+}: ResetPasswordFormData): Promise<ResetPasswordResult | undefined> {
   return await operateGraphQlApi(
     async () =>
       await queryOrMutate(httpApiConfig, {

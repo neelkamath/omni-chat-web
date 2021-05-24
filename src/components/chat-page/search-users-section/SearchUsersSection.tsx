@@ -21,7 +21,7 @@ export default function SearchUsersSection({ type }: SearchUsersSectionProps): R
       text = 'contacts';
       break;
     case 'BLOCKED_USERS':
-      text = 'users you\'ve blocked';
+      text = "users you've blocked";
       break;
     case 'USERS':
       text = 'users';
