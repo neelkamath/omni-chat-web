@@ -1,12 +1,3 @@
-import {
-  ActionMessage,
-  Chat,
-  GroupChat,
-  PicMessage,
-  PollMessage,
-  PrivateChat,
-  TextMessage,
-} from '@neelkamath/omni-chat';
 import React, { ReactElement, ReactNode } from 'react';
 import { Col, Row, Tooltip, Typography } from 'antd';
 import { useSelector } from 'react-redux';
@@ -14,9 +5,13 @@ import { RootState, useThunkDispatch } from '../../../../store/store';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import TimeAgo from 'timeago-react';
 import { CheckCircleTwoTone, ClockCircleTwoTone } from '@ant-design/icons';
+import TextMessage = ChatsSlice.TextMessage;
+import ActionMessage = ChatsSlice.ActionMessage;
+import PicMessage = ChatsSlice.PicMessage;
+import PollMessage = ChatsSlice.PollMessage;
 
 export interface ChatMetadataProps {
-  readonly chat: Chat;
+  readonly chat: ChatsSlice.Chat;
 }
 
 export default function ChatMetadata({ chat }: ChatMetadataProps): ReactElement {
@@ -27,15 +22,15 @@ export default function ChatMetadata({ chat }: ChatMetadataProps): ReactElement 
           <ChatName chat={chat} />
         </Col>
         <Col>
-          <LastMessageTimeAgo chatId={chat.id} />
+          <LastMessageTimeAgo chatId={chat.chatId} />
         </Col>
       </Row>
       <Row gutter={16} justify='space-between'>
         <Col>
-          <LastChatMessageText chatId={chat.id} />
+          <LastChatMessageText chatId={chat.chatId} />
         </Col>
         <Col>
-          <LastMessageStatus chatId={chat.id} />
+          <LastMessageStatus chatId={chat.chatId} />
         </Col>
       </Row>
     </>
@@ -43,17 +38,17 @@ export default function ChatMetadata({ chat }: ChatMetadataProps): ReactElement 
 }
 
 interface ChatNameProps {
-  readonly chat: Chat;
+  readonly chat: ChatsSlice.Chat;
 }
 
 function ChatName({ chat }: ChatNameProps): ReactElement {
   let name: string;
   switch (chat.__typename) {
     case 'GroupChat':
-      name = (chat as GroupChat).title;
+      name = (chat as ChatsSlice.GroupChat).title;
       break;
     case 'PrivateChat':
-      name = (chat as PrivateChat).user.username;
+      name = (chat as ChatsSlice.PrivateChat).user.username;
   }
   return (
     <Typography.Text ellipsis={true} strong style={{ width: 225 }}>

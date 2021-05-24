@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Account, readAccount, UpdatedAccount } from '@neelkamath/omni-chat';
 import { RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
+import { Bio, Name, queryOrMutate, Username } from '@neelkamath/omni-chat';
 
 export namespace AccountSlice {
   const sliceName = 'account';
@@ -17,7 +17,7 @@ export namespace AccountSlice {
   export const fetchAccount = createAsyncThunk(
     `${sliceName}/fetchAccount`,
     async () => {
-      const result = await operateGraphQlApi(() => readAccount(httpApiConfig, Storage.readAccessToken()!));
+      const result = await readAccount();
       return result?.readAccount;
     },
     {
@@ -28,12 +28,58 @@ export namespace AccountSlice {
     },
   );
 
+  export interface Account {
+    readonly userId: number;
+    readonly username: Username;
+    readonly emailAddress: string;
+    readonly firstName: Name;
+    readonly lastName: Name;
+    readonly bio: Bio;
+  }
+
+  interface ReadAccountResult {
+    readonly readAccount: Account;
+  }
+
+  async function readAccount(): Promise<ReadAccountResult | undefined> {
+    return await operateGraphQlApi(
+      async () =>
+        await queryOrMutate(
+          httpApiConfig,
+          {
+            query: `
+              query ReadAccount {
+                readAccount {
+                  userId
+                  username
+                  emailAddress
+                  firstName
+                  lastName
+                  bio
+                }
+              }
+            `,
+          },
+          Storage.readAccessToken()!,
+        ),
+    );
+  }
+
+  export interface UpdatedAccount {
+    readonly userId: number;
+    readonly username: Username;
+    readonly emailAddress: string;
+    readonly firstName: Name;
+    readonly lastName: Name;
+    readonly bio: Bio;
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: { isLoading: false } as State,
     reducers: {
       update: (state, { payload }: PayloadAction<UpdatedAccount>) => {
-        state.data = { ...payload, __typename: 'Account' };
+        state.data = payload;
       },
     },
     extraReducers: (builder) => {

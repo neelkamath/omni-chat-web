@@ -1,10 +1,15 @@
 import jwtDecode from 'jwt-decode';
-import { TokenSet } from '@neelkamath/omni-chat';
+import { Id } from '@neelkamath/omni-chat';
 
 export namespace Storage {
   interface TokenPayload {
     readonly sub: string;
     readonly exp: number;
+  }
+
+  export interface TokenSet {
+    readonly accessToken: Id;
+    readonly refreshToken: Id;
   }
 
   export function saveTokenSet(tokenSet: TokenSet): void {
@@ -21,7 +26,7 @@ export namespace Storage {
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
     if (accessToken === null || refreshToken === null) return undefined;
-    return { __typename: 'TokenSet', accessToken, refreshToken };
+    return { accessToken, refreshToken };
   }
 
   /** @see {@link readTokenSet} */

@@ -1,8 +1,8 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Col, Form, Image, Input, message, Row, Space, Typography } from 'antd';
 import forgotPasswordImage from '../../images/forgot-password.svg';
-import { emailPasswordResetCode } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
+import { queryOrMutate } from '@neelkamath/omni-chat';
 
 export default function EmailPasswordResetCodeSection(): ReactElement {
   return (
@@ -51,8 +51,32 @@ function EmailPasswordResetCodeForm(): ReactElement {
 }
 
 async function operateEmailPasswordResetCode(emailAddress: string): Promise<void> {
-  const result = await operateGraphQlApi(() => emailPasswordResetCode(httpApiConfig, emailAddress));
+  const result = await emailPasswordResetCode(emailAddress);
   if (result?.emailPasswordResetCode === null) message.success('Password reset code sent to your email.', 5);
   else if (result?.emailPasswordResetCode?.__typename === 'UnregisteredEmailAddress')
     message.error('That email address isn\'t registered.', 5);
+}
+
+interface EmailPasswordResetCodeResult {
+  readonly emailPasswordResetCode: UnregisteredEmailAddress | null;
+}
+
+interface UnregisteredEmailAddress {
+  readonly __typename: 'UnregisteredEmailAddress';
+}
+
+async function emailPasswordResetCode(emailAddress: string): Promise<EmailPasswordResetCodeResult | undefined> {
+  return operateGraphQlApi(
+    async () =>
+      await queryOrMutate(httpApiConfig, {
+        query: `
+          mutation EmailPasswordResetCode($emailAddress: String!) {
+            emailPasswordResetCode(emailAddress: $emailAddress) {
+              __typename
+            }
+          }
+        `,
+        variables: { emailAddress },
+      }),
+  );
 }

@@ -4,17 +4,11 @@ import { useSelector } from 'react-redux';
 import { AccountSlice } from '../../../store/slices/AccountSlice';
 import { useThunkDispatch } from '../../../store/store';
 import { Storage } from '../../../Storage';
-import {
-  AccountUpdate,
-  isValidNameScalar,
-  isValidUsernameScalar,
-  Name,
-  setOnline,
-  updateAccount,
-} from '@neelkamath/omni-chat';
+import { Bio, isValidNameScalar, isValidUsernameScalar, Name, queryOrMutate, Username } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
-import logOut from '../../../logOut';
 import GfmFormItem from '../GfmFormItem';
+import setOnline from '../../../setOnline';
+import logOut from '../../../logOut';
 
 export default function UpdateAccountSection(): ReactElement {
   return (
@@ -80,6 +74,15 @@ function UpdateAccountForm(): ReactElement {
   );
 }
 
+interface AccountUpdate {
+  readonly username: Username;
+  readonly password: null;
+  readonly emailAddress: string;
+  readonly firstName: Name;
+  readonly lastName: Name;
+  readonly bio: Bio;
+}
+
 function buildAccountUpdate({
                               username,
                               emailAddress,
@@ -88,7 +91,6 @@ function buildAccountUpdate({
                               bio,
                             }: UpdateAccountFormData): AccountUpdate {
   return {
-    __typename: 'AccountUpdate',
     username: username.trim(),
     password: null,
     emailAddress: emailAddress,
@@ -117,8 +119,8 @@ function validateAccountUpdate({ username, firstName, lastName }: AccountUpdate)
 
 async function operateUpdateAccount(currentEmailAddress: string, update: AccountUpdate): Promise<void> {
   const isUpdatedAddress = update.emailAddress !== undefined && currentEmailAddress !== update.emailAddress;
-  if (isUpdatedAddress) await operateGraphQlApi(() => setOnline(httpApiConfig, Storage.readAccessToken()!, false));
-  const result = await operateGraphQlApi(() => updateAccount(httpApiConfig, Storage.readAccessToken()!, update));
+  if (isUpdatedAddress) await setOnline(false);
+  const result = await updateAccount(update);
   if (result?.updateAccount === null) {
     message.success('Account updated.', 3);
     if (isUpdatedAddress) await logOut();
@@ -126,4 +128,36 @@ async function operateUpdateAccount(currentEmailAddress: string, update: Account
     message.error('That username has already been taken.', 5);
   else if (result?.updateAccount?.__typename === 'EmailAddressTaken')
     message.error('That email address has already been taken.', 5);
+}
+
+interface UsernameTaken {
+  readonly __typename: 'UsernameTaken';
+}
+
+interface EmailAddressTaken {
+  readonly __typename: 'EmailAddressTaken';
+}
+
+interface UpdateAccountResult {
+  readonly updateAccount: UsernameTaken | EmailAddressTaken | null;
+}
+
+async function updateAccount(update: AccountUpdate): Promise<UpdateAccountResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(
+        httpApiConfig,
+        {
+          query: `
+          mutation UpdateAccount($update: AccountUpdate!) {
+            updateAccount(update: $update) {
+              __typename
+            }
+          }
+        `,
+          variables: { update },
+        },
+        Storage.readAccessToken()!,
+      ),
+  );
 }

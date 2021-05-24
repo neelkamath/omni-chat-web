@@ -1,4 +1,3 @@
-import logOut from './logOut';
 import { message, notification, Typography } from 'antd';
 import React from 'react';
 import {
@@ -12,6 +11,7 @@ import {
   WebSocketProtocol,
   WsApiConfig,
 } from '@neelkamath/omni-chat';
+import logOut from './logOut';
 
 export const httpApiConfig: HttpApiConfig = {
   apiUrl: process.env.API_URL!,

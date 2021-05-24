@@ -1,7 +1,7 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Form, message } from 'antd';
 import { SendOutlined } from '@ant-design/icons';
-import { createTextMessage, isValidMessageTextScalar, MessageText } from '@neelkamath/omni-chat';
+import { isValidMessageTextScalar, MessageText, queryOrMutate } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
 import { Storage } from '../../../../Storage';
 import store from '../../../../store/store';
@@ -44,9 +44,7 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
 
 /** @returns Whether the message was sent. */
 async function operateCreateTextMessage(chatId: number, text: MessageText): Promise<boolean> {
-  const result = await operateGraphQlApi(() =>
-    createTextMessage(httpApiConfig, Storage.readAccessToken()!, chatId, text),
-  );
+  const result = await createTextMessage(chatId, text);
   if (result?.createTextMessage === null) return true;
   switch (result?.createTextMessage?.__typename) {
     case 'InvalidChatId':
@@ -57,4 +55,36 @@ async function operateCreateTextMessage(chatId: number, text: MessageText): Prom
       message.error('The context message has just been deleted.', 5);
   }
   return false;
+}
+
+interface CreateTextMessageResult {
+  readonly createTextMessage: InvalidChatId | InvalidMessageId | null;
+}
+
+interface InvalidChatId {
+  readonly __typename: 'InvalidChatId';
+}
+
+interface InvalidMessageId {
+  readonly __typename: 'InvalidMessageId';
+}
+
+async function createTextMessage(chatId: number, text: MessageText): Promise<CreateTextMessageResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(
+        httpApiConfig,
+        {
+          query: `
+            mutation CreateTextMessage($chatId: Int!, $text: MessageText!) {
+              createTextMessage(chatId: $chatId, text: $text) {
+                __typename
+              }
+            }
+          `,
+          variables: { chatId, text },
+        },
+        Storage.readAccessToken()!,
+      ),
+  );
 }

@@ -1,7 +1,7 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Form, Input, message } from 'antd';
 import { Storage } from '../../../Storage';
-import { AccountUpdate, isValidPasswordScalar, updateAccount } from '@neelkamath/omni-chat';
+import { isValidPasswordScalar, Password, queryOrMutate } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
 
 interface UpdatePasswordFormData {
@@ -10,10 +10,9 @@ interface UpdatePasswordFormData {
 
 export default function UpdatePasswordForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
-  const onFinish = async ({ password }: UpdatePasswordFormData) => {
+  const onFinish = async (data: UpdatePasswordFormData) => {
     setLoading(true);
-    const update = buildAccountUpdate(password);
-    if (validateAccountUpdate(update)) await operateUpdateAccount(update);
+    if (validateAccountUpdate(data)) await operateUpdateAccount(data);
     setLoading(false);
   };
   return (
@@ -30,16 +29,8 @@ export default function UpdatePasswordForm(): ReactElement {
   );
 }
 
-function buildAccountUpdate(password: string): AccountUpdate {
-  return {
-    __typename: 'AccountUpdate',
-    username: null,
-    password,
-    emailAddress: null,
-    firstName: null,
-    lastName: null,
-    bio: null,
-  };
+interface AccountUpdate {
+  readonly password: Password;
 }
 
 function validateAccountUpdate({ password }: AccountUpdate): boolean {
@@ -51,6 +42,38 @@ function validateAccountUpdate({ password }: AccountUpdate): boolean {
 }
 
 async function operateUpdateAccount(update: AccountUpdate): Promise<void> {
-  const result = await operateGraphQlApi(() => updateAccount(httpApiConfig, Storage.readAccessToken()!, update));
+  const result = await updateAccount(update);
   if (result?.updateAccount === null) message.success('Account updated.', 3);
+}
+
+interface UsernameTaken {
+  readonly __typename: 'UsernameTaken';
+}
+
+interface EmailAddressTaken {
+  readonly __typename: 'EmailAddressTaken';
+}
+
+interface UpdateAccountResult {
+  readonly updateAccount: UsernameTaken | EmailAddressTaken | null;
+}
+
+async function updateAccount(update: AccountUpdate): Promise<UpdateAccountResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(
+        httpApiConfig,
+        {
+          query: `
+            mutation UpdateAccount($update: AccountUpdate!) {
+              updateAccount(update: $update) {
+                __typename
+              }
+            }
+          `,
+          variables: { update },
+        },
+        Storage.readAccessToken()!,
+      ),
+  );
 }

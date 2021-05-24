@@ -1,8 +1,8 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Col, Form, Image, Input, message, Row, Typography } from 'antd';
 import mailSentImage from '../../images/mail-sent.svg';
-import { verifyEmailAddress } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
+import { queryOrMutate } from '@neelkamath/omni-chat';
 
 export default function VerifyYourEmailAddressSection(): ReactElement {
   return (
@@ -55,14 +55,41 @@ function VerifyYourEmailAddressForm(): ReactElement {
   );
 }
 
-async function operateVerifyEmailAddress({
-                                           emailAddress,
-                                           verificationCode,
-                                         }: VerifyYourEmailAddressFormData): Promise<void> {
-  const result = await operateGraphQlApi(() => verifyEmailAddress(httpApiConfig, emailAddress, verificationCode));
+async function operateVerifyEmailAddress(data: VerifyYourEmailAddressFormData): Promise<void> {
+  const result = await verifyEmailAddress(data);
   if (result?.verifyEmailAddress === null) message.success('Email address verified.', 3);
   else if (result?.verifyEmailAddress?.__typename === 'UnregisteredEmailAddress')
     message.error('That email address isn\'t registered.', 5);
   else if (result?.verifyEmailAddress?.__typename === 'InvalidVerificationCode')
     message.error('Incorrect verification code.', 3);
+}
+
+interface VerifyEmailAddressResult {
+  readonly verifyEmailAddress: InvalidVerificationCode | UnregisteredEmailAddress | null;
+}
+
+interface InvalidVerificationCode {
+  readonly __typename: 'InvalidVerificationCode';
+}
+
+interface UnregisteredEmailAddress {
+  readonly __typename: 'UnregisteredEmailAddress';
+}
+
+async function verifyEmailAddress({
+                                    emailAddress,
+                                    verificationCode,
+                                  }: VerifyYourEmailAddressFormData): Promise<VerifyEmailAddressResult | undefined> {
+  return await operateGraphQlApi(async () =>
+    queryOrMutate(httpApiConfig, {
+      query: `
+        mutation VerifyEmailAddress($emailAddress: String!, $verificationCode: Int!) {
+          verifyEmailAddress(emailAddress: $emailAddress, verificationCode: $verificationCode) {
+            __typename
+          }
+        }
+      `,
+      variables: { emailAddress, verificationCode },
+    }),
+  );
 }

@@ -1,11 +1,11 @@
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Account, BlockedAccount, readBlockedUsers, UpdatedAccount } from '@neelkamath/omni-chat';
 import { FetchStatus, RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
+import { Bio, Name, queryOrMutate, Username } from '@neelkamath/omni-chat';
 
 export namespace BlockedUsersSlice {
-  const adapter = createEntityAdapter<Account>();
+  const adapter = createEntityAdapter<Account>({ selectId: ({ userId }) => userId });
 
   const sliceName = 'blockedUsers';
 
@@ -16,7 +16,7 @@ export namespace BlockedUsersSlice {
   export const fetchUsers = createAsyncThunk(
     `${sliceName}/fetchUsers`,
     async () => {
-      const users = await operateGraphQlApi(() => readBlockedUsers(httpApiConfig, Storage.readAccessToken()!));
+      const users = await readBlockedUsers();
       return users?.readBlockedUsers?.edges?.map(({ node }) => node);
     },
     {
@@ -27,19 +27,72 @@ export namespace BlockedUsersSlice {
     },
   );
 
+  interface AccountsConnection {
+    readonly edges: AccountEdge[];
+  }
+
+  interface AccountEdge {
+    readonly node: Account;
+  }
+
+  export interface Account {
+    readonly userId: number;
+    readonly username: Username;
+    readonly emailAddress: string;
+    readonly firstName: Name;
+    readonly lastName: Name;
+    readonly bio: Bio;
+  }
+
+  interface ReadBlockedUsersResult {
+    readonly readBlockedUsers: AccountsConnection;
+  }
+
+  async function readBlockedUsers(): Promise<ReadBlockedUsersResult | undefined> {
+    return await operateGraphQlApi(
+      async () =>
+        await queryOrMutate(
+          httpApiConfig,
+          {
+            query: `
+              query ReadBlockedUsers {
+                readBlockedUsers {
+                  edges {
+                    node {
+                      userId
+                      username
+                      emailAddress
+                      firstName
+                      lastName
+                      bio
+                    }
+                  }
+                }
+              }
+            `,
+          },
+          Storage.readAccessToken()!,
+        ),
+    );
+  }
+
+  export interface UpdatedAccount {
+    readonly userId: number;
+    readonly username: Username;
+    readonly emailAddress: string;
+    readonly firstName: Name;
+    readonly lastName: Name;
+    readonly bio: Bio;
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: {
       updateAccount: (state, { payload }: PayloadAction<UpdatedAccount>) => {
-        adapter.updateOne(state, {
-          id: payload.id,
-          changes: { ...payload, __typename: 'Account' },
-        });
+        adapter.updateOne(state, { id: payload.userId, changes: payload });
       },
-      upsertOne: (state, { payload }: PayloadAction<BlockedAccount>) => {
-        adapter.upsertOne(state, { ...payload, __typename: 'Account' });
-      },
+      upsertOne: adapter.upsertOne,
       removeOne: adapter.removeOne,
     },
     extraReducers: (builder) => {
@@ -60,8 +113,6 @@ export namespace BlockedUsersSlice {
   export const { reducer } = slice;
 
   export const { updateAccount, upsertOne, removeOne } = slice.actions;
-
-  export const { selectAll } = adapter.getSelectors((state: RootState) => state.blockedUsers);
 
   export const selectIsBlocked = createSelector(
     [(state: RootState) => state.blockedUsers.ids, (_: RootState, userId: number) => userId],

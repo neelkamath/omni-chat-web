@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 import { Comment } from 'antd';
-import { Message, TextMessage } from '@neelkamath/omni-chat';
+import { Message, TextMessage } from './ChatSection';
 
 export interface ChatMessageProps {
   readonly message: Message;

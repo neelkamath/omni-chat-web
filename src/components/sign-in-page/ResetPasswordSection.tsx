@@ -1,7 +1,7 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Col, Form, Image, Input, message, Row, Space, Typography } from 'antd';
 import authenticationImage from '../../images/authentication.svg';
-import { isValidPasswordScalar, resetPassword } from '@neelkamath/omni-chat';
+import { isValidPasswordScalar, queryOrMutate } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export default function ResetPasswordSection(): ReactElement {
@@ -70,16 +70,46 @@ function validatePassword(password: string): boolean {
   return true;
 }
 
-async function operateResetPassword({
-                                      emailAddress,
-                                      passwordResetCode,
-                                      newPassword,
-                                    }: ResetPasswordFormData): Promise<void> {
-  const result = await operateGraphQlApi(() =>
-    resetPassword(httpApiConfig, emailAddress, passwordResetCode, newPassword),
-  );
+async function operateResetPassword(data: ResetPasswordFormData): Promise<void> {
+  const result = await resetPassword(data);
   if (result?.resetPassword === null) message.success('Password reset.', 3);
   else if (result?.resetPassword?.__typename === 'UnregisteredEmailAddress')
     message.error('That email address isn\'t registered.', 5);
   else if (result?.resetPassword?.__typename === 'InvalidPasswordResetCode') message.error('Incorrect reset code.', 3);
+}
+
+interface ResetPasswordResult {
+  readonly resetPassword: InvalidPasswordResetCode | UnregisteredEmailAddress | null;
+}
+
+interface InvalidPasswordResetCode {
+  readonly __typename: 'InvalidPasswordResetCode';
+}
+
+interface UnregisteredEmailAddress {
+  readonly __typename: 'UnregisteredEmailAddress';
+}
+
+async function resetPassword({
+                               emailAddress,
+                               passwordResetCode,
+                               newPassword,
+                             }: ResetPasswordFormData): Promise<ResetPasswordResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(httpApiConfig, {
+        query: `
+          mutation ResetPassword($emailAddress: String!, $passwordResetCode: Int!, $newPassword: Password!) {
+            resetPassword(
+              emailAddress: $emailAddress
+              passwordResetCode: $passwordResetCode
+              newPassword: $newPassword
+            ) {
+              __typename
+            }
+          }
+        `,
+        variables: { emailAddress, passwordResetCode, newPassword },
+      }),
+  );
 }

@@ -7,10 +7,10 @@ import {
   EntityAdapter,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { readTypingUsers, TypingStatus } from '@neelkamath/omni-chat';
 import { FetchStatus, RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
+import { queryOrMutate } from '@neelkamath/omni-chat';
 
 export namespace TypingStatusesSlice {
   const sliceName = 'typingStatuses';
@@ -34,9 +34,9 @@ export namespace TypingStatusesSlice {
   export const fetchStatuses = createAsyncThunk(
     `${sliceName}/fetchStatuses`,
     async () => {
-      const chats = await operateGraphQlApi(() => readTypingUsers(httpApiConfig, Storage.readAccessToken()!));
-      return chats?.readTypingUsers.flatMap(({ chatId, users }) =>
-        users.map(({ id }) => ({ id: generateId(id, chatId), isTyping: true })),
+      const result = await readTypingUsers();
+      return result?.readTypingUsers.flatMap(({ chatId, users }) =>
+        users.map(({ userId }) => ({ id: generateId(userId, chatId), isTyping: true })),
       );
     },
     {
@@ -46,6 +46,47 @@ export namespace TypingStatusesSlice {
       },
     },
   );
+
+  interface ReadTypingUsersResult {
+    readonly readTypingUsers: TypingUsers[];
+  }
+
+  interface TypingUsers {
+    readonly chatId: number;
+    readonly users: Account[];
+  }
+
+  interface Account {
+    readonly userId: number;
+  }
+
+  async function readTypingUsers(): Promise<ReadTypingUsersResult | undefined> {
+    return await operateGraphQlApi(
+      async () =>
+        await queryOrMutate(
+          httpApiConfig,
+          {
+            query: `
+              query readTypingUsers {
+                readTypingUsers {
+                  chatId
+                  users {
+                    userId
+                  }
+                }
+              }
+            `,
+          },
+          Storage.readAccessToken()!,
+        ),
+    );
+  }
+
+  export interface TypingStatus {
+    readonly userId: number;
+    readonly chatId: number;
+    readonly isTyping: boolean;
+  }
 
   const slice = createSlice({
     name: sliceName,

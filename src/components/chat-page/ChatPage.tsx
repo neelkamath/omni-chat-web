@@ -3,7 +3,6 @@ import React, { ReactElement, useEffect, useState } from 'react';
 import ChatPageMenu from './ChatPageMenu';
 import { setUpSubscriptions } from '../../store/subscriptions';
 import { Storage } from '../../Storage';
-import { refreshTokenSet, setOnline } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { useSelector } from 'react-redux';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
@@ -12,18 +11,19 @@ import SearchUsersSection from './search-users-section/SearchUsersSection';
 import ChatPageSupportSection from './ChatPageSupportSection';
 import DevelopersSection from '../DevelopersSection';
 import ChatSection from './chat-section/ChatSection';
+import { queryOrMutate } from '@neelkamath/omni-chat';
+import setOnline from '../../setOnline';
 
 export default function ChatPage(): ReactElement {
   const [page, setPage] = useState(<LoadingPage />);
   useEffect(() => {
-    operateGraphQlApi(() => refreshTokenSet(httpApiConfig, Storage.readRefreshToken()!)).then(async (result) => {
+    refreshTokenSet().then(async (result) => {
       if (result === undefined) {
         location.href = '/sign-in';
         return;
       }
       Storage.saveTokenSet(result.refreshTokenSet);
-      // TODO: Test once Omni Chat Backend 0.19.0 releases.
-      await operateGraphQlApi(() => setOnline(httpApiConfig, Storage.readAccessToken()!, true));
+      await setOnline(true);
       await setUpSubscriptions();
       addEventListener('online', () => {
         if (location.pathname === '/chat')
@@ -34,6 +34,27 @@ export default function ChatPage(): ReactElement {
     Notification.requestPermission();
   }, []);
   return page;
+}
+
+interface RefreshTokenSetResult {
+  readonly refreshTokenSet: Storage.TokenSet;
+}
+
+async function refreshTokenSet(): Promise<RefreshTokenSetResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(httpApiConfig, {
+        query: `
+          query RefreshTokenSet($refreshToken: ID!) {
+            refreshTokenSet(refreshToken: $refreshToken) {
+              accessToken
+              refreshToken
+            }
+          }
+        `,
+        variables: { refreshToken: Storage.readRefreshToken()! },
+      }),
+  );
 }
 
 function LoadingPage(): ReactElement {

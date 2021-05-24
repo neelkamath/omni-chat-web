@@ -2,14 +2,14 @@ import React, { ReactElement, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import { Card, Col, Row, Typography } from 'antd';
 import ProfileModal from './ProfileModal';
-import { Account } from '@neelkamath/omni-chat';
 import { useSelector } from 'react-redux';
 import { PicsSlice } from '../../store/slices/PicsSlice';
 import { RootState, useThunkDispatch } from '../../store/store';
 import CustomAvatar from './CustomAvatar';
+import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
 
 export interface UserCardProps {
-  readonly account: Account;
+  readonly account: SearchedUsersSlice.Account;
 }
 
 export default function UserCard({ account }: UserCardProps): ReactElement {
@@ -19,7 +19,7 @@ export default function UserCard({ account }: UserCardProps): ReactElement {
       <Card hoverable={true} onClick={() => setVisible(true)}>
         <Row gutter={16} align='middle'>
           <Col>
-            <ProfilePic userId={account.id} />
+            <ProfilePic userId={account.userId} />
           </Col>
           <Col>
             <Typography.Text strong>{account.username}</Typography.Text>

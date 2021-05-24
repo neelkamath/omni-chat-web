@@ -1,4 +1,3 @@
-import { OnlineStatus, readOnlineStatus } from '@neelkamath/omni-chat';
 import {
   createAsyncThunk,
   createEntityAdapter,
@@ -9,9 +8,10 @@ import {
 } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
+import { DateTime, queryOrMutate } from '@neelkamath/omni-chat';
 
 export namespace OnlineStatusesSlice {
-  const adapter: EntityAdapter<OnlineStatus> = createEntityAdapter({ selectId: (model) => model.userId });
+  const adapter: EntityAdapter<OnlineStatus> = createEntityAdapter({ selectId: ({ userId }) => userId });
 
   const sliceName = 'onlineStatuses';
 
@@ -21,8 +21,44 @@ export namespace OnlineStatusesSlice {
   }
 
   async function operateReadOnlineStatus(userId: number): Promise<OnlineStatus | undefined> {
-    const result = await operateGraphQlApi(() => readOnlineStatus(httpApiConfig, userId));
+    const result = await readOnlineStatus(userId);
     return result?.readOnlineStatus.__typename === 'InvalidUserId' ? undefined : result?.readOnlineStatus;
+  }
+
+  interface ReadOnlineStatusResult {
+    readonly readOnlineStatus: OnlineStatus | InvalidUserId;
+  }
+
+  export interface OnlineStatus {
+    readonly __typename: 'OnlineStatus';
+    readonly userId: number;
+    readonly isOnline: boolean;
+    readonly lastOnline: DateTime;
+  }
+
+  interface InvalidUserId {
+    readonly __typename: 'InvalidUserId';
+  }
+
+  async function readOnlineStatus(userId: number): Promise<ReadOnlineStatusResult | undefined> {
+    return await operateGraphQlApi(
+      async () =>
+        await queryOrMutate(httpApiConfig, {
+          query: `
+            query ReadOnlineStatus($userId: Int!) {
+              readOnlineStatus(userId: $userId) {
+                __typename
+                ... on OnlineStatus {
+                  userId
+                  isOnline
+                  lastOnline
+                }
+              }
+            }
+          `,
+          variables: { userId },
+        }),
+    );
   }
 
   export const fetchStatus = createAsyncThunk(`${sliceName}/fetchStatus`, operateReadOnlineStatus, {
@@ -35,7 +71,6 @@ export namespace OnlineStatusesSlice {
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState({ fetching: [] }) as State,
-    // TODO: Test <removeOne()> once Omni Chat Backend 0.19.0 releases.
     reducers: { upsertOne: adapter.upsertOne, removeOne: adapter.removeOne },
     extraReducers: (builder) => {
       builder

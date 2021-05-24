@@ -4,7 +4,7 @@ import { Storage } from '../../../Storage';
 import { useSelector } from 'react-redux';
 import { RootState, useThunkDispatch } from '../../../store/store';
 import { PicsSlice } from '../../../store/slices/PicsSlice';
-import { deleteProfilePic, InvalidPicError, NonexistentUserIdError, patchProfilePic } from '@neelkamath/omni-chat';
+import { InvalidPicError, NonexistentUserIdError, patchProfilePic, queryOrMutate } from '@neelkamath/omni-chat';
 import logOut from '../../../logOut';
 import OriginalProfilePic from '../OriginalProfilePic';
 import { ShowUploadListInterface } from 'antd/lib/upload/interface';
@@ -58,12 +58,37 @@ async function operatePatchProfilePic(file: File): Promise<void> {
 
 function DeleteProfilePicButton(): ReactElement {
   const onClick = async () => {
-    const result = await operateGraphQlApi(() => deleteProfilePic(httpApiConfig, Storage.readAccessToken()!));
+    const result = await deleteProfilePic();
     if (result !== undefined) message.success('Profile picture deleted.');
   };
   return (
     <Button danger icon={<DeleteOutlined />} onClick={onClick}>
       Delete Profile Picture
     </Button>
+  );
+}
+
+interface Placeholder {
+  readonly __typename: 'Placeholder';
+}
+
+interface DeleteProfilePicResult {
+  readonly deleteProfilePic: Placeholder;
+}
+
+async function deleteProfilePic(): Promise<DeleteProfilePicResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(
+        httpApiConfig,
+        {
+          query: `
+            mutation DeleteProfilePic {
+              deleteProfilePic
+            }
+          `,
+        },
+        Storage.readAccessToken()!,
+      ),
   );
 }

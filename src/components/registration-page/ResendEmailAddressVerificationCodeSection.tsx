@@ -1,8 +1,8 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Col, Form, Image, Input, message, Row, Space, Typography } from 'antd';
 import happyNewsImage from '../../images/happy-news.svg';
-import { emailEmailAddressVerification } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
+import { queryOrMutate } from '@neelkamath/omni-chat';
 
 export default function ResendEmailAddressVerificationCodeSection(): ReactElement {
   return (
@@ -51,10 +51,40 @@ function ResendEmailAddressVerificationCodeForm(): ReactElement {
 }
 
 async function operateEmailEmailAddressVerification(emailAddress: string): Promise<void> {
-  const result = await operateGraphQlApi(() => emailEmailAddressVerification(httpApiConfig, emailAddress));
+  const result = await emailEmailAddressVerification(emailAddress);
   if (result?.emailEmailAddressVerification === null) message.success('Resent verification code.', 3);
   else if (result?.emailEmailAddressVerification?.__typename === 'EmailAddressVerified')
     message.warn('The account has already been verified.', 5);
   else if (result?.emailEmailAddressVerification?.__typename === 'UnregisteredEmailAddress')
     message.error('There\'s no account associated with that email address.', 5);
+}
+
+interface EmailEmailAddressVerificationResult {
+  readonly emailEmailAddressVerification: UnregisteredEmailAddress | EmailAddressVerified | null;
+}
+
+interface UnregisteredEmailAddress {
+  readonly __typename: 'UnregisteredEmailAddress';
+}
+
+interface EmailAddressVerified {
+  readonly __typename: 'EmailAddressVerified';
+}
+
+async function emailEmailAddressVerification(
+  emailAddress: string,
+): Promise<EmailEmailAddressVerificationResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(httpApiConfig, {
+        query: `
+          mutation EmailEmailAddressVerification($emailAddress: String!) {
+            emailEmailAddressVerification(emailAddress: $emailEmailAddressVerification) {
+              __typename
+            }
+          }
+        `,
+        variables: { emailAddress },
+      }),
+  );
 }

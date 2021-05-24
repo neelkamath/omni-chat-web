@@ -1,9 +1,9 @@
 import React, { ReactElement } from 'react';
 import { Layout } from 'antd';
 import ChatMessage from '../ChatMessage';
-import { PrivateChat } from '@neelkamath/omni-chat';
 import Header from './Header';
 import MessageCreator from './MessageCreator';
+import { PrivateChat } from '../ChatSection';
 
 export interface PrivateChatSectionProps {
   readonly chat: PrivateChat;
@@ -17,13 +17,13 @@ export default function PrivateChatSection({ chat }: PrivateChatSectionProps): R
   return (
     <Layout>
       <Layout.Header>
-        <Header user={chat.user} chatId={chat.id} />
+        <Header user={chat.user} chatId={chat.chatId} />
       </Layout.Header>
       <Layout.Content style={{ padding: 16 }}>
         {chat.messages.edges.map(({ node }) => (
           <ChatMessage key={node.messageId} message={node} />
         ))}
-        <MessageCreator chatId={chat.id} />
+        <MessageCreator chatId={chat.chatId} />
       </Layout.Content>
     </Layout>
   );

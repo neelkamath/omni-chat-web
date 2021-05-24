@@ -2,7 +2,14 @@ import React, { ReactElement, useState } from 'react';
 import { Button, Col, Form, Image, Input, message, Row, Typography } from 'antd';
 import signInImage from '../../images/sign-in.svg';
 import { Storage } from '../../Storage';
-import { isValidPasswordScalar, isValidUsernameScalar, Login, requestTokenSet } from '@neelkamath/omni-chat';
+import {
+  Id,
+  isValidPasswordScalar,
+  isValidUsernameScalar,
+  Password,
+  queryOrMutate,
+  Username,
+} from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export default function SignInSection(): ReactElement {
@@ -28,8 +35,7 @@ function SignInForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const onFinish = async (data: SignInFormData) => {
     setLoading(true);
-    const login: Login = { __typename: 'Login', ...data };
-    if (validateLogin(login)) await operateRequestTokenSet(login);
+    if (validateLogin(data)) await operateRequestTokenSet(data);
     setLoading(false);
   };
   return (
@@ -49,6 +55,11 @@ function SignInForm(): ReactElement {
   );
 }
 
+interface Login {
+  readonly username: Username;
+  readonly password: Password;
+}
+
 function validateLogin({ username, password }: Login): boolean {
   if (!isValidUsernameScalar(username)) {
     message.error('That username doesn\'t exist.', 5);
@@ -62,12 +73,12 @@ function validateLogin({ username, password }: Login): boolean {
 }
 
 async function operateRequestTokenSet(login: Login): Promise<void> {
-  const result = await operateGraphQlApi(() => requestTokenSet(httpApiConfig, login));
+  const result = await requestTokenSet(login);
   switch (result?.requestTokenSet.__typename) {
     case 'IncorrectPassword':
       message.error('Incorrect password.', 3);
       break;
-    case 'NonexistentUser':
+    case 'NonexistingUser':
       message.error('That username doesn\'t exist.', 5);
       break;
     case 'TokenSet':
@@ -77,4 +88,46 @@ async function operateRequestTokenSet(login: Login): Promise<void> {
     case 'UnverifiedEmailAddress':
       message.error('You must first verify your email address.', 5);
   }
+}
+
+interface RequestTokenSetResult {
+  readonly requestTokenSet: TokenSet | NonexistingUser | UnverifiedEmailAddress | IncorrectPassword;
+}
+
+interface TokenSet {
+  readonly __typename: 'TokenSet';
+  readonly accessToken: Id;
+  readonly refreshToken: Id;
+}
+
+interface NonexistingUser {
+  readonly __typename: 'NonexistingUser';
+}
+
+interface UnverifiedEmailAddress {
+  readonly __typename: 'UnverifiedEmailAddress';
+}
+
+interface IncorrectPassword {
+  readonly __typename: 'IncorrectPassword';
+}
+
+async function requestTokenSet(login: Login): Promise<RequestTokenSetResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(httpApiConfig, {
+        query: `
+          query RequestTokenSet($login: Login!) {
+            requestTokenSet(login: $login) {
+              __typename
+              ... on TokenSet {
+                accessToken
+                refreshToken
+              }
+            }
+          }
+        `,
+        variables: { login },
+      }),
+  );
 }

@@ -7,14 +7,7 @@ import { ChatsSlice } from './slices/ChatsSlice';
 import { OnlineStatusesSlice } from './slices/OnlineStatusesSlice';
 import { TypingStatusesSlice } from './slices/TypingStatusesSlice';
 import { ContactsSlice } from './slices/ContactsSlice';
-import {
-  OnSocketClose,
-  subscribeToAccounts,
-  subscribeToGroupChats,
-  subscribeToMessages,
-  subscribeToOnlineStatuses,
-  subscribeToTypingStatuses,
-} from '@neelkamath/omni-chat';
+import { Bio, DateTime, GraphQlResponse, Name, OnSocketClose, subscribe, Username } from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../api';
 
 // TODO: Test every LOC in this file once the app is complete.
@@ -37,11 +30,11 @@ function verifyCreation(onSubscriptionClose: OnSubscriptionClose): void {
 /** Sets up the GraphQL subscriptions to keep the {@link store} up-to-date. */
 export async function setUpSubscriptions(): Promise<void> {
   await Promise.all([
-    setUpAccountsSubscription(),
-    setUpGroupChatsSubscription(),
-    setUpMessagesSubscription(),
-    setUpOnlineStatusesSubscription(),
-    setUpTypingStatusesSubscription(),
+    subscribeToAccounts(),
+    subscribeToGroupChats(),
+    subscribeToMessages(),
+    subscribeToOnlineStatuses(),
+    subscribeToTypingStatuses(),
   ]);
 }
 
@@ -66,14 +59,114 @@ TODO: There are three types of errors:
  */
 const onError = console.error;
 
-/** Keeps the {@link store} up-to-date with events from {@link subscribeToAccounts}. */
-async function setUpAccountsSubscription(): Promise<void> {
+interface SubscribeToAccountsResult {
+  readonly subscribeToAccounts:
+    | CreatedSubscription
+    | NewContact
+    | UpdatedAccount
+    | UpdatedProfilePic
+    | DeletedContact
+    | BlockedAccount
+    | UnblockedAccount
+    | DeletedAccount;
+}
+
+interface UnblockedAccount {
+  readonly __typename: 'UnblockedAccount';
+  readonly userId: number;
+}
+
+interface DeletedAccount {
+  readonly __typename: 'DeletedAccount';
+  readonly userId: number;
+}
+
+interface DeletedContact {
+  readonly __typename: 'DeletedContact';
+  readonly userId: number;
+}
+
+interface BlockedAccount {
+  readonly __typename: 'BlockedAccount';
+  readonly userId: number;
+  readonly username: Username;
+  readonly emailAddress: string;
+  readonly firstName: Name;
+  readonly lastName: Name;
+  readonly bio: Bio;
+}
+
+interface UpdatedProfilePic {
+  readonly __typename: 'UpdatedProfilePic';
+  readonly userId: number;
+}
+
+interface CreatedSubscription {
+  readonly __typename: 'CreatedSubscription';
+}
+
+interface NewContact {
+  readonly __typename: 'NewContact';
+  readonly userId: number;
+}
+
+interface UpdatedAccount {
+  readonly __typename: 'UpdatedAccount';
+  readonly userId: number;
+  readonly username: Username;
+  readonly emailAddress: string;
+  readonly firstName: Name;
+  readonly lastName: Name;
+  readonly bio: Bio;
+}
+
+/** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToAccounts`. */
+async function subscribeToAccounts(): Promise<void> {
   verifyCreation(onAccountsSubscriptionClose);
   return new Promise((resolve) => {
-    onAccountsSubscriptionClose = subscribeToAccounts(
+    onAccountsSubscriptionClose = subscribe(
       wsApiConfig,
       Storage.readAccessToken()!,
-      async ({ data, errors }) => {
+      '/accounts-subscription',
+      `
+        subscription SubscribeToAccounts {
+          subscribeToAccounts {
+            __typename
+            ... on UpdatedAccount {
+              userId
+              username
+              emailAddress
+              firstName
+              lastName
+              bio
+            }
+            ... on UpdatedProfilePic {
+              userId
+            }
+            ... on BlockedAccount {
+              userId
+              username
+              emailAddress
+              firstName
+              lastName
+              bio
+            }
+            ... on DeletedContact {
+              userId
+            }
+            ... on NewContact {
+              userId
+            }
+            ... on UnblockedAccount {
+              userId
+            }
+            ... on DeletedAccount {
+              userId
+            }
+          }
+        }
+      `,
+      async ({ data, errors }: GraphQlResponse<SubscribeToAccountsResult>) => {
         if (errors !== undefined) await displayBugReporter(errors);
         const message = data?.subscribeToAccounts;
         switch (message?.__typename) {
@@ -81,32 +174,32 @@ async function setUpAccountsSubscription(): Promise<void> {
             resolve();
             break;
           case 'UpdatedAccount':
-            if (message.id === Storage.readUserId()!) store.dispatch(AccountSlice.update(message));
+            if (message.userId === Storage.readUserId()!) store.dispatch(AccountSlice.update(message));
             store.dispatch(BlockedUsersSlice.updateAccount(message));
             store.dispatch(ChatsSlice.updateAccount(message));
             store.dispatch(ContactsSlice.updateOne(message));
             break;
           case 'UpdatedProfilePic':
-            store.dispatch(PicsSlice.fetchPic({ id: message.id, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
+            store.dispatch(PicsSlice.fetchPic({ id: message.userId, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
             break;
           case 'BlockedAccount':
             store.dispatch(BlockedUsersSlice.upsertOne(message));
             break;
           case 'DeletedContact':
-            store.dispatch(ContactsSlice.removeOne(message.id));
+            store.dispatch(ContactsSlice.removeOne(message.userId));
             break;
           case 'NewContact':
             store.dispatch(ContactsSlice.upsertOne(message));
             break;
           case 'UnblockedAccount':
-            store.dispatch(BlockedUsersSlice.removeOne(message.id));
+            store.dispatch(BlockedUsersSlice.removeOne(message.userId));
             break;
           case 'DeletedAccount':
-            store.dispatch(BlockedUsersSlice.removeOne(message.id));
-            store.dispatch(ChatsSlice.removePrivateChat(message.id));
-            store.dispatch(OnlineStatusesSlice.removeOne(message.id));
-            store.dispatch(PicsSlice.removeAccount(message.id));
-            store.dispatch(TypingStatusesSlice.removeUser(message.id));
+            store.dispatch(BlockedUsersSlice.removeOne(message.userId));
+            store.dispatch(ChatsSlice.removePrivateChat(message.userId));
+            store.dispatch(OnlineStatusesSlice.removeOne(message.userId));
+            store.dispatch(PicsSlice.removeAccount(message.userId));
+            store.dispatch(TypingStatusesSlice.removeUser(message.userId));
         }
       },
       onError,
@@ -114,14 +207,65 @@ async function setUpAccountsSubscription(): Promise<void> {
   });
 }
 
-/** Keeps the {@link store} up-to-date with events from {@link subscribeToGroupChats}. */
-async function setUpGroupChatsSubscription(): Promise<void> {
+interface SubscribeToGroupChatsResult {
+  readonly subscribeToGroupChats:
+    | CreatedSubscription
+    | GroupChatId
+    | UpdatedGroupChatPic
+    | UpdatedGroupChat
+    | ExitedUsers;
+}
+
+interface GroupChatId {
+  readonly __typename: 'GroupChatId';
+  readonly chatId: number;
+}
+
+interface UpdatedGroupChatPic {
+  readonly __typename: 'UpdatedGroupChatPic';
+  readonly chatId: number;
+}
+
+interface UpdatedGroupChat {
+  readonly __typename: 'UpdatedGroupChat';
+  readonly chatId: number;
+}
+
+interface ExitedUsers {
+  readonly __typename: 'ExitedUsers';
+  readonly chatId: number;
+  readonly userIdList: number[];
+}
+
+/** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToGroupChats`. */
+async function subscribeToGroupChats(): Promise<void> {
   verifyCreation(onGroupChatsSubscriptionClose);
   return new Promise((resolve) => {
-    onGroupChatsSubscriptionClose = subscribeToGroupChats(
+    onGroupChatsSubscriptionClose = subscribe(
       wsApiConfig,
       Storage.readAccessToken()!,
-      async ({ data, errors }) => {
+      '/group-chats-subscription',
+      `
+        subscription SubscribeToGroupChats {
+          subscribeToGroupChats {
+            __typename
+            ... on GroupChatId {
+              chatId
+            }
+            ... on ExitedUsers {
+              chatId
+              userIdList
+            }
+            ... on UpdatedGroupChat {
+              chatId
+            }
+            ... on UpdatedGroupChatPic {
+              chatId
+            }
+          }
+        }
+      `,
+      async ({ data, errors }: GraphQlResponse<SubscribeToGroupChatsResult>) => {
         if (errors !== undefined) await displayBugReporter(errors);
         const message = data?.subscribeToGroupChats;
         switch (message?.__typename) {
@@ -129,7 +273,7 @@ async function setUpGroupChatsSubscription(): Promise<void> {
             resolve();
             break;
           case 'GroupChatId':
-            store.dispatch(ChatsSlice.fetchChat(message.id));
+            store.dispatch(ChatsSlice.fetchChat(message.chatId));
             break;
           case 'ExitedUsers':
             if (message.userIdList.includes(Storage.readUserId()!))
@@ -139,7 +283,7 @@ async function setUpGroupChatsSubscription(): Promise<void> {
             store.dispatch(ChatsSlice.fetchChat(message.chatId));
             break;
           case 'UpdatedGroupChatPic':
-            store.dispatch(PicsSlice.fetchPic({ id: message.id, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
+            store.dispatch(PicsSlice.fetchPic({ id: message.chatId, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
         }
       },
       onError,
@@ -147,14 +291,126 @@ async function setUpGroupChatsSubscription(): Promise<void> {
   });
 }
 
-/** Keeps the {@link store} up-to-date with events from {@link subscribeToMessages}. */
-async function setUpMessagesSubscription(): Promise<void> {
+interface SubscribeToMessagesResult {
+  readonly subscribeToMessages:
+    | CreatedSubscription
+    | UpdatedMessage
+    | DeletedMessage
+    | UserChatMessagesRemoval
+    | NewActionMessage
+    | NewAudioMessage
+    | NewDocMessage
+    | NewGroupChatInviteMessage
+    | NewPicMessage
+    | NewPollMessage
+    | NewTextMessage
+    | NewVideoMessage;
+}
+
+interface NewTextMessage {
+  readonly __typename: 'NewTextMessage';
+  readonly chatId: number;
+}
+
+interface NewActionMessage {
+  readonly __typename: 'NewActionMessage';
+  readonly chatId: number;
+}
+
+interface NewPicMessage {
+  readonly __typename: 'NewPicMessage';
+  readonly chatId: number;
+}
+
+interface NewAudioMessage {
+  readonly __typename: 'NewAudioMessage';
+  readonly chatId: number;
+}
+
+interface NewGroupChatInviteMessage {
+  readonly __typename: 'NewGroupChatInviteMessage';
+  readonly chatId: number;
+}
+
+interface NewDocMessage {
+  readonly __typename: 'NewDocMessage';
+  readonly chatId: number;
+}
+
+interface NewVideoMessage {
+  readonly __typename: 'NewVideoMessage';
+  readonly chatId: number;
+}
+
+interface NewPollMessage {
+  readonly __typename: 'NewPollMessage';
+  readonly chatId: number;
+}
+
+interface UpdatedMessage {
+  readonly __typename: 'UpdatedMessage';
+  readonly chatId: number;
+}
+
+interface DeletedMessage {
+  readonly __typename: 'DeletedMessage';
+  readonly chatId: number;
+}
+
+interface UserChatMessagesRemoval {
+  readonly __typename: 'UserChatMessagesRemoval';
+  readonly chatId: number;
+}
+
+/** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToMessages`. */
+async function subscribeToMessages(): Promise<void> {
   verifyCreation(onMessagesSubscriptionClose);
   return new Promise((resolve) => {
-    onMessagesSubscriptionClose = subscribeToMessages(
+    onMessagesSubscriptionClose = subscribe(
       wsApiConfig,
       Storage.readAccessToken()!,
-      async ({ data, errors }) => {
+      '/messages-subscription',
+      `
+        subscription SubscribeToMessages {
+          subscribeToMessages {
+            __typename
+            ... on UpdatedMessage {
+              chatId
+            }
+            ... on DeletedMessage {
+              chatId
+            }
+            ... on NewActionMessage {
+              chatId
+            }
+            ... on NewAudioMessage {
+              chatId
+            }
+            ... on NewDocMessage {
+              chatId
+            }
+            ... on NewGroupChatInviteMessage {
+              chatId
+            }
+            ... on NewPicMessage {
+              chatId
+            }
+            ... on NewPollMessage {
+              chatId
+            }
+            ... on NewTextMessage {
+              chatId
+            }
+            ... on NewVideoMessage {
+              chatId
+            }
+            ... on UserChatMessagesRemoval {
+              chatId
+            }
+          }
+        }
+      `,
+      async ({ data, errors }: GraphQlResponse<SubscribeToMessagesResult>) => {
         if (errors !== undefined) await displayBugReporter(errors);
         const message = data?.subscribeToMessages;
         switch (message?.__typename) {
@@ -163,8 +419,7 @@ async function setUpMessagesSubscription(): Promise<void> {
             break;
           case 'UpdatedMessage':
           case 'DeletedMessage':
-          case 'DeletionOfEveryMessage':
-          case 'MessageDeletionPoint':
+          case 'UserChatMessagesRemoval':
           case 'NewActionMessage':
           case 'NewAudioMessage':
           case 'NewDocMessage':
@@ -173,7 +428,6 @@ async function setUpMessagesSubscription(): Promise<void> {
           case 'NewPollMessage':
           case 'NewTextMessage':
           case 'NewVideoMessage':
-          case 'UserChatMessagesRemoval':
             /*
             TODO: Don't fetch a chat in all these cases. For example, only fetch it if the UpdatedMessage is the latest
              one, and maybe not even then - just update the latest message in the chat instead.
@@ -186,14 +440,38 @@ async function setUpMessagesSubscription(): Promise<void> {
   });
 }
 
-/** Keeps the {@link store} up-to-date with events from {@link subscribeToOnlineStatuses}. */
-async function setUpOnlineStatusesSubscription(): Promise<void> {
+interface SubscribeToOnlineStatuses {
+  readonly subscribeToOnlineStatuses: CreatedSubscription | OnlineStatus;
+}
+
+interface OnlineStatus {
+  readonly __typename: 'OnlineStatus';
+  readonly userId: number;
+  readonly isOnline: boolean;
+  readonly lastOnline: DateTime;
+}
+
+/** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToOnlineStatuses`. */
+async function subscribeToOnlineStatuses(): Promise<void> {
   verifyCreation(onOnlineStatusesSubscriptionClose);
   return new Promise((resolve) => {
-    onOnlineStatusesSubscriptionClose = subscribeToOnlineStatuses(
+    onOnlineStatusesSubscriptionClose = subscribe(
       wsApiConfig,
       Storage.readAccessToken()!,
-      async ({ data, errors }) => {
+      '/online-statuses-subscription',
+      `
+        subscription SubscribeToOnlineStatuses {
+          subscribeToOnlineStatuses {
+            __typename
+            ... on OnlineStatus {
+              userId
+              isOnline
+              lastOnline
+            }
+          }
+        }
+      `,
+      async ({ data, errors }: GraphQlResponse<SubscribeToOnlineStatuses>) => {
         if (errors !== undefined) await displayBugReporter(errors);
         const message = data?.subscribeToOnlineStatuses;
         switch (message?.__typename) {
@@ -201,7 +479,7 @@ async function setUpOnlineStatusesSubscription(): Promise<void> {
             resolve();
             break;
           case 'OnlineStatus':
-            store.dispatch(OnlineStatusesSlice.upsertOne({ ...message, __typename: 'OnlineStatus' }));
+            store.dispatch(OnlineStatusesSlice.upsertOne(message));
         }
       },
       onError,
@@ -209,14 +487,38 @@ async function setUpOnlineStatusesSubscription(): Promise<void> {
   });
 }
 
-/** Keeps the {@link store} up-to-date with events from {@link subscribeToTypingStatuses}. */
-async function setUpTypingStatusesSubscription(): Promise<void> {
+interface SubscribeToTypingStatusesResult {
+  readonly subscribeToTypingStatuses: CreatedSubscription | TypingStatus;
+}
+
+interface TypingStatus {
+  readonly __typename: 'TypingStatus';
+  readonly chatId: number;
+  readonly userId: number;
+  readonly isTyping: boolean;
+}
+
+/** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToTypingStatuses`. */
+async function subscribeToTypingStatuses(): Promise<void> {
   verifyCreation(onTypingStatusesSubscriptionClose);
   return new Promise((resolve) => {
-    onTypingStatusesSubscriptionClose = subscribeToTypingStatuses(
+    onTypingStatusesSubscriptionClose = subscribe(
       wsApiConfig,
       Storage.readAccessToken()!,
-      async ({ data, errors }) => {
+      '/typing-statuses-subscription',
+      `
+        subscription SubscribeToTypingStatuses {
+          subscribeToTypingStatuses {
+            __typename
+            ... on TypingStatus {
+              chatId
+              userId
+              isTyping
+            }
+          }
+        }
+      `,
+      async ({ data, errors }: GraphQlResponse<SubscribeToTypingStatusesResult>) => {
         if (errors !== undefined) await displayBugReporter(errors);
         const message = data?.subscribeToTypingStatuses;
         switch (message?.__typename) {

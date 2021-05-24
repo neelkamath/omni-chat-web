@@ -8,8 +8,8 @@ import { PicsSlice } from '../../../../store/slices/PicsSlice';
 import CustomAvatar from '../../CustomAvatar';
 import { OnlineStatusesSlice } from '../../../../store/slices/OnlineStatusesSlice';
 import TimeAgo from 'timeago-react';
-import { Account } from '@neelkamath/omni-chat';
 import { TypingStatusesSlice } from '../../../../store/slices/TypingStatusesSlice';
+import { Account } from '../ChatSection';
 
 export interface HeaderProps {
   /** The user being chatted with. */
@@ -23,15 +23,15 @@ export default function Header({ user, chatId }: HeaderProps): ReactElement {
   return (
     <Row gutter={16}>
       <Col>
-        <ProfilePic userId={user.id} />
+        <ProfilePic userId={user.userId} />
       </Col>
       <Col>
         <Typography.Text style={{ color: 'white' }} strong>
           {user.username}
         </Typography.Text>
       </Col>
-      <OnlineStatusSection userId={user.id} />
-      <TypingStatusSection userId={user.id} chatId={chatId} />
+      <OnlineStatusSection userId={user.userId} />
+      <TypingStatusSection userId={user.userId} chatId={chatId} />
       <Col>
         <Tag color='orange'>Private</Tag>
         <Button ghost onClick={() => setVisible(true)} icon={<InfoCircleOutlined />} />

@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 import { Layout, Tag } from 'antd';
-import { GroupChat } from '@neelkamath/omni-chat';
+import { GroupChat } from './ChatSection';
 
 export interface GroupChatSectionProps {
   readonly chat: GroupChat;

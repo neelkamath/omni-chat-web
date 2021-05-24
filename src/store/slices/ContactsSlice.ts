@@ -6,13 +6,13 @@ import {
   EntityAdapter,
   PayloadAction,
 } from '@reduxjs/toolkit';
-import { Account, NewContact, readContacts, UpdatedAccount } from '@neelkamath/omni-chat';
 import { FetchStatus, RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
+import { Bio, Name, queryOrMutate, Username } from '@neelkamath/omni-chat';
 
 export namespace ContactsSlice {
-  const adapter: EntityAdapter<Account> = createEntityAdapter();
+  const adapter: EntityAdapter<Account> = createEntityAdapter({ selectId: ({ userId }) => userId });
 
   const sliceName = 'contacts';
 
@@ -23,7 +23,7 @@ export namespace ContactsSlice {
   export const fetchContacts = createAsyncThunk(
     `${sliceName}/fetchContacts`,
     async () => {
-      const result = await operateGraphQlApi(() => readContacts(httpApiConfig, Storage.readAccessToken()!));
+      const result = await readContacts();
       return result?.readContacts.edges.map(({ node }) => node);
     },
     {
@@ -34,20 +34,63 @@ export namespace ContactsSlice {
     },
   );
 
+  interface AccountsConnection {
+    readonly edges: AccountEdge[];
+  }
+
+  interface AccountEdge {
+    readonly node: Account;
+  }
+
+  interface Account {
+    readonly userId: number;
+  }
+
+  interface ReadContactsResult {
+    readonly readContacts: AccountsConnection;
+  }
+
+  async function readContacts(): Promise<ReadContactsResult | undefined> {
+    return await operateGraphQlApi(
+      async () =>
+        await queryOrMutate(
+          httpApiConfig,
+          {
+            query: `
+              query ReadContacts {
+                readContacts {
+                  edges {
+                    node {
+                      userId
+                    }
+                  }
+                }
+              }
+            `,
+          },
+          Storage.readAccessToken()!,
+        ),
+    );
+  }
+
+  export interface UpdatedAccount {
+    readonly userId: number;
+    readonly username: Username;
+    readonly emailAddress: string;
+    readonly firstName: Name;
+    readonly lastName: Name;
+    readonly bio: Bio;
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: {
       updateOne: (state, { payload }: PayloadAction<UpdatedAccount>) => {
-        adapter.updateOne(state, {
-          id: payload.id,
-          changes: { ...payload, __typename: 'Account' },
-        });
+        adapter.updateOne(state, { id: payload.userId, changes: payload });
       },
       removeOne: adapter.removeOne,
-      upsertOne: (state, { payload }: PayloadAction<NewContact>) => {
-        adapter.upsertOne(state, { ...payload, __typename: 'Account' });
-      },
+      upsertOne: adapter.upsertOne,
     },
     extraReducers: (builder) => {
       builder

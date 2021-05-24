@@ -1,21 +1,21 @@
-import { Chat, PrivateChat } from '@neelkamath/omni-chat';
 import React, { ReactElement } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useThunkDispatch } from '../../../../store/store';
 import { PicsSlice } from '../../../../store/slices/PicsSlice';
 import CustomAvatar from '../../CustomAvatar';
 import { TeamOutlined, UserOutlined } from '@ant-design/icons';
+import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 
 export interface ChatPicProps {
-  readonly chat: Chat;
+  readonly chat: ChatsSlice.Chat;
 }
 
 export default function ChatPic({ chat }: ChatPicProps): ReactElement {
   switch (chat.__typename) {
     case 'PrivateChat':
-      return <PrivateChatPic userId={(chat as PrivateChat).user.id} />;
+      return <PrivateChatPic userId={(chat as ChatsSlice.PrivateChat).user.userId} />;
     case 'GroupChat':
-      return <GroupChatPic chatId={chat.id} />;
+      return <GroupChatPic chatId={chat.chatId} />;
   }
 }
 

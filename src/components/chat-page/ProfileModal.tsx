@@ -1,13 +1,5 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, List, message, Modal, Spin, Typography } from 'antd';
-import {
-  Account,
-  blockUser,
-  createContact,
-  createPrivateChat,
-  deleteContact,
-  unblockUser,
-} from '@neelkamath/omni-chat';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, useThunkDispatch } from '../../store/store';
 import { ContactsSlice } from '../../store/slices/ContactsSlice';
@@ -17,6 +9,8 @@ import OriginalProfilePic from './OriginalProfilePic';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
+import { Account } from './chat-section/ChatSection';
+import { queryOrMutate } from '@neelkamath/omni-chat';
 
 export interface ProfileModalProps {
   readonly account: Account;
@@ -43,8 +37,8 @@ interface ProfileSectionProps {
 }
 
 function ProfileSection({ account, hasChatButton }: ProfileSectionProps) {
-  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.id, 'ORIGINAL'));
-  useThunkDispatch(PicsSlice.fetchPic({ id: account.id, type: 'PROFILE_PIC' }));
+  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.userId, 'ORIGINAL'));
+  useThunkDispatch(PicsSlice.fetchPic({ id: account.userId, type: 'PROFILE_PIC' }));
   const name = `${account.firstName} ${account.lastName}`.trim();
   return (
     <List>
@@ -75,9 +69,9 @@ function ProfileSection({ account, hasChatButton }: ProfileSectionProps) {
         </List.Item>
       )}
       <List.Item>
-        <ContactButton userId={account.id} />
-        {hasChatButton && <ChatButton userId={account.id} />}
-        <BlockButton userId={account.id} />
+        <ContactButton userId={account.userId} />
+        {hasChatButton && <ChatButton userId={account.userId} />}
+        <BlockButton userId={account.userId} />
       </List.Item>
     </List>
   );
@@ -105,12 +99,48 @@ function ChatButton({ userId }: ChatButtonProps): ReactElement {
 }
 
 async function operateCreatePrivateChat(userId: number): Promise<number | undefined> {
-  const result = await operateGraphQlApi(() => createPrivateChat(httpApiConfig, Storage.readAccessToken()!, userId));
+  const result = await createPrivateChat(userId);
   if (result?.createPrivateChat.__typename === 'InvalidUserId') {
     message.warning('The user just deleted their account.', 5);
     return undefined;
   }
-  return result?.createPrivateChat.id;
+  return result?.createPrivateChat.chatId;
+}
+
+interface InvalidUserId {
+  readonly __typename: 'InvalidUserId';
+}
+
+interface CreatedChatId {
+  readonly __typename: 'CreatedChatId';
+  readonly chatId: number;
+}
+
+interface CreatePrivateChatResult {
+  readonly createPrivateChat: InvalidUserId | CreatedChatId;
+}
+
+async function createPrivateChat(userId: number): Promise<CreatePrivateChatResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(
+        httpApiConfig,
+        {
+          query: `
+            mutation CreatePrivateChat($userId: Int!) {
+              createPrivateChat(userId: $userId) {
+                __typename
+                ... on CreatedChatId {
+                  chatId
+                }
+              }
+            }
+          `,
+          variables: { userId },
+        },
+        Storage.readAccessToken()!,
+      ),
+  );
 }
 
 interface ContactButtonProps {
@@ -137,15 +167,59 @@ function ContactButton({ userId }: ContactButtonProps): ReactElement {
 }
 
 async function operateCreateContact(userId: number): Promise<void> {
-  const result = await operateGraphQlApi(() => createContact(httpApiConfig, Storage.readAccessToken()!, userId));
+  const result = await createContact(userId);
   if (result?.createContact === true) message.success('Contact created.', 3);
   else if (result?.createContact === false) message.warning('That user just deleted their account.', 5);
 }
 
+interface CreateContactResult {
+  readonly createContact: boolean;
+}
+
+async function createContact(id: number): Promise<CreateContactResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(
+        httpApiConfig,
+        {
+          query: `
+            mutation CreateContact($id: Int!) {
+              createContact(id: $id)
+            }
+          `,
+          variables: { id },
+        },
+        Storage.readAccessToken()!,
+      ),
+  );
+}
+
 async function operateDeleteContact(userId: number): Promise<void> {
-  const result = await operateGraphQlApi(() => deleteContact(httpApiConfig, Storage.readAccessToken()!, userId));
+  const result = await deleteContact(userId);
   if (result?.deleteContact === true) message.success('Contact deleted', 3);
   else if (result?.deleteContact === false) message.warning('That user just deleted their account', 5);
+}
+
+interface DeleteContactResult {
+  readonly deleteContact: boolean;
+}
+
+async function deleteContact(id: number): Promise<DeleteContactResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(
+        httpApiConfig,
+        {
+          query: `
+            mutation DeleteContact($id: Int!) {
+              deleteContact(id: $id)
+            }
+          `,
+          variables: { id },
+        },
+        Storage.readAccessToken()!,
+      ),
+  );
 }
 
 interface BlockButtonProps {
@@ -171,14 +245,60 @@ function BlockButton({ userId }: BlockButtonProps): ReactElement {
   );
 }
 
-async function operateUnblockUser(userId: number): Promise<void> {
-  const result = await operateGraphQlApi(() => unblockUser(httpApiConfig, Storage.readAccessToken()!, userId));
+async function operateUnblockUser(id: number): Promise<void> {
+  const result = await unblockUser(id);
   if (result?.unblockUser === true) message.success('User unblocked.');
   else if (result?.unblockUser === false) message.warning('That user just deleted their account.', 5);
 }
 
-async function operateBlockUser(userId: number): Promise<void> {
-  const result = await operateGraphQlApi(() => blockUser(httpApiConfig, Storage.readAccessToken()!, userId));
+interface UnblockUserResult {
+  readonly unblockUser: boolean;
+}
+
+async function unblockUser(id: number): Promise<UnblockUserResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(
+        httpApiConfig,
+        {
+          query: `
+            mutation UnblockUser($id: Int!) {
+              unblockUser(id: $id)
+            }
+          `,
+          variables: { id },
+        },
+        Storage.readAccessToken()!,
+      ),
+  );
+}
+
+async function operateBlockUser(id: number): Promise<void> {
+  const result = await blockUser(id);
   if (result?.blockUser?.__typename === 'InvalidUserId') message.warning('That user just deleted their account.', 5);
   else if (result !== undefined) message.success('User blocked.');
+}
+
+interface BlockUserResult {
+  readonly blockUser: InvalidUserId | null;
+}
+
+async function blockUser(id: number): Promise<BlockUserResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(
+        httpApiConfig,
+        {
+          query: `
+            mutation BlockUser($id: Int!) {
+              blockUser(id: $id) {
+                __typename
+              }
+            }
+          `,
+          variables: { id },
+        },
+        Storage.readAccessToken()!,
+      ),
+  );
 }

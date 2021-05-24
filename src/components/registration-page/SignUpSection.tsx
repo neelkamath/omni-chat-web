@@ -1,7 +1,15 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Col, Form, Image, Input, message, Row, Space, Typography } from 'antd';
 import completingImage from '../../images/completing.svg';
-import { AccountInput, createAccount, isValidPasswordScalar, isValidUsernameScalar } from '@neelkamath/omni-chat';
+import {
+  Bio,
+  isValidPasswordScalar,
+  isValidUsernameScalar,
+  Name,
+  Password,
+  queryOrMutate,
+  Username,
+} from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 
 export default function SignUpSection(): ReactElement {
@@ -59,10 +67,18 @@ function SignUpForm(): ReactElement {
   );
 }
 
+interface AccountInput {
+  readonly username: Username;
+  readonly password: Password;
+  readonly emailAddress: string;
+  readonly firstName: Name;
+  readonly lastName: Name;
+  readonly bio: Bio;
+}
+
 // TODO: Delete the empty string fields once GraphQL Java 16.3 (currently unreleased) is used by Omni Chat Backend.
 function buildAccountInput(data: SignUpFormData): AccountInput {
   return {
-    __typename: 'AccountInput',
     username: data.username.trim(),
     password: data.password,
     emailAddress: data.emailAddress,
@@ -84,8 +100,8 @@ function validateAccountInput({ username, password }: AccountInput): boolean {
   return true;
 }
 
-async function operateCreateAccount(input: AccountInput): Promise<void> {
-  const result = await operateGraphQlApi(() => createAccount(httpApiConfig, input));
+async function operateCreateAccount(account: AccountInput): Promise<void> {
+  const result = await createAccount(account);
   if (result?.createAccount === null)
     message.success('Account created. Check your email for an account verification code.', 5);
   switch (result?.createAccount?.__typename) {
@@ -102,4 +118,36 @@ async function operateCreateAccount(input: AccountInput): Promise<void> {
     case 'UsernameTaken':
       message.error('That username has already been taken.', 5);
   }
+}
+
+interface CreateAccountResult {
+  readonly createAccount: UsernameTaken | EmailAddressTaken | InvalidDomain | null;
+}
+
+interface UsernameTaken {
+  readonly __typename: 'UsernameTaken';
+}
+
+interface EmailAddressTaken {
+  readonly __typename: 'EmailAddressTaken';
+}
+
+interface InvalidDomain {
+  readonly __typename: 'InvalidDomain';
+}
+
+async function createAccount(account: AccountInput): Promise<CreateAccountResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(httpApiConfig, {
+        query: `
+          mutation CreateAccount($account: AccountInput!) {
+            createAccount(account: $account) {
+              __typename
+            }
+          }
+        `,
+        variables: { account },
+      }),
+  );
 }
