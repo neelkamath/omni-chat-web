@@ -31,7 +31,7 @@ function verifyCreation(onSubscriptionClose: OnSubscriptionClose): void {
 export async function setUpSubscriptions(): Promise<void> {
   await Promise.all([
     subscribeToAccounts(),
-    subscribeToGroupChats(),
+    subscribeToChats(),
     subscribeToMessages(),
     subscribeToOnlineStatuses(),
     subscribeToTypingStatuses(),
@@ -207,13 +207,19 @@ async function subscribeToAccounts(): Promise<void> {
   });
 }
 
-interface SubscribeToGroupChatsResult {
-  readonly subscribeToGroupChats:
+interface SubscribeToChatsResult {
+  readonly subscribeToChats:
     | CreatedSubscription
     | GroupChatId
     | UpdatedGroupChatPic
     | UpdatedGroupChat
-    | ExitedUsers;
+    | ExitedUsers
+    | DeletedPrivateChat;
+}
+
+interface DeletedPrivateChat {
+  readonly __typename: 'DeletedPrivateChat';
+  readonly chatId: number;
 }
 
 interface GroupChatId {
@@ -237,17 +243,17 @@ interface ExitedUsers {
   readonly userIdList: number[];
 }
 
-/** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToGroupChats`. */
-async function subscribeToGroupChats(): Promise<void> {
+/** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToChats`. */
+async function subscribeToChats(): Promise<void> {
   verifyCreation(onGroupChatsSubscriptionClose);
   return new Promise((resolve) => {
     onGroupChatsSubscriptionClose = subscribe(
       wsApiConfig,
       Storage.readAccessToken()!,
-      '/group-chats-subscription',
+      '/chats-subscription',
       `
-        subscription SubscribeToGroupChats {
-          subscribeToGroupChats {
+        subscription SubscribeToChats {
+          subscribeToChats {
             __typename
             ... on GroupChatId {
               chatId
@@ -262,12 +268,15 @@ async function subscribeToGroupChats(): Promise<void> {
             ... on UpdatedGroupChatPic {
               chatId
             }
+            ... on DeletedPrivateChat {
+              chatId
+            }
           }
         }
       `,
-      async ({ data, errors }: GraphQlResponse<SubscribeToGroupChatsResult>) => {
+      async ({ data, errors }: GraphQlResponse<SubscribeToChatsResult>) => {
         if (errors !== undefined) await displayBugReporter(errors);
-        const message = data?.subscribeToGroupChats;
+        const message = data?.subscribeToChats;
         switch (message?.__typename) {
           case 'CreatedSubscription':
             resolve();
@@ -284,6 +293,9 @@ async function subscribeToGroupChats(): Promise<void> {
             break;
           case 'UpdatedGroupChatPic':
             store.dispatch(PicsSlice.fetchPic({ id: message.chatId, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
+            break;
+          case 'DeletedPrivateChat':
+            ChatsSlice.removeOne(message.chatId); // TODO: Test once deleting private chats is implemented.
         }
       },
       onError,
