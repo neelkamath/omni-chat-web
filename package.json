@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "4.5.0",
-    "@neelkamath/omni-chat": "0.13.0",
+    "@neelkamath/omni-chat": "1.0.0",
     "@reduxjs/toolkit": "1.5.0",
     "antd": "4.14.0",
     "jwt-decode": "3.1.2",
