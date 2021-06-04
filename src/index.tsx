@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import App from './components/App';
 import setOnline from './setOnline';
 
-// TODO: Test that it works on supported browsers.
 /*
 TODO: Once context messages have been implemented, test that if the context has been deleted, messages which replied to
  it no longer display the context, and that a message being created in reply to it has the context disappear with an

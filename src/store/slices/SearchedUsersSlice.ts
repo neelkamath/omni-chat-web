@@ -5,7 +5,6 @@ import { ForwardPagination } from '../../pagination';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { Storage } from '../../Storage';
 
-// TODO: Handle deleted accounts even if it glitches the UI.
 /**
  * The results of a search for blocked users, contacts, or users registered on the Omni Chat instance being used.
  *

@@ -440,10 +440,6 @@ async function subscribeToMessages(): Promise<void> {
           case 'NewPollMessage':
           case 'NewTextMessage':
           case 'NewVideoMessage':
-            /*
-            TODO: Don't fetch a chat in all these cases. For example, only fetch it if the UpdatedMessage is the latest
-             one, and maybe not even then - just update the latest message in the chat instead.
-             */
             store.dispatch(ChatsSlice.fetchChat(message.chatId));
         }
       },

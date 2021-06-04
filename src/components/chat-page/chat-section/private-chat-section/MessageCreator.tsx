@@ -18,11 +18,11 @@ export interface MessageCreatorProps {
 export default function MessageCreator({ chatId }: MessageCreatorProps): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const [value, setValue] = useState('');
-  const onFinish = () => {
+  const onFinish = async () => {
     setLoading(true);
     const text = value.trim();
     if (isValidMessageTextScalar(text)) {
-      const isCreated = operateCreateTextMessage(chatId, text);
+      const isCreated = await operateCreateTextMessage(chatId, text);
       if (isCreated) setValue('');
     } else message.error('Messages must contain characters other than spaces.', 5);
     setLoading(false);
@@ -34,7 +34,7 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
       name='createMessage'
       layout='inline'
     >
-      <GfmFormItem initialValue={value} onChange={setValue} maxLength={10_000} name='text' onPressEnter={onFinish} />
+      <GfmFormItem value={value} setValue={setValue} maxLength={10_000} name='text' onPressEnter={onFinish} />
       <Form.Item>
         <Button loading={isLoading} type='primary' htmlType='submit' icon={<SendOutlined />} />
       </Form.Item>

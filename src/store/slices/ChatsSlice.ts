@@ -330,11 +330,9 @@ export namespace ChatsSlice {
     (state: RootState) => state,
     (state: RootState) => {
       return selectAll(state).filter((chat) => {
-        if (chat.__typename === 'PrivateChat') {
-          const userId = (chat as PrivateChat).user.userId;
-          return !BlockedUsersSlice.selectIsBlocked(state, userId);
-        }
-        return true;
+        if (chat.__typename === 'GroupChat') return true;
+        const userId = (chat as PrivateChat).user.userId;
+        return !BlockedUsersSlice.selectIsBlocked(state, userId);
       });
     },
   );

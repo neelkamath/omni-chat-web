@@ -22,7 +22,6 @@ interface ChatCardProps {
   readonly chat: ChatsSlice.Chat;
 }
 
-// TODO: Make chats with new messages stand out, perhaps with a card glow.
 function ChatCard({ chat }: ChatCardProps): ReactElement {
   const dispatch = useDispatch();
   return (

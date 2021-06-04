@@ -5,8 +5,8 @@ import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
 
 export interface GfmFormItemProps {
-  readonly initialValue?: string;
-  readonly onChange: (newValue: string) => void;
+  readonly value?: string;
+  readonly setValue: (newValue: string) => void;
   readonly maxLength: number;
   readonly name: string;
   readonly label?: string;
@@ -14,14 +14,13 @@ export interface GfmFormItemProps {
 }
 
 export default function GfmFormItem({
-  initialValue,
-  onChange,
-  maxLength,
-  name,
-  label,
-  onPressEnter,
-}: GfmFormItemProps): ReactElement {
-  const [value, setValue] = useState(initialValue);
+                                      value,
+                                      setValue,
+                                      maxLength,
+                                      name,
+                                      label,
+                                      onPressEnter,
+                                    }: GfmFormItemProps): ReactElement {
   const [isShiftDown, setShiftDown] = useState(false);
   return (
     <Form.Item style={{ width: '100%' }} name={name} label={label}>
@@ -32,8 +31,8 @@ export default function GfmFormItem({
             value={value}
             autoSize={{ minRows: 1, maxRows: 5 }}
             onChange={({ target }) => {
-              onChange(target.value);
-              setValue(target.value);
+              const char = target.value[target.value.length - 1];
+              if (char !== '\n' || (isShiftDown && char === '\n')) setValue(target.value);
             }}
             onPressEnter={() => {
               if (onPressEnter !== undefined && !isShiftDown) onPressEnter();
