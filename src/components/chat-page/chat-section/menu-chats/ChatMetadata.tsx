@@ -5,10 +5,6 @@ import { RootState, useThunkDispatch } from '../../../../store/store';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import TimeAgo from 'timeago-react';
 import { CheckCircleTwoTone, ClockCircleTwoTone } from '@ant-design/icons';
-import TextMessage = ChatsSlice.TextMessage;
-import ActionMessage = ChatsSlice.ActionMessage;
-import PicMessage = ChatsSlice.PicMessage;
-import PollMessage = ChatsSlice.PollMessage;
 
 export interface ChatMetadataProps {
   readonly chat: ChatsSlice.Chat;
@@ -51,7 +47,7 @@ function ChatName({ chat }: ChatNameProps): ReactElement {
       name = (chat as ChatsSlice.PrivateChat).user.username;
   }
   return (
-    <Typography.Text ellipsis={true} strong style={{ width: 225 }}>
+    <Typography.Text ellipsis={true} strong style={{ width: 200 }}>
       {name}
     </Typography.Text>
   );
@@ -83,19 +79,19 @@ function LastChatMessageText({ chatId }: LastChatMessageTextProps): ReactElement
   let message: ReactNode;
   switch (lastMessage.__typename) {
     case 'TextMessage':
-      message = (lastMessage as TextMessage).textMessage;
+      message = (lastMessage as ChatsSlice.TextMessage).textMessage;
       break;
     case 'ActionMessage':
-      message = (lastMessage as ActionMessage).actionableMessage.text;
+      message = (lastMessage as ChatsSlice.ActionMessage).actionableMessage.text;
       break;
     case 'PicMessage': {
-      const caption = (lastMessage as PicMessage).caption;
+      const caption = (lastMessage as ChatsSlice.PicMessage).caption;
       if (caption === null) message = <Typography.Text strong>Sent a picture.</Typography.Text>;
       else message = caption;
       break;
     }
     case 'PollMessage':
-      message = (lastMessage as PollMessage).poll.title;
+      message = (lastMessage as ChatsSlice.PollMessage).poll.title;
       break;
     case 'AudioMessage':
       message = <Typography.Text strong>Sent an audio.</Typography.Text>;

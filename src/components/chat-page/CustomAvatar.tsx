@@ -2,11 +2,10 @@ import React, { ReactElement } from 'react';
 import { Avatar, Spin } from 'antd';
 import { PicsSlice } from '../../store/slices/PicsSlice';
 import { AvatarSize } from 'antd/lib/avatar/SizeContext';
-import PicUrl = PicsSlice.PicUrl;
 
 export interface CustomAvatarProps {
   readonly icon: ReactElement;
-  readonly url: PicUrl;
+  readonly url: PicsSlice.PicUrl;
   readonly size?: AvatarSize;
 }
 

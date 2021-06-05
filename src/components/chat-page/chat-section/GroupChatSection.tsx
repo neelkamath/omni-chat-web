@@ -1,9 +1,9 @@
 import React, { ReactElement } from 'react';
 import { Layout, Tag } from 'antd';
-import { GroupChat } from './ChatSection';
+import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 
 export interface GroupChatSectionProps {
-  readonly chat: GroupChat;
+  readonly chat: ChatsSlice.GroupChat;
 }
 
 // TODO
@@ -19,7 +19,7 @@ export default function GroupChatSection({ chat }: GroupChatSectionProps): React
 }
 
 interface ChatTagsProps {
-  readonly chat: GroupChat;
+  readonly chat: ChatsSlice.GroupChat;
 }
 
 // TODO: Test once group chats have been implemented.

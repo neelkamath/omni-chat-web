@@ -12,10 +12,8 @@ import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { Bio, DateTime, GroupChatTitle, MessageText, Name, queryOrMutate, Username } from '@neelkamath/omni-chat';
 
-/**
- * Stores every chat the user is in. Only the last message sent in ({@link Chat.messages}) is stored. Group chats don't
- * store their participants in {@link GroupChat.users}.
- */
+// TODO: Paginate queries.
+/** Stores every chat the user is in. Group chats don't store their participants in {@link GroupChat.users}. */
 export namespace ChatsSlice {
   const sliceName = 'chats';
 
@@ -51,6 +49,7 @@ export namespace ChatsSlice {
     readonly sent: DateTime;
     readonly sender: SenderAccount;
     readonly state: MessageState;
+    readonly messageId: number;
   }
 
   export type MessageState = 'SENT' | 'DELIVERED' | 'READ';
@@ -84,12 +83,18 @@ export namespace ChatsSlice {
   export interface UserAccount {
     readonly username: Username;
     readonly userId: number;
+    readonly firstName: Name;
+    readonly lastName: Name;
+    readonly emailAddress: string;
+    readonly bio: Bio;
   }
 
   export interface SenderAccount {
     readonly username: Username;
     readonly userId: number;
   }
+
+  export type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
 
   export interface PrivateChat extends Chat {
     readonly __typename: 'PrivateChat';
@@ -99,6 +104,8 @@ export namespace ChatsSlice {
   export interface GroupChat extends Chat {
     readonly __typename: 'GroupChat';
     readonly title: GroupChatTitle;
+    readonly publicity: GroupChatPublicity;
+    readonly isBroadcast: boolean;
   }
 
   interface InvalidChatId {
@@ -113,7 +120,7 @@ export namespace ChatsSlice {
     __typename
     ... on Chat {
       chatId
-      messages(last: $last) {
+      messages {
         edges {
           node {
             __typename
@@ -122,6 +129,7 @@ export namespace ChatsSlice {
               username
               userId
             }
+            messageId
             ... on TextMessage {
               textMessage
             }
@@ -146,10 +154,16 @@ export namespace ChatsSlice {
       user {
         userId
         username
+        firstName
+        lastName
+        emailAddress
+        bio
       }
     }
     ... on GroupChat {
       title
+      publicity
+      isBroadcast
     }
   `;
 
@@ -160,13 +174,13 @@ export namespace ChatsSlice {
           httpApiConfig,
           {
             query: `
-              query ReadChat($id: Int!, $last: Int) {
+              query ReadChat($id: Int!) {
                 readChat(id: $id) {
                   ${chatFragment}
                 }
               }
             `,
-            variables: { id, last: 1 },
+            variables: { id },
           },
           Storage.readAccessToken()!,
         ),
@@ -190,7 +204,6 @@ export namespace ChatsSlice {
     readonly readChats: ChatsConnection;
   }
 
-  // TODO: Only retrieve the first 15.
   async function readChats(): Promise<ReadChatsResult | undefined> {
     return await operateGraphQlApi(
       async () =>
@@ -198,7 +211,7 @@ export namespace ChatsSlice {
           httpApiConfig,
           {
             query: `
-              query ReadChats($last: Int) {
+              query ReadChats {
                 readChats {
                   edges {
                     node {
@@ -208,7 +221,6 @@ export namespace ChatsSlice {
                 }
               }
             `,
-            variables: { last: 1 },
           },
           Storage.readAccessToken()!,
         ),
@@ -220,7 +232,7 @@ export namespace ChatsSlice {
     selectId: ({ chatId }) => chatId,
     sortComparer: (a, b) => {
       const readSent = (chat: Chat) => {
-        const sent = chat.messages.edges[0]?.node.sent;
+        const sent = chat.messages.edges[chat.messages.edges.length - 1]?.node.sent;
         return sent === undefined ? undefined : Date.parse(sent);
       };
       const aLast = readSent(a);
@@ -337,6 +349,11 @@ export namespace ChatsSlice {
     },
   );
 
+  export const selectChat = createSelector(
+    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
+    (chats: Dictionary<Chat>, chatId: number) => chats[chatId],
+  );
+
   /** Whether the chats have been fetched. */
   export const selectIsLoaded = createSelector(
     (state: RootState) => state.chats.status,
@@ -349,7 +366,10 @@ export namespace ChatsSlice {
    */
   export const selectLastMessage = createSelector(
     [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
-    (chats: Dictionary<Chat>, chatId: number) => chats[chatId]?.messages.edges[0]?.node,
+    (chats: Dictionary<Chat>, chatId: number) => {
+      const edges = chats[chatId]?.messages.edges;
+      return edges === undefined ? undefined : edges[edges.length - 1]?.node;
+    },
   );
 
   /** Whether the specified private chat belongs to a user who deleted their account, and therefore deleted the chat. */

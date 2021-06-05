@@ -1,6 +1,5 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, Form, message } from 'antd';
-import { SendOutlined } from '@ant-design/icons';
+import { Form, message } from 'antd';
 import { isValidMessageTextScalar, MessageText, queryOrMutate } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
 import { Storage } from '../../../../Storage';
@@ -14,30 +13,18 @@ export interface MessageCreatorProps {
 
 // TODO: Support replying to a message.
 // TODO: Test.
-// TODO: Make it look good.
+// TODO: Fix it at the bottom of the page.
 export default function MessageCreator({ chatId }: MessageCreatorProps): ReactElement {
-  const [isLoading, setLoading] = useState(false);
   const [value, setValue] = useState('');
   const onFinish = async () => {
-    setLoading(true);
     const text = value.trim();
     if (isValidMessageTextScalar(text)) {
-      const isCreated = await operateCreateTextMessage(chatId, text);
-      if (isCreated) setValue('');
+      if (await operateCreateTextMessage(chatId, text)) setValue('');
     } else message.error('Messages must contain characters other than spaces.', 5);
-    setLoading(false);
   };
   return (
-    <Form
-      style={{ position: 'fixed', width: '100%', bottom: 16 }}
-      onFinish={onFinish}
-      name='createMessage'
-      layout='inline'
-    >
+    <Form name='createMessage'>
       <GfmFormItem value={value} setValue={setValue} maxLength={10_000} name='text' onPressEnter={onFinish} />
-      <Form.Item>
-        <Button loading={isLoading} type='primary' htmlType='submit' icon={<SendOutlined />} />
-      </Form.Item>
     </Form>
   );
 }

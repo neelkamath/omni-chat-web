@@ -3,10 +3,10 @@ import { Layout } from 'antd';
 import ChatMessage from '../ChatMessage';
 import Header from './Header';
 import MessageCreator from './MessageCreator';
-import { PrivateChat } from '../ChatSection';
+import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 
 export interface PrivateChatSectionProps {
-  readonly chat: PrivateChat;
+  readonly chat: ChatsSlice.PrivateChat;
 }
 
 /*

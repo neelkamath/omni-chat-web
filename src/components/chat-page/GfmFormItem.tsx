@@ -23,7 +23,7 @@ export default function GfmFormItem({
                                     }: GfmFormItemProps): ReactElement {
   const [isShiftDown, setShiftDown] = useState(false);
   return (
-    <Form.Item style={{ width: '100%' }} name={name} label={label}>
+    <Form.Item name={name} label={label}>
       <Tabs tabBarExtraContent={<TabBarExtraContent />}>
         <Tabs.TabPane tab={<EditTab />} key={1}>
           <Input.TextArea
@@ -53,6 +53,7 @@ export default function GfmFormItem({
   );
 }
 
+// TODO: State you can either enter using Enter key or button, and that Shift + Enter creates a new line.
 function TabBarExtraContent(): ReactElement {
   return (
     <>

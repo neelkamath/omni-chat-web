@@ -9,11 +9,11 @@ import OriginalProfilePic from './OriginalProfilePic';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
-import { Account } from './chat-section/ChatSection';
 import { queryOrMutate } from '@neelkamath/omni-chat';
+import { ChatsSlice } from '../../store/slices/ChatsSlice';
 
 export interface ProfileModalProps {
-  readonly account: Account;
+  readonly account: ChatsSlice.UserAccount;
   /** Whether to display a button which opens a private chat with this {@link account}. */
   readonly hasChatButton: boolean;
   /** Whether the modal is visible. */
@@ -31,7 +31,7 @@ export default function ProfileModal({ account, hasChatButton, isVisible, onCanc
 }
 
 interface ProfileSectionProps {
-  readonly account: Account;
+  readonly account: ChatsSlice.UserAccount;
   /** Whether to display a button which opens a private chat with this {@link account}. */
   readonly hasChatButton: boolean;
 }

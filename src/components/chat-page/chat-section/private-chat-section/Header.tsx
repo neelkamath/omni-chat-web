@@ -9,11 +9,11 @@ import CustomAvatar from '../../CustomAvatar';
 import { OnlineStatusesSlice } from '../../../../store/slices/OnlineStatusesSlice';
 import TimeAgo from 'timeago-react';
 import { TypingStatusesSlice } from '../../../../store/slices/TypingStatusesSlice';
-import { Account } from '../ChatSection';
+import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 
 export interface HeaderProps {
   /** The user being chatted with. */
-  readonly user: Account;
+  readonly user: ChatsSlice.UserAccount;
   readonly chatId: number;
 }
 

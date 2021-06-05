@@ -64,7 +64,7 @@ function UpdateAccountForm(): ReactElement {
       <Form.Item name='lastName' label='Last name' initialValue={account.lastName}>
         <Input maxLength={30} />
       </Form.Item>
-      <GfmFormItem value={account.bio} setValue={setBio} maxLength={2500} name='bio' label='Bio' />
+      <GfmFormItem value={account.bio} setValue={setBio} maxLength={2_500} name='bio' label='Bio' />
       <Form.Item>
         <Button type='primary' htmlType='submit' loading={isLoading}>
           Submit
