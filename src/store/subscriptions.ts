@@ -7,11 +7,18 @@ import { ChatsSlice } from './slices/ChatsSlice';
 import { OnlineStatusesSlice } from './slices/OnlineStatusesSlice';
 import { TypingStatusesSlice } from './slices/TypingStatusesSlice';
 import { ContactsSlice } from './slices/ContactsSlice';
-import { Bio, DateTime, GraphQlResponse, Name, OnSocketClose, subscribe, Username } from '@neelkamath/omni-chat';
+import {
+  Bio,
+  DateTime,
+  GraphQlResponse,
+  MessageText,
+  Name,
+  OnSocketClose,
+  subscribe,
+  Username,
+  Uuid,
+} from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../api';
-
-// TODO: Test every LOC in this file once the app is complete.
-// TODO: Create web notifications of new messages, group chats added to, etc. once the app is complete.
 
 /** `undefined` if no subscription is running. */
 type OnSubscriptionClose = OnSocketClose | undefined;
@@ -282,20 +289,20 @@ async function subscribeToChats(): Promise<void> {
             resolve();
             break;
           case 'GroupChatId':
-            store.dispatch(ChatsSlice.fetchChat(message.chatId));
+            store.dispatch(ChatsSlice.fetchChats());
             break;
           case 'ExitedUsers':
             if (message.userIdList.includes(Storage.readUserId()!))
               store.dispatch(ChatsSlice.removeOne(message.chatId));
             break;
           case 'UpdatedGroupChat':
-            store.dispatch(ChatsSlice.fetchChat(message.chatId));
+            store.dispatch(ChatsSlice.fetchChats());
             break;
           case 'UpdatedGroupChatPic':
             store.dispatch(PicsSlice.fetchPic({ id: message.chatId, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
             break;
           case 'DeletedPrivateChat':
-            ChatsSlice.removeOne(message.chatId); // TODO: Test once deleting private chats is implemented.
+            ChatsSlice.removeOne(message.chatId);
         }
       },
       onError,
@@ -306,7 +313,6 @@ async function subscribeToChats(): Promise<void> {
 interface SubscribeToMessagesResult {
   readonly subscribeToMessages:
     | CreatedSubscription
-    | UpdatedMessage
     | DeletedMessage
     | UserChatMessagesRemoval
     | NewActionMessage
@@ -319,59 +325,96 @@ interface SubscribeToMessagesResult {
     | NewVideoMessage;
 }
 
-interface NewTextMessage {
+interface NewMessage {
+  readonly __typename:
+    | 'NewActionMessage'
+    | 'NewAudioMessage'
+    | 'NewDocMessage'
+    | 'NewGroupChatInviteMessage'
+    | 'NewPicMessage'
+    | 'NewPollMessage'
+    | 'NewTextMessage'
+    | 'NewVideoMessage';
+  readonly chatId: number;
+  readonly messageId: number;
+  readonly sent: DateTime;
+  readonly sender: Sender;
+  readonly state: MessageState;
+}
+
+export type MessageState = 'SENT' | 'DELIVERED' | 'READ';
+
+interface Sender {
+  readonly userId: number;
+  readonly username: Username;
+}
+
+interface NewTextMessage extends NewMessage {
   readonly __typename: 'NewTextMessage';
-  readonly chatId: number;
+  readonly textMessage: MessageText;
 }
 
-interface NewActionMessage {
+interface NewActionMessage extends NewMessage {
   readonly __typename: 'NewActionMessage';
-  readonly chatId: number;
+  readonly actionableMessage: ActionableMessage;
 }
 
-interface NewPicMessage {
+interface ActionableMessage {
+  readonly text: MessageText;
+  readonly actions: MessageText[];
+}
+
+interface NewPicMessage extends NewMessage {
   readonly __typename: 'NewPicMessage';
-  readonly chatId: number;
+  readonly caption: MessageText;
 }
 
-interface NewAudioMessage {
+interface NewAudioMessage extends NewMessage {
   readonly __typename: 'NewAudioMessage';
-  readonly chatId: number;
 }
 
-interface NewGroupChatInviteMessage {
+interface NewGroupChatInviteMessage extends NewMessage {
   readonly __typename: 'NewGroupChatInviteMessage';
-  readonly chatId: number;
+  readonly inviteCode: Uuid;
 }
 
-interface NewDocMessage {
+interface NewDocMessage extends NewMessage {
   readonly __typename: 'NewDocMessage';
-  readonly chatId: number;
 }
 
-interface NewVideoMessage {
+interface NewVideoMessage extends NewMessage {
   readonly __typename: 'NewVideoMessage';
-  readonly chatId: number;
 }
 
-interface NewPollMessage {
+interface NewPollMessage extends NewMessage {
   readonly __typename: 'NewPollMessage';
-  readonly chatId: number;
+  readonly poll: Poll;
 }
 
-interface UpdatedMessage {
-  readonly __typename: 'UpdatedMessage';
-  readonly chatId: number;
+interface Poll {
+  readonly title: MessageText;
+  readonly options: PollOption[];
+}
+
+interface PollOption {
+  readonly option: MessageText;
+  readonly votes: VoterAccount[];
+}
+
+interface VoterAccount {
+  readonly userId: number;
 }
 
 interface DeletedMessage {
   readonly __typename: 'DeletedMessage';
   readonly chatId: number;
+  readonly messageId: number;
 }
 
 interface UserChatMessagesRemoval {
   readonly __typename: 'UserChatMessagesRemoval';
   readonly chatId: number;
+  readonly userId: number;
 }
 
 /** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToMessages`. */
@@ -382,42 +425,54 @@ async function subscribeToMessages(): Promise<void> {
       wsApiConfig,
       Storage.readAccessToken()!,
       '/messages-subscription',
+      // TODO: Instead of duplicating account info everywhere, use a slice which gets users from their ID.
       `
         subscription SubscribeToMessages {
           subscribeToMessages {
             __typename
-            ... on UpdatedMessage {
-              chatId
-            }
             ... on DeletedMessage {
               chatId
+              messageId
             }
-            ... on NewActionMessage {
+            ... on NewMessage {
               chatId
-            }
-            ... on NewAudioMessage {
-              chatId
-            }
-            ... on NewDocMessage {
-              chatId
-            }
-            ... on NewGroupChatInviteMessage {
-              chatId
-            }
-            ... on NewPicMessage {
-              chatId
-            }
-            ... on NewPollMessage {
-              chatId
+              messageId
+              sent
+              sender {
+                username
+                userId
+              }
+              state
             }
             ... on NewTextMessage {
-              chatId
+              textMessage
             }
-            ... on NewVideoMessage {
-              chatId
+            ... on NewActionMessage {
+              actionableMessage {
+                text
+                actions
+              }
+            }
+            ... on NewPicMessage {
+              caption
+            }
+            ... on NewPollMessage {
+              poll {
+                title
+                options {
+                  option
+                  votes {
+                    userId
+                  }
+                }
+              }
+            }
+            ... on NewGroupChatInviteMessage {
+              inviteCode
             }
             ... on UserChatMessagesRemoval {
               chatId
+              userId
             }
           }
         }
@@ -429,9 +484,12 @@ async function subscribeToMessages(): Promise<void> {
           case 'CreatedSubscription':
             resolve();
             break;
-          case 'UpdatedMessage':
           case 'DeletedMessage':
+            store.dispatch(ChatsSlice.deleteMessage(message));
+            break;
           case 'UserChatMessagesRemoval':
+            store.dispatch(ChatsSlice.removeUserChatMessages(message));
+            break;
           case 'NewActionMessage':
           case 'NewAudioMessage':
           case 'NewDocMessage':
@@ -440,7 +498,7 @@ async function subscribeToMessages(): Promise<void> {
           case 'NewPollMessage':
           case 'NewTextMessage':
           case 'NewVideoMessage':
-            store.dispatch(ChatsSlice.fetchChat(message.chatId));
+            store.dispatch(ChatsSlice.addMessage(message));
         }
       },
       onError,

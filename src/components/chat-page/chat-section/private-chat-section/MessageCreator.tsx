@@ -11,9 +11,6 @@ export interface MessageCreatorProps {
   readonly chatId: number;
 }
 
-// TODO: Support replying to a message.
-// TODO: Test.
-// TODO: Fix it at the bottom of the page.
 export default function MessageCreator({ chatId }: MessageCreatorProps): ReactElement {
   const [value, setValue] = useState('');
   const onFinish = async () => {

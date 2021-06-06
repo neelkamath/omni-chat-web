@@ -71,10 +71,9 @@ interface LastChatMessageTextProps {
   readonly chatId: number;
 }
 
-// TODO: Test once all message types have been implemented.
 function LastChatMessageText({ chatId }: LastChatMessageTextProps): ReactElement {
   const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  useThunkDispatch(ChatsSlice.fetchChats());
   if (lastMessage === undefined) return <></>;
   let message: ReactNode;
   switch (lastMessage.__typename) {

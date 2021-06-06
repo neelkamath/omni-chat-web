@@ -51,7 +51,6 @@ function DeleteAccountForm(): ReactElement {
   );
 }
 
-// TODO: Test once group chats have been implemented.
 async function operateDeleteAccount(): Promise<void> {
   const result = await deleteAccount();
   if (result?.deleteAccount?.__typename === 'CannotDeleteAccount')

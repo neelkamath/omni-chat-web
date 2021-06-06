@@ -12,7 +12,7 @@ export interface ChatSectionProps {
 
 export default function ChatSection({ chatId }: ChatSectionProps): ReactElement {
   const [section, setSection] = useState(<Spin style={{ padding: 16 }} />);
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  useThunkDispatch(ChatsSlice.fetchChats());
   const isDeletedPrivateChat = useSelector((state: RootState) => ChatsSlice.selectIsDeletedPrivateChat(state, chatId));
   const chat = useSelector((state: RootState) => ChatsSlice.selectChat(state, chatId));
   const onDeletedChat = () => {

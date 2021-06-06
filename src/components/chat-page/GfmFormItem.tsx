@@ -1,6 +1,6 @@
 import React, { ReactElement, useState } from 'react';
-import { Form, Input, Space, Tabs, Typography } from 'antd';
-import { EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { Form, Input, Space, Tabs, Tooltip, Typography } from 'antd';
+import { EditOutlined, EyeOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
 
@@ -14,13 +14,13 @@ export interface GfmFormItemProps {
 }
 
 export default function GfmFormItem({
-                                      value,
-                                      setValue,
-                                      maxLength,
-                                      name,
-                                      label,
-                                      onPressEnter,
-                                    }: GfmFormItemProps): ReactElement {
+  value,
+  setValue,
+  maxLength,
+  name,
+  label,
+  onPressEnter,
+}: GfmFormItemProps): ReactElement {
   const [isShiftDown, setShiftDown] = useState(false);
   return (
     <Form.Item name={name} label={label}>
@@ -53,16 +53,28 @@ export default function GfmFormItem({
   );
 }
 
-// TODO: State you can either enter using Enter key or button, and that Shift + Enter creates a new line.
 function TabBarExtraContent(): ReactElement {
-  return (
+  const title = (
     <>
-      Uses GitHub Flavored{' '}
-      <Typography.Link target='_blank' href='https://commonmark.org/help/'>
-        Markdown
-      </Typography.Link>
-      .
+      <Typography.Paragraph>
+        Uses GitHub Flavored{' '}
+        <Typography.Link target='_blank' href='https://commonmark.org/help/'>
+          Markdown
+        </Typography.Link>
+        .
+      </Typography.Paragraph>
+      <Typography.Paragraph>
+        Press <Typography.Text keyboard>return</Typography.Text> to submit.
+      </Typography.Paragraph>
+      <Typography.Paragraph>
+        Press <Typography.Text keyboard>shift+return</Typography.Text> to go to the next line.
+      </Typography.Paragraph>
     </>
+  );
+  return (
+    <Tooltip title={title} color='white' placement='topRight'>
+      <QuestionCircleOutlined />
+    </Tooltip>
   );
 }
 

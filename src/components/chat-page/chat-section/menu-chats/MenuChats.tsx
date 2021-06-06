@@ -7,8 +7,6 @@ import ChatPic from './ChatPic';
 import ChatMetadata from './ChatMetadata';
 import { ChatPageLayoutSlice } from '../../../../store/slices/ChatPageLayoutSlice';
 
-// TODO: Test every LOC in this file once group chats can be created.
-
 export default function MenuChats(): ReactElement {
   const chats = useSelector(ChatsSlice.selectChats);
   const isLoading = !useSelector(ChatsSlice.selectIsLoaded);

@@ -1,19 +1,20 @@
 import React, { ReactElement } from 'react';
-import { Layout, Tag } from 'antd';
+import { Empty, Layout, Tag } from 'antd';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 
 export interface GroupChatSectionProps {
   readonly chat: ChatsSlice.GroupChat;
 }
 
-// TODO
 export default function GroupChatSection({ chat }: GroupChatSectionProps): ReactElement {
   return (
     <Layout>
       <Layout.Header>
         <ChatTags chat={chat} />
       </Layout.Header>
-      <Layout.Content>Content</Layout.Content>
+      <Layout.Content>
+        <Empty />
+      </Layout.Content>
     </Layout>
   );
 }
@@ -22,7 +23,6 @@ interface ChatTagsProps {
   readonly chat: ChatsSlice.GroupChat;
 }
 
-// TODO: Test once group chats have been implemented.
 function ChatTags({ chat }: ChatTagsProps): ReactElement {
   const tags = [];
   tags.push(

@@ -21,7 +21,6 @@ import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
 
 export default function ChatPageMenu(): ReactElement {
-  useThunkDispatch(PicsSlice.fetchPic({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
   return (
     <>
       <Row gutter={16} justify='space-around' style={{ padding: 16 }}>

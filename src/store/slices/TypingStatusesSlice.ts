@@ -96,7 +96,6 @@ export namespace TypingStatusesSlice {
         const entity = { id: generateId(payload.userId, payload.chatId), ...payload };
         adapter.upsertOne(state, entity);
       },
-      // TODO: Test once typing statuses have been implemented.
       /** Removes the specified user ID's statuses. */
       removeUser: (state, { payload }: PayloadAction<number>) =>
         Object.values(state.entities).forEach((entity) => {

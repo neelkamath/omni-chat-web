@@ -9,10 +9,6 @@ export interface PrivateChatSectionProps {
   readonly chat: ChatsSlice.PrivateChat;
 }
 
-/*
-TODO: Use a scroller so that messages don't overflow the screen, and we get scroll events to know when to load more. Use
- https://ant.design/components/list/?theme=dark#components-list-demo-infinite-load.
- */
 export default function PrivateChatSection({ chat }: PrivateChatSectionProps): ReactElement {
   return (
     <Layout>

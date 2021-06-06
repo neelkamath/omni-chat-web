@@ -15,7 +15,6 @@ export interface ChatMessageProps {
   readonly message: ChatsSlice.Message;
 }
 
-// TODO
 export default function ChatMessage({ message }: ChatMessageProps): ReactElement {
   useThunkDispatch(AccountSlice.fetchAccount());
   const userId = useSelector(AccountSlice.select)?.userId;

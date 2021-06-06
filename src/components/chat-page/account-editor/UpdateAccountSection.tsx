@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { Button, Form, Input, message, Space, Spin } from 'antd';
 import { useSelector } from 'react-redux';
 import { AccountSlice } from '../../../store/slices/AccountSlice';
@@ -33,6 +33,9 @@ function UpdateAccountForm(): ReactElement {
   const [bio, setBio] = useState('');
   const account = useSelector(AccountSlice.select);
   useThunkDispatch(AccountSlice.fetchAccount());
+  useEffect(() => {
+    if (account !== undefined) setBio(account.bio);
+  }, [account]);
   if (account === undefined) return <Spin />;
   const onFinish = async (data: UpdateAccountFormData) => {
     setLoading(true);
@@ -64,7 +67,7 @@ function UpdateAccountForm(): ReactElement {
       <Form.Item name='lastName' label='Last name' initialValue={account.lastName}>
         <Input maxLength={30} />
       </Form.Item>
-      <GfmFormItem value={account.bio} setValue={setBio} maxLength={2_500} name='bio' label='Bio' />
+      <GfmFormItem value={bio} setValue={setBio} maxLength={2_500} name='bio' label='Bio' />
       <Form.Item>
         <Button type='primary' htmlType='submit' loading={isLoading}>
           Submit
