@@ -35,6 +35,7 @@ interface ChatSegmentProps {
 }
 
 function ChatSegment({ chat }: ChatSegmentProps): ReactElement {
+  const isBroadcast = chat.__typename === 'GroupChat' && chat.isBroadcast;
   return (
     <Layout>
       <Layout.Header>
@@ -44,7 +45,7 @@ function ChatSegment({ chat }: ChatSegmentProps): ReactElement {
         {chat.messages.edges.map(({ node }) => (
           <ChatMessage key={node.messageId} message={node} />
         ))}
-        <MessageCreator chatId={chat.chatId} />
+        {isBroadcast ? 'Only admins can send messages in this chat.' : <MessageCreator chatId={chat.chatId} />}
       </Layout.Content>
     </Layout>
   );

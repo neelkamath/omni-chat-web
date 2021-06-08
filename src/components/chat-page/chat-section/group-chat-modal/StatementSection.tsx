@@ -2,35 +2,32 @@ import React, { ReactElement, useState } from 'react';
 import { Button, Form, Input, message, Spin, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import { GroupChatDescription, GroupChatTitle, Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
-import store, { RootState, useThunkDispatch } from '../../../../store/store';
+import { RootState, useThunkDispatch } from '../../../../store/store';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import { Storage } from '../../../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
 
-export type SectionType = 'TITLE' | 'DESCRIPTION';
-
 export interface StatementSectionProps {
   readonly chatId: number;
-  readonly type: SectionType;
+  readonly type: ChatsSlice.GroupChatStatementType;
 }
 
 export default function StatementSection({ chatId, type }: StatementSectionProps): ReactElement {
   useThunkDispatch(ChatsSlice.fetchChat(chatId));
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
-  let name, data;
+  const statement = useSelector((state: RootState) => ChatsSlice.selectGroupChatStatement(state, chatId, type));
+  let name;
   switch (type) {
     case 'TITLE':
       name = 'Title';
-      data = ChatsSlice.selectGroupChatTitle(store.getState(), chatId);
       break;
     case 'DESCRIPTION':
       name = 'Description';
-      data = ChatsSlice.selectGroupChatDescription(store.getState(), chatId);
   }
   if (isAdmin) return <UpdateSectionForm chatId={chatId} type={type} />;
   return (
     <>
-      <Typography.Text strong>{name}</Typography.Text>: {data}
+      <Typography.Text strong>{name}</Typography.Text>: {statement}
     </>
   );
 }
@@ -41,49 +38,23 @@ interface UpdateSectionFormData {
 
 interface UpdateSectionFormProps {
   readonly chatId: number;
-  readonly type: SectionType;
+  readonly type: ChatsSlice.GroupChatStatementType;
 }
 
 function UpdateSectionForm({ chatId, type }: UpdateSectionFormProps): ReactElement {
   useThunkDispatch(ChatsSlice.fetchChat(chatId));
   const [isLoading, setLoading] = useState(false);
-  let name, data, maxLength, minLength;
-  switch (type) {
-    case 'TITLE':
-      name = 'title';
-      maxLength = 70;
-      minLength = 1;
-      data = ChatsSlice.selectGroupChatTitle(store.getState(), chatId);
-      break;
-    case 'DESCRIPTION':
-      name = 'description';
-      maxLength = 1_000;
-      minLength = 0;
-      data = ChatsSlice.selectGroupChatDescription(store.getState(), chatId);
-  }
-  if (data === undefined) return <Spin />;
-  const onFinish = async (form: UpdateSectionFormData) => {
+  const statement = useSelector((state: RootState) => ChatsSlice.selectGroupChatStatement(state, chatId, type));
+  const { maxLength, minLength, name } = buildFormData(type);
+  if (statement === undefined) return <Spin />;
+  const onFinish = async ({ data }: UpdateSectionFormData) => {
     setLoading(true);
-    const newData = form.data.trim();
-    switch (type) {
-      case 'TITLE':
-        if (newData.length === 0)
-          message.error("The title must contain at least one character which isn't a space.", 5);
-        else {
-          const result = await updateGroupChatTitle(chatId, newData);
-          if (result !== undefined) message.success('Title updated.', 3);
-        }
-        break;
-      case 'DESCRIPTION': {
-        const result = await updateGroupChatDescription(chatId, newData);
-        if (result !== undefined) message.success('Description updated.', 3);
-      }
-    }
+    await operateUpdateGroupChatStatement(type, chatId, data.trim());
     setLoading(false);
   };
   return (
-    <Form onFinish={onFinish} name='updateGroupChatTitle' layout='inline'>
-      <Form.Item name='data' label={name[0]!.toUpperCase() + name.slice(1)} initialValue={data}>
+    <Form onFinish={onFinish} name={`updateGroupChat${name}`} layout='inline'>
+      <Form.Item name='data' label={name} initialValue={statement}>
         <Input maxLength={maxLength} minLength={minLength} />
       </Form.Item>
       <Form.Item>
@@ -93,6 +64,41 @@ function UpdateSectionForm({ chatId, type }: UpdateSectionFormProps): ReactEleme
       </Form.Item>
     </Form>
   );
+}
+
+async function operateUpdateGroupChatStatement(
+  type: ChatsSlice.GroupChatStatementType,
+  chatId: number,
+  data: GroupChatTitle | GroupChatDescription,
+): Promise<void> {
+  switch (type) {
+    case 'TITLE':
+      if (data.length === 0) message.error("The title must contain at least one character which isn't a space.", 5);
+      else {
+        const result = await updateGroupChatTitle(chatId, data);
+        if (result !== undefined) message.success('Title updated.', 3);
+      }
+      break;
+    case 'DESCRIPTION': {
+      const result = await updateGroupChatDescription(chatId, data);
+      if (result !== undefined) message.success('Description updated.', 3);
+    }
+  }
+}
+
+interface FormData {
+  readonly name: 'Title' | 'Description';
+  readonly minLength: 0 | 1;
+  readonly maxLength: 70 | 1_000;
+}
+
+function buildFormData(type: ChatsSlice.GroupChatStatementType): FormData {
+  switch (type) {
+    case 'TITLE':
+      return { name: 'Title', maxLength: 70, minLength: 1 };
+    case 'DESCRIPTION':
+      return { name: 'Description', maxLength: 1_000, minLength: 0 };
+  }
 }
 
 interface UpdateGroupChatTitleResult {

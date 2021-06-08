@@ -567,16 +567,23 @@ export namespace ChatsSlice {
     },
   );
 
-  const selectGroupChat = createSelector(
-    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
-    (chats: Dictionary<Chat>, chatId: number) => chats[chatId] as GroupChat | undefined,
-  );
+  export type GroupChatStatementType = 'TITLE' | 'DESCRIPTION';
 
-  export const selectGroupChatTitle = createSelector(selectGroupChat, (chat: GroupChat | undefined) => chat?.title);
-
-  export const selectGroupChatDescription = createSelector(
-    selectGroupChat,
-    (chat: GroupChat | undefined) => chat?.description,
+  export const selectGroupChatStatement = createSelector(
+    [
+      (state: RootState) => state.chats.entities,
+      (_: RootState, chatId: number) => chatId,
+      (_state: RootState, _chatId: number, type: GroupChatStatementType) => type,
+    ],
+    (chats: Dictionary<Chat>, chatId: number, type: GroupChatStatementType) => {
+      const chat = chats[chatId] as GroupChat | undefined;
+      switch (type) {
+        case 'TITLE':
+          return chat?.title;
+        case 'DESCRIPTION':
+          return chat?.description;
+      }
+    },
   );
 
   export const selectChat = createSelector(
@@ -592,7 +599,13 @@ export namespace ChatsSlice {
       (_state: RootState, _chatId: number, userId: number) => userId,
     ],
     (chats: Dictionary<Chat>, chatId: number, userId: number) =>
-      (chats[chatId] as GroupChat).adminIdList.includes(userId),
+      (chats[chatId] as GroupChat | undefined)?.adminIdList.includes(userId),
+  );
+
+  /** Whether the specified group chat is a broadcast chat. */
+  export const selectIsBroadcast = createSelector(
+    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
+    (chats: Dictionary<Chat>, chatId: number) => (chats[chatId] as GroupChat | undefined)?.isBroadcast,
   );
 
   /** Whether the chats have been fetched. */
