@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { Divider, Modal, Row } from 'antd';
 import PicSection from './pic-section/PicSection';
-import TitleSection from './TitleSection';
+import StatementSection from './StatementSection';
 
 export interface GroupChatModalProps {
   /** Whether the modal is visible. */
@@ -28,7 +28,9 @@ function GroupChatSection({ chatId }: GroupChatSectionProps): ReactElement {
     <Row style={{ padding: 16 }}>
       <PicSection chatId={chatId} />
       <Divider />
-      <TitleSection chatId={chatId} />
+      <StatementSection type='TITLE' chatId={chatId} />
+      <Divider />
+      <StatementSection type='DESCRIPTION' chatId={chatId} />
     </Row>
   );
 }

@@ -567,9 +567,16 @@ export namespace ChatsSlice {
     },
   );
 
-  export const selectGroupChatTitle = createSelector(
+  const selectGroupChat = createSelector(
     [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
-    (chats: Dictionary<Chat>, chatId: number) => (chats[chatId] as GroupChat | undefined)?.title,
+    (chats: Dictionary<Chat>, chatId: number) => chats[chatId] as GroupChat | undefined,
+  );
+
+  export const selectGroupChatTitle = createSelector(selectGroupChat, (chat: GroupChat | undefined) => chat?.title);
+
+  export const selectGroupChatDescription = createSelector(
+    selectGroupChat,
+    (chat: GroupChat | undefined) => chat?.description,
   );
 
   export const selectChat = createSelector(
