@@ -1,8 +1,8 @@
 import React, { ReactElement, ReactNode } from 'react';
 import { Col, Row, Tooltip, Typography } from 'antd';
 import { useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../../store/store';
-import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
+import { RootState, useThunkDispatch } from '../../../store/store';
+import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import TimeAgo from 'timeago-react';
 import { CheckCircleTwoTone, ClockCircleTwoTone } from '@ant-design/icons';
 
@@ -73,7 +73,7 @@ interface LastChatMessageTextProps {
 
 function LastChatMessageText({ chatId }: LastChatMessageTextProps): ReactElement {
   const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
-  useThunkDispatch(ChatsSlice.fetchChats());
+  useThunkDispatch(ChatsSlice.fetchChat(chatId));
   if (lastMessage === undefined) return <></>;
   let message: ReactNode;
   switch (lastMessage.__typename) {

@@ -13,6 +13,7 @@ import DevelopersSection from '../DevelopersSection';
 import ChatSection from './chat-section/ChatSection';
 import { queryOrMutate } from '@neelkamath/omni-chat';
 import setOnline from '../../setOnline';
+import CreateGroupChatSection from './CreateGroupChatSection';
 
 export default function ChatPage(): ReactElement {
   const [page, setPage] = useState(<LoadingPage />);
@@ -91,11 +92,13 @@ function LayoutContent(): ReactElement {
       return <SearchUsersSection type='CONTACTS' />;
     case 'SEARCH_USERS_SECTION':
       return <SearchUsersSection type='USERS' />;
-    case 'CHAT_PAGE_SUPPORT_SECTION':
+    case 'SUPPORT_SECTION':
       return <ChatPageSupportSection />;
     case 'DEVELOPERS_SECTION':
       return <DevelopersSection />;
     case 'CHAT_SECTION':
       return <ChatSection chatId={chatId!} />;
+    case 'CREATE_GROUP_CHAT':
+      return <CreateGroupChatSection />;
   }
 }

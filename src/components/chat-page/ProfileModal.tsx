@@ -5,7 +5,7 @@ import { RootState, useThunkDispatch } from '../../store/store';
 import { ContactsSlice } from '../../store/slices/ContactsSlice';
 import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
 import { PicsSlice } from '../../store/slices/PicsSlice';
-import OriginalProfilePic from './OriginalProfilePic';
+import OriginalPic from './OriginalPic';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
@@ -36,12 +36,12 @@ interface ProfileSectionProps {
   readonly hasChatButton: boolean;
 }
 
-function ProfileSection({ account, hasChatButton }: ProfileSectionProps) {
+function ProfileSection({ account, hasChatButton }: ProfileSectionProps): ReactElement {
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.userId, 'ORIGINAL'));
   useThunkDispatch(PicsSlice.fetchPic({ id: account.userId, type: 'PROFILE_PIC' }));
   const name = `${account.firstName} ${account.lastName}`.trim();
   return (
-    <List>
+    <List style={{ padding: 16 }}>
       {url === undefined && (
         <List.Item>
           <Spin />
@@ -49,7 +49,7 @@ function ProfileSection({ account, hasChatButton }: ProfileSectionProps) {
       )}
       {url !== undefined && url !== null && (
         <List.Item>
-          <OriginalProfilePic url={url} />
+          <OriginalPic type='PROFILE_PIC' url={url} />
         </List.Item>
       )}
       <List.Item>

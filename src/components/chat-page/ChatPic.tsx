@@ -1,15 +1,16 @@
 import React, { ReactElement } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../../store/store';
-import { PicsSlice } from '../../../../store/slices/PicsSlice';
-import CustomAvatar from '../../CustomAvatar';
+import { RootState, useThunkDispatch } from '../../store/store';
+import { PicsSlice } from '../../store/slices/PicsSlice';
+import CustomPic from './CustomPic';
 import { TeamOutlined, UserOutlined } from '@ant-design/icons';
-import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
+import { ChatsSlice } from '../../store/slices/ChatsSlice';
 
 export interface ChatPicProps {
   readonly chat: ChatsSlice.Chat;
 }
 
+/** {@link CustomPic} wrapper for chats. */
 export default function ChatPic({ chat }: ChatPicProps): ReactElement {
   switch (chat.__typename) {
     case 'PrivateChat':
@@ -30,7 +31,7 @@ function PrivateChatPic({ userId }: PrivateChatPicProps): ReactElement {
    */
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
   useThunkDispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
-  return <CustomAvatar icon={<UserOutlined />} url={url} />;
+  return <CustomPic icon={<UserOutlined />} url={url} />;
 }
 
 interface GroupChatPicProps {
@@ -44,5 +45,5 @@ function GroupChatPic({ chatId }: GroupChatPicProps): ReactElement {
    */
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'GROUP_CHAT_PIC', chatId, 'THUMBNAIL'));
   useThunkDispatch(PicsSlice.fetchPic({ id: chatId, type: 'GROUP_CHAT_PIC' }));
-  return <CustomAvatar icon={<TeamOutlined />} url={url} />;
+  return <CustomPic icon={<TeamOutlined />} url={url} />;
 }

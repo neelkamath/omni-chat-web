@@ -1,10 +1,11 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { Empty, message, Spin } from 'antd';
-import PrivateChatSection from './private-chat-section/PrivateChatSection';
-import GroupChatSection from './GroupChatSection';
+import { Empty, Layout, message, Spin } from 'antd';
 import { useSelector } from 'react-redux';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { RootState, useThunkDispatch } from '../../../store/store';
+import ChatMessage from './ChatMessage';
+import MessageCreator from './MessageCreator';
+import Header from './Header';
 
 export interface ChatSectionProps {
   readonly chatId: number;
@@ -12,7 +13,7 @@ export interface ChatSectionProps {
 
 export default function ChatSection({ chatId }: ChatSectionProps): ReactElement {
   const [section, setSection] = useState(<Spin style={{ padding: 16 }} />);
-  useThunkDispatch(ChatsSlice.fetchChats());
+  useThunkDispatch(ChatsSlice.fetchChat(chatId));
   const isDeletedPrivateChat = useSelector((state: RootState) => ChatsSlice.selectIsDeletedPrivateChat(state, chatId));
   const chat = useSelector((state: RootState) => ChatsSlice.selectChat(state, chatId));
   const onDeletedChat = () => {
@@ -23,16 +24,28 @@ export default function ChatSection({ chatId }: ChatSectionProps): ReactElement 
     if (isDeletedPrivateChat) onDeletedChat();
   }, [isDeletedPrivateChat]);
   useEffect(() => {
-    switch (chat?.__typename) {
-      case 'PrivateChat':
-        setSection(<PrivateChatSection chat={chat as ChatsSlice.PrivateChat} />);
-        break;
-      case 'GroupChat':
-        setSection(<GroupChatSection chat={chat as ChatsSlice.GroupChat} />);
-        break;
-      case undefined:
-        onDeletedChat();
-    }
+    if (chat?.__typename) setSection(<ChatSegment chat={chat as ChatsSlice.PrivateChat} />);
+    else if (chat?.__typename === 'GroupChat') setSection(<ChatSegment chat={chat as ChatsSlice.GroupChat} />);
   }, [chat]);
   return section;
+}
+
+interface ChatSegmentProps {
+  readonly chat: ChatsSlice.PrivateChat | ChatsSlice.GroupChat;
+}
+
+function ChatSegment({ chat }: ChatSegmentProps): ReactElement {
+  return (
+    <Layout>
+      <Layout.Header>
+        <Header chat={chat} />
+      </Layout.Header>
+      <Layout.Content style={{ padding: 16 }}>
+        {chat.messages.edges.map(({ node }) => (
+          <ChatMessage key={node.messageId} message={node} />
+        ))}
+        <MessageCreator chatId={chat.chatId} />
+      </Layout.Content>
+    </Layout>
+  );
 }

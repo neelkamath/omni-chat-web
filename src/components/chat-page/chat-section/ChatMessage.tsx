@@ -4,10 +4,10 @@ import { RootState, useThunkDispatch } from '../../../store/store';
 import { PicsSlice } from '../../../store/slices/PicsSlice';
 import { useSelector } from 'react-redux';
 import { DeleteOutlined, UserOutlined } from '@ant-design/icons';
-import CustomAvatar from '../CustomAvatar';
+import CustomPic from '../CustomPic';
 import { AccountSlice } from '../../../store/slices/AccountSlice';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
-import { queryOrMutate } from '@neelkamath/omni-chat';
+import { Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
 import { Storage } from '../../../Storage';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 
@@ -33,16 +33,12 @@ export default function ChatMessage({ message }: ChatMessageProps): ReactElement
   return (
     <Comment
       actions={actions}
-      avatar={<CustomAvatar icon={<UserOutlined />} url={url} />}
+      avatar={<CustomPic icon={<UserOutlined />} url={url} />}
       author={message.sender.username}
       content={(message as ChatsSlice.TextMessage).textMessage}
       datetime={message.sent}
     />
   );
-}
-
-interface Placeholder {
-  readonly __typename: 'Placeholder';
 }
 
 interface DeleteMessageResult {

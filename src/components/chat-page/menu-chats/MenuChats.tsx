@@ -1,11 +1,11 @@
 import React, { ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
+import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Card, Col, Row, Spin } from 'antd';
-import { useThunkDispatch } from '../../../../store/store';
-import ChatPic from './ChatPic';
+import { useThunkDispatch } from '../../../store/store';
+import ChatPic from '../ChatPic';
 import ChatMetadata from './ChatMetadata';
-import { ChatPageLayoutSlice } from '../../../../store/slices/ChatPageLayoutSlice';
+import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
 
 export default function MenuChats(): ReactElement {
   const chats = useSelector(ChatsSlice.selectChats);

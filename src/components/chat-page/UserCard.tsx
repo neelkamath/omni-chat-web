@@ -5,7 +5,7 @@ import ProfileModal from './ProfileModal';
 import { useSelector } from 'react-redux';
 import { PicsSlice } from '../../store/slices/PicsSlice';
 import { RootState, useThunkDispatch } from '../../store/store';
-import CustomAvatar from './CustomAvatar';
+import CustomPic from './CustomPic';
 import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
 
 export interface UserCardProps {
@@ -43,5 +43,5 @@ function ProfilePic({ userId }: ProfilePicProps): ReactElement {
    */
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
   useThunkDispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
-  return <CustomAvatar icon={<UserOutlined />} url={url} />;
+  return <CustomPic icon={<UserOutlined />} url={url} />;
 }

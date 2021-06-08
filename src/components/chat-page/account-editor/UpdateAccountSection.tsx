@@ -25,7 +25,6 @@ interface UpdateAccountFormData {
   readonly emailAddress: string;
   readonly firstName: string;
   readonly lastName: string;
-  readonly bio: string;
 }
 
 function UpdateAccountForm(): ReactElement {
@@ -39,7 +38,7 @@ function UpdateAccountForm(): ReactElement {
   if (account === undefined) return <Spin />;
   const onFinish = async (data: UpdateAccountFormData) => {
     setLoading(true);
-    const update = buildAccountUpdate({ ...data, bio: bio! });
+    const update = buildAccountUpdate(data, bio);
     if (validateAccountUpdate(update)) await operateUpdateAccount(account.emailAddress, update);
     setLoading(false);
   };
@@ -86,13 +85,10 @@ interface AccountUpdate {
   readonly bio: Bio;
 }
 
-function buildAccountUpdate({
-  username,
-  emailAddress,
-  firstName,
-  lastName,
-  bio,
-}: UpdateAccountFormData): AccountUpdate {
+function buildAccountUpdate(
+  { username, emailAddress, firstName, lastName }: UpdateAccountFormData,
+  bio: string,
+): AccountUpdate {
   return {
     username: username.trim(),
     password: null,
@@ -152,12 +148,12 @@ async function updateAccount(update: AccountUpdate): Promise<UpdateAccountResult
         httpApiConfig,
         {
           query: `
-          mutation UpdateAccount($update: AccountUpdate!) {
-            updateAccount(update: $update) {
-              __typename
+            mutation UpdateAccount($update: AccountUpdate!) {
+              updateAccount(update: $update) {
+                __typename
+              }
             }
-          }
-        `,
+          `,
           variables: { update },
         },
         Storage.readAccessToken()!,

@@ -11,7 +11,17 @@ import { FetchStatus, RootState } from '../store';
 import { BlockedUsersSlice } from './BlockedUsersSlice';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
-import { Bio, DateTime, GroupChatTitle, MessageText, Name, queryOrMutate, Username, Uuid } from '@neelkamath/omni-chat';
+import {
+  Bio,
+  DateTime,
+  GroupChatDescription,
+  GroupChatTitle,
+  MessageText,
+  Name,
+  queryOrMutate,
+  Username,
+  Uuid,
+} from '@neelkamath/omni-chat';
 
 /** Stores every chat the user is in. Group chats don't store their participants in {@link GroupChat.users}. */
 export namespace ChatsSlice {
@@ -99,13 +109,40 @@ export namespace ChatsSlice {
   export interface GroupChat extends Chat {
     readonly __typename: 'GroupChat';
     readonly title: GroupChatTitle;
+    readonly description: GroupChatDescription;
     readonly publicity: GroupChatPublicity;
     readonly isBroadcast: boolean;
+    readonly adminIdList: number[];
+    readonly users: GroupChatAccountsConnection;
+  }
+
+  export interface GroupChatAccountsConnection {
+    readonly edges: GroupChatAccountEdge[];
+  }
+
+  export interface GroupChatAccountEdge {
+    readonly node: GroupChatUserAccount;
+  }
+
+  export interface GroupChatUserAccount {
+    readonly userId: number;
   }
 
   async function operateReadChats(): Promise<ChatsConnection | undefined> {
     const result = await readChats();
     return result?.readChats;
+  }
+
+  async function operateReadChat(id: number): Promise<PrivateChat | GroupChat | undefined> {
+    const result = await readChat(id);
+    switch (result?.readChat.__typename) {
+      case 'GroupChat':
+      case 'PrivateChat':
+        return result.readChat;
+      case 'InvalidChatId':
+      case undefined:
+        return undefined;
+    }
   }
 
   interface ChatsConnection {
@@ -120,6 +157,66 @@ export namespace ChatsSlice {
     readonly readChats: ChatsConnection;
   }
 
+  const READ_CHAT_FRAGMENT = `
+    __typename
+    ... on Chat {
+      chatId
+      messages {
+        edges {
+          node {
+            __typename
+            sent
+            sender {
+              username
+              userId
+            }
+            messageId
+            ... on TextMessage {
+              textMessage
+            }
+            ... on ActionMessage {
+              actionableMessage {
+                text
+              }
+            }
+            ... on PicMessage {
+              caption
+            }
+            ... on PollMessage {
+              poll {
+                title
+              }
+            }
+          }
+        }
+      }
+    }
+    ... on PrivateChat {
+      user {
+        userId
+        username
+        firstName
+        lastName
+        emailAddress
+        bio
+      }
+    }
+    ... on GroupChat {
+      title
+      description
+      publicity
+      isBroadcast
+      adminIdList
+      users {
+        edges {
+          node {
+            userId
+          }
+        }
+      }
+    }
+  `;
+
   async function readChats(): Promise<ReadChatsResult | undefined> {
     return await operateGraphQlApi(
       async () =>
@@ -131,59 +228,40 @@ export namespace ChatsSlice {
                 readChats {
                   edges {
                     node {
-                      __typename
-                      ... on Chat {
-                        chatId
-                        messages {
-                          edges {
-                            node {
-                              __typename
-                              sent
-                              sender {
-                                username
-                                userId
-                              }
-                              messageId
-                              ... on TextMessage {
-                                textMessage
-                              }
-                              ... on ActionMessage {
-                                actionableMessage {
-                                  text
-                                }
-                              }
-                              ... on PicMessage {
-                                caption
-                              }
-                              ... on PollMessage {
-                                poll {
-                                  title
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                      ... on PrivateChat {
-                        user {
-                          userId
-                          username
-                          firstName
-                          lastName
-                          emailAddress
-                          bio
-                        }
-                      }
-                      ... on GroupChat {
-                        title
-                        publicity
-                        isBroadcast
-                      }
+                      ${READ_CHAT_FRAGMENT}
                     }
                   }
                 }
               }
             `,
+          },
+          Storage.readAccessToken()!,
+        ),
+    );
+  }
+
+  interface InvalidChatId {
+    readonly __typename: 'InvalidChatId';
+  }
+
+  interface ReadChatResult {
+    readonly readChat: PrivateChat | GroupChat | InvalidChatId;
+  }
+
+  async function readChat(id: number): Promise<ReadChatResult | undefined> {
+    return await operateGraphQlApi(
+      async () =>
+        await queryOrMutate(
+          httpApiConfig,
+          {
+            query: `
+              query ReadChat($id: Int!) {
+                readChat(id: $id) {
+                  ${READ_CHAT_FRAGMENT}
+                }
+              }
+            `,
+            variables: { id },
           },
           Storage.readAccessToken()!,
         ),
@@ -197,12 +275,21 @@ export namespace ChatsSlice {
     readonly status: FetchStatus;
     /** The IDs of private chats which were deleted because the user being chatted with deleted their account. */
     readonly deletedPrivateChatIdList: number[];
+    /** The IDs of chats currently being fetched by calls to {@link fetchChat}. */
+    readonly fetching: number[];
   }
 
   export const fetchChats = createAsyncThunk(`${sliceName}/fetchChats`, operateReadChats, {
     condition: (_, { getState }) => {
       const { chats } = getState() as { chats: State };
       return chats.status === 'IDLE';
+    },
+  });
+
+  export const fetchChat = createAsyncThunk(`${sliceName}/fetchChat`, operateReadChat, {
+    condition: (chatId, { getState }) => {
+      const { chats } = getState() as { chats: State };
+      return chats.entities[chatId] === undefined && !chats.fetching.includes(chatId);
     },
   });
 
@@ -304,79 +391,126 @@ export namespace ChatsSlice {
     readonly userId: number;
   }
 
+  interface UpdatedGroupChat {
+    readonly chatId: number;
+    readonly title: GroupChatTitle | null;
+    readonly description: GroupChatDescription | null;
+    readonly newUsers: UpdatedGroupChatAccount[] | null;
+    readonly removedUsers: UpdatedGroupChatAccount[] | null;
+    readonly adminIdList: number[] | null;
+    readonly isBroadcast: boolean | null;
+    readonly publicity: GroupChatPublicity | null;
+  }
+
+  interface UpdatedGroupChatAccount {
+    readonly userId: number;
+  }
+
+  function reduceUpdateGroupChat(state: Draft<State>, { payload }: PayloadAction<UpdatedGroupChat>): State | void {
+    const chat = state.entities[payload.chatId] as Draft<GroupChat> | undefined;
+    if (chat === undefined) return;
+    if (payload.adminIdList !== null) chat.adminIdList = payload.adminIdList;
+    if (payload.description !== null) chat.description = payload.description;
+    if (payload.title !== null) chat.title = payload.title;
+    if (payload.newUsers !== null) {
+      const nodes = payload.newUsers.map((user) => ({ node: user }));
+      chat.users.edges.push(...nodes);
+    }
+    if (payload.removedUsers !== null) {
+      const removedUsers = payload.removedUsers.map(({ userId }) => userId);
+      chat.users.edges = chat.users.edges.filter(({ node }) => !removedUsers.includes(node.userId));
+    }
+    if (payload.isBroadcast !== null) chat.isBroadcast = payload.isBroadcast;
+    if (payload.publicity !== null) chat.publicity = payload.publicity;
+  }
+
+  /** If there's a private chat with the specified user ID, then it'll be removed. */
+  function reduceRemovePrivateChat(state: Draft<State>, { payload }: PayloadAction<number>): State | void {
+    const chat = Object.values(state.entities).find(
+      (entity) => entity?.__typename === 'PrivateChat' && (entity as PrivateChat).user.userId === payload,
+    );
+    if (chat !== undefined) {
+      state.deletedPrivateChatIdList.push(chat.chatId);
+      adapter.removeOne(state, chat.chatId);
+    }
+  }
+
+  function reduceUpdateAccount(state: Draft<State>, { payload }: PayloadAction<UpdatedAccount>): State | void {
+    Object.values(state.entities).forEach((entity) => {
+      const node = entity?.messages.edges[0]?.node;
+      if (payload.userId === node?.sender.userId) node.sender = payload;
+      if (entity?.__typename === 'PrivateChat' && payload.userId === (entity as PrivateChat).user.userId)
+        (entity as Draft<PrivateChat>).user = payload;
+    });
+  }
+
+  function reduceDeleteMessage(state: Draft<State>, { payload }: PayloadAction<DeletedMessage>): State | void {
+    const messages = state.entities[payload.chatId]?.messages;
+    if (messages !== undefined)
+      messages.edges = messages.edges.filter(({ node }) => node.messageId !== payload.messageId);
+  }
+
+  function reduceRemoveUserChatMessages(
+    state: Draft<State>,
+    { payload }: PayloadAction<UserChatMessagesRemoval>,
+  ): State | void {
+    const messages = state.entities[payload.chatId]?.messages;
+    if (messages !== undefined)
+      messages.edges = messages.edges.filter(({ node }) => node.sender.userId !== payload.userId);
+  }
+
+  function reduceAddMessage(state: Draft<State>, { payload }: PayloadAction<NewMessage>): State | void {
+    const node: any = {
+      __typename: '',
+      sent: payload.sent,
+      sender: payload.sender,
+      state: payload.state,
+      messageId: payload.messageId,
+    };
+    switch (payload.__typename) {
+      case 'NewTextMessage':
+        node.__typename = 'TextMessage';
+        node.textMessage = (payload as NewTextMessage).textMessage;
+        break;
+      case 'NewActionMessage':
+        node.__typename = 'ActionMessage';
+        node.actionableMessage = (payload as NewActionMessage).actionableMessage;
+        break;
+      case 'NewPicMessage':
+        node.__typename = 'PicMessage';
+        node.caption = (payload as NewPicMessage).caption;
+        break;
+      case 'NewPollMessage':
+        node.__typename = 'PollMessage';
+        node.poll = (payload as NewPollMessage).poll;
+        break;
+      case 'NewAudioMessage':
+        node.__typename = 'AudioMessage';
+        break;
+      case 'NewDocMessage':
+        node.__typename = 'DocMessage';
+        break;
+      case 'NewGroupChatInviteMessage':
+        node.__typename = 'GroupChatInviteMessage';
+        node.inviteCode = (payload as NewGroupChatInviteMessage).inviteCode;
+        break;
+      case 'NewVideoMessage':
+        node.__typename = 'VideoMessage';
+    }
+    state.entities[payload.chatId]?.messages.edges.push({ node });
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE', fetching: [], deletedPrivateChatIdList: [] }) as State,
     reducers: {
       removeOne: adapter.removeOne,
-      /** If there's a private chat with the specified user ID, then it'll be removed. */
-      removePrivateChat: (state, { payload }: PayloadAction<number>) => {
-        const chat = Object.values(state.entities).find(
-          (entity) => entity?.__typename === 'PrivateChat' && (entity as PrivateChat).user.userId === payload,
-        );
-        if (chat !== undefined) {
-          state.deletedPrivateChatIdList.push(chat.chatId);
-          adapter.removeOne(state, chat.chatId);
-        }
-      },
-      updateAccount: (state, { payload }: PayloadAction<UpdatedAccount>) => {
-        Object.values(state.entities).forEach((entity) => {
-          const node = entity?.messages.edges[0]?.node;
-          if (payload.userId === node?.sender.userId) node.sender = payload;
-          if (entity?.__typename === 'PrivateChat' && payload.userId === (entity as PrivateChat).user.userId)
-            (entity as Draft<PrivateChat>).user = payload;
-        });
-      },
-      deleteMessage: (state, { payload }: PayloadAction<DeletedMessage>) => {
-        const messages = state.entities[payload.chatId]?.messages;
-        if (messages !== undefined)
-          messages.edges = messages.edges.filter(({ node }) => node.messageId !== payload.messageId);
-      },
-      removeUserChatMessages: (state, { payload }: PayloadAction<UserChatMessagesRemoval>) => {
-        const messages = state.entities[payload.chatId]?.messages;
-        if (messages !== undefined)
-          messages.edges = messages.edges.filter(({ node }) => node.sender.userId !== payload.userId);
-      },
-      addMessage: (state, { payload }: PayloadAction<NewMessage>) => {
-        const node: any = {
-          __typename: '',
-          sent: payload.sent,
-          sender: payload.sender,
-          state: payload.state,
-          messageId: payload.messageId,
-        };
-        switch (payload.__typename) {
-          case 'NewTextMessage':
-            node.__typename = 'TextMessage';
-            node.textMessage = (payload as NewTextMessage).textMessage;
-            break;
-          case 'NewActionMessage':
-            node.__typename = 'ActionMessage';
-            node.actionableMessage = (payload as NewActionMessage).actionableMessage;
-            break;
-          case 'NewPicMessage':
-            node.__typename = 'PicMessage';
-            node.caption = (payload as NewPicMessage).caption;
-            break;
-          case 'NewPollMessage':
-            node.__typename = 'PollMessage';
-            node.poll = (payload as NewPollMessage).poll;
-            break;
-          case 'NewAudioMessage':
-            node.__typename = 'AudioMessage';
-            break;
-          case 'NewDocMessage':
-            node.__typename = 'DocMessage';
-            break;
-          case 'NewGroupChatInviteMessage':
-            node.__typename = 'GroupChatInviteMessage';
-            node.inviteCode = (payload as NewGroupChatInviteMessage).inviteCode;
-            break;
-          case 'NewVideoMessage':
-            node.__typename = 'VideoMessage';
-        }
-        state.entities[payload.chatId]?.messages.edges.push({ node });
-      },
+      removePrivateChat: reduceRemovePrivateChat,
+      updateGroupChat: reduceUpdateGroupChat,
+      updateAccount: reduceUpdateAccount,
+      deleteMessage: reduceDeleteMessage,
+      removeUserChatMessages: reduceRemoveUserChatMessages,
+      addMessage: reduceAddMessage,
     },
     extraReducers: (builder) => {
       builder
@@ -393,6 +527,16 @@ export namespace ChatsSlice {
         })
         .addCase(fetchChats.pending, (state) => {
           state.status = 'LOADING';
+        })
+        .addCase(fetchChat.fulfilled, (state, { payload, meta }) => {
+          state.fetching = state.fetching.filter((chatId) => chatId !== meta.arg);
+          if (payload !== undefined) adapter.upsertOne(state, payload);
+        })
+        .addCase(fetchChat.rejected, (state, { meta }) => {
+          state.fetching = state.fetching.filter((chatId) => chatId !== meta.arg);
+        })
+        .addCase(fetchChat.pending, (state, { meta }) => {
+          state.fetching.push(meta.arg);
         });
     },
   });
@@ -403,6 +547,7 @@ export namespace ChatsSlice {
     removeOne,
     updateAccount,
     removePrivateChat,
+    updateGroupChat,
     deleteMessage,
     removeUserChatMessages,
     addMessage,
@@ -422,9 +567,25 @@ export namespace ChatsSlice {
     },
   );
 
+  export const selectGroupChatTitle = createSelector(
+    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
+    (chats: Dictionary<Chat>, chatId: number) => (chats[chatId] as GroupChat | undefined)?.title,
+  );
+
   export const selectChat = createSelector(
     [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
     (chats: Dictionary<Chat>, chatId: number) => chats[chatId],
+  );
+
+  /** Whether the specified user is an admin of the specified group chat. */
+  export const selectIsAdmin = createSelector(
+    [
+      (state: RootState) => state.chats.entities,
+      (_: RootState, chatId: number) => chatId,
+      (_state: RootState, _chatId: number, userId: number) => userId,
+    ],
+    (chats: Dictionary<Chat>, chatId: number, userId: number) =>
+      (chats[chatId] as GroupChat).adminIdList.includes(userId),
   );
 
   /** Whether the chats have been fetched. */

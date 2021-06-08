@@ -4,6 +4,7 @@ import {
   createSelector,
   createSlice,
   Dictionary,
+  Draft,
   EntityAdapter,
   EntityState,
   PayloadAction,
@@ -111,14 +112,17 @@ export namespace PicsSlice {
     },
   );
 
+  type State = ReturnType<typeof adapter.getInitialState>;
+
+  /** Removes the profile pic of the specified user. */
+  function reduceRemoveAccount(state: Draft<State>, { payload }: PayloadAction<number>): State | void {
+    adapter.removeOne(state, generateId('PROFILE_PIC', payload));
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState(),
-    reducers: {
-      /** Removes the profile pic of the specified user. */
-      removeAccount: (state, { payload }: PayloadAction<number>) =>
-        adapter.removeOne(state, generateId('PROFILE_PIC', payload)),
-    },
+    reducers: { removeAccount: reduceRemoveAccount },
     extraReducers: (builder) => {
       builder
         .addCase(fetchPic.rejected, ({ entities }, { meta, error }) => {

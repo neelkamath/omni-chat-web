@@ -1,11 +1,11 @@
 import React, { ReactElement, useState } from 'react';
 import { Form, message } from 'antd';
 import { isValidMessageTextScalar, MessageText, queryOrMutate } from '@neelkamath/omni-chat';
-import { httpApiConfig, operateGraphQlApi } from '../../../../api';
-import { Storage } from '../../../../Storage';
-import store from '../../../../store/store';
-import { ChatPageLayoutSlice } from '../../../../store/slices/ChatPageLayoutSlice';
-import GfmFormItem from '../../GfmFormItem';
+import { httpApiConfig, operateGraphQlApi } from '../../../api';
+import { Storage } from '../../../Storage';
+import store from '../../../store/store';
+import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
+import GfmFormItem from '../GfmFormItem';
 
 export interface MessageCreatorProps {
   readonly chatId: number;

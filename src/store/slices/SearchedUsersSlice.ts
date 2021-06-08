@@ -1,4 +1,4 @@
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Draft } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { Cursor, Name, queryOrMutate, Username } from '@neelkamath/omni-chat';
 import { ForwardPagination } from '../../pagination';
@@ -235,16 +235,16 @@ export namespace SearchedUsersSlice {
     );
   }
 
+  function reduceClear(state: Draft<State>): State | void {
+    state.query = undefined;
+    state.hasNextPage = undefined;
+    adapter.removeAll(state);
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState() as State,
-    reducers: {
-      clear: (state) => {
-        state.query = undefined;
-        state.hasNextPage = undefined;
-        adapter.removeAll(state);
-      },
-    },
+    reducers: { clear: reduceClear },
     extraReducers: (builder) => {
       builder
         .addCase(fetchAdditional.fulfilled, (state, { payload }) => {

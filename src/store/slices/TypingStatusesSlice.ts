@@ -4,6 +4,7 @@ import {
   createSelector,
   createSlice,
   Dictionary,
+  Draft,
   EntityAdapter,
   PayloadAction,
 } from '@reduxjs/toolkit';
@@ -17,6 +18,8 @@ export namespace TypingStatusesSlice {
 
   export interface Entity {
     readonly id: string; // Generated using <generateId()>.
+    readonly chatId: number;
+    readonly userId: number;
     readonly isTyping: boolean;
   }
 
@@ -36,7 +39,7 @@ export namespace TypingStatusesSlice {
     async () => {
       const result = await readTypingUsers();
       return result?.readTypingUsers.flatMap(({ chatId, users }) =>
-        users.map(({ userId }) => ({ id: generateId(userId, chatId), isTyping: true })),
+        users.map(({ userId }) => ({ id: generateId(userId, chatId), chatId, userId, isTyping: true })),
       );
     },
     {
@@ -88,20 +91,22 @@ export namespace TypingStatusesSlice {
     readonly isTyping: boolean;
   }
 
+  function reduceUpsertOne(state: Draft<State>, { payload }: PayloadAction<TypingStatus>): State | void {
+    const entity = { id: generateId(payload.userId, payload.chatId), ...payload };
+    adapter.upsertOne(state, entity);
+  }
+
+  /** Removes the specified user ID's statuses. */
+  function reduceRemoveUser(state: Draft<State>, { payload }: PayloadAction<number>): State | void {
+    Object.values(state.entities).forEach((entity) => {
+      if (entity !== undefined && entity.id.startsWith(`${payload}_`)) adapter.removeOne(state, entity.id);
+    });
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
-    reducers: {
-      upsertOne: (state, { payload }: PayloadAction<TypingStatus>) => {
-        const entity = { id: generateId(payload.userId, payload.chatId), ...payload };
-        adapter.upsertOne(state, entity);
-      },
-      /** Removes the specified user ID's statuses. */
-      removeUser: (state, { payload }: PayloadAction<number>) =>
-        Object.values(state.entities).forEach((entity) => {
-          if (entity !== undefined && entity.id.startsWith(`${payload}_`)) adapter.removeOne(state, entity.id);
-        }),
-    },
+    reducers: { upsertOne: reduceUpsertOne, removeUser: reduceRemoveUser },
     extraReducers: (builder) => {
       builder
         .addCase(fetchStatuses.rejected, (state) => {
@@ -129,5 +134,13 @@ export namespace TypingStatusesSlice {
     ],
     (entities: Dictionary<Entity>, userId: number, chatId: number) =>
       entities[generateId(userId, chatId)]?.isTyping === true,
+  );
+
+  export const selectTyping = createSelector(
+    [(state: RootState) => state.typingStatuses.entities, (_: RootState, chatId: number) => chatId],
+    (entities: Dictionary<Entity>, chatId: number) =>
+      Object.values(entities)
+        .filter((entity) => entity?.chatId === chatId)
+        .map((entity) => entity?.userId),
   );
 }

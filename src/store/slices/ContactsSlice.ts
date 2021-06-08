@@ -3,6 +3,7 @@ import {
   createEntityAdapter,
   createSelector,
   createSlice,
+  Draft,
   EntityAdapter,
   PayloadAction,
 } from '@reduxjs/toolkit';
@@ -42,7 +43,7 @@ export namespace ContactsSlice {
     readonly node: Account;
   }
 
-  interface Account {
+  export interface Account {
     readonly userId: number;
   }
 
@@ -82,16 +83,14 @@ export namespace ContactsSlice {
     readonly bio: Bio;
   }
 
+  function reduceUpdateOne(state: Draft<State>, { payload }: PayloadAction<UpdatedAccount>): State | void {
+    adapter.updateOne(state, { id: payload.userId, changes: payload });
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
-    reducers: {
-      updateOne: (state, { payload }: PayloadAction<UpdatedAccount>) => {
-        adapter.updateOne(state, { id: payload.userId, changes: payload });
-      },
-      removeOne: adapter.removeOne,
-      upsertOne: adapter.upsertOne,
-    },
+    reducers: { updateOne: reduceUpdateOne, removeOne: adapter.removeOne, upsertOne: adapter.upsertOne },
     extraReducers: (builder) => {
       builder
         .addCase(fetchContacts.pending, (state) => {

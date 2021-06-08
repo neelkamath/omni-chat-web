@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSelector, createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
@@ -74,14 +74,14 @@ export namespace AccountSlice {
     readonly bio: Bio;
   }
 
+  function reduceUpdate(state: Draft<State>, { payload }: PayloadAction<UpdatedAccount>): State | void {
+    state.data = payload;
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: { isLoading: false } as State,
-    reducers: {
-      update: (state, { payload }: PayloadAction<UpdatedAccount>) => {
-        state.data = payload;
-      },
-    },
+    reducers: { update: reduceUpdate },
     extraReducers: (builder) => {
       builder
         .addCase(fetchAccount.rejected, (state) => {

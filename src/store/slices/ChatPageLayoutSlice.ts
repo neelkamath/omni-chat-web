@@ -1,4 +1,4 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, Draft, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
 export namespace ChatPageLayoutSlice {
@@ -14,7 +14,7 @@ export namespace ChatPageLayoutSlice {
    * - `'ACCOUNT_EDITOR'` indicates `<AccountEditor />`.
    * - `'CONTACTS_SECTION'` indicates `<ContactsSection />`.
    * - `'SEARCH_USERS_SECTION'` indicates `<SearchUsersSection />`.
-   * - `'CHAT_PAGE_SUPPORT_SECTION'` indicates `<ChatPageSupportSection />`.
+   * - `'SUPPORT_SECTION'` indicates `<ChatPageSupportSection />`.
    * - `'DEVELOPERS_SECTION'` indicates `<DevelopersSection />`.
    * - `'CHAT_SECTION'` indicates `<ChatSection />`.
    */
@@ -24,14 +24,19 @@ export namespace ChatPageLayoutSlice {
     | 'ACCOUNT_EDITOR'
     | 'CONTACTS_SECTION'
     | 'SEARCH_USERS_SECTION'
-    | 'CHAT_PAGE_SUPPORT_SECTION'
+    | 'SUPPORT_SECTION'
     | 'DEVELOPERS_SECTION'
-    | 'CHAT_SECTION';
+    | 'CHAT_SECTION'
+    | 'CREATE_GROUP_CHAT';
+
+  function reduceUpdate(_: Draft<State>, { payload }: PayloadAction<State>): State | void {
+    return payload;
+  }
 
   const slice = createSlice({
     name: 'chatPageLayout',
     initialState: { type: 'EMPTY' } as State,
-    reducers: { update: (_, { payload }: PayloadAction<State>) => payload },
+    reducers: { update: reduceUpdate },
   });
 
   export const { reducer } = slice;

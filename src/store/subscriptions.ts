@@ -11,6 +11,8 @@ import {
   Bio,
   DateTime,
   GraphQlResponse,
+  GroupChatDescription,
+  GroupChatTitle,
   MessageText,
   Name,
   OnSocketClose,
@@ -242,7 +244,20 @@ interface UpdatedGroupChatPic {
 interface UpdatedGroupChat {
   readonly __typename: 'UpdatedGroupChat';
   readonly chatId: number;
+  readonly title: GroupChatTitle | null;
+  readonly description: GroupChatDescription | null;
+  readonly newUsers: UpdatedGroupChatAccount[] | null;
+  readonly removedUsers: UpdatedGroupChatAccount[] | null;
+  readonly adminIdList: number[] | null;
+  readonly isBroadcast: boolean | null;
+  readonly publicity: GroupChatPublicity | null;
 }
+
+interface UpdatedGroupChatAccount {
+  readonly userId: number;
+}
+
+export type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
 
 interface ExitedUsers {
   readonly __typename: 'ExitedUsers';
@@ -271,6 +286,17 @@ async function subscribeToChats(): Promise<void> {
             }
             ... on UpdatedGroupChat {
               chatId
+              title
+              description
+              newUsers {
+                userId
+              }
+              removedUsers {
+                userId
+              }
+              adminIdList
+              isBroadcast
+              publicity
             }
             ... on UpdatedGroupChatPic {
               chatId
@@ -289,14 +315,14 @@ async function subscribeToChats(): Promise<void> {
             resolve();
             break;
           case 'GroupChatId':
-            store.dispatch(ChatsSlice.fetchChats());
+            store.dispatch(ChatsSlice.fetchChat(message.chatId));
             break;
           case 'ExitedUsers':
             if (message.userIdList.includes(Storage.readUserId()!))
               store.dispatch(ChatsSlice.removeOne(message.chatId));
             break;
           case 'UpdatedGroupChat':
-            store.dispatch(ChatsSlice.fetchChats());
+            store.dispatch(ChatsSlice.updateGroupChat(message));
             break;
           case 'UpdatedGroupChatPic':
             store.dispatch(PicsSlice.fetchPic({ id: message.chatId, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));

@@ -1,4 +1,11 @@
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+  Draft,
+  PayloadAction,
+} from '@reduxjs/toolkit';
 import { FetchStatus, RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
@@ -85,13 +92,15 @@ export namespace BlockedUsersSlice {
     readonly bio: Bio;
   }
 
+  function reduceUpdateAccount(state: Draft<State>, { payload }: PayloadAction<UpdatedAccount>): State | void {
+    adapter.updateOne(state, { id: payload.userId, changes: payload });
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: {
-      updateAccount: (state, { payload }: PayloadAction<UpdatedAccount>) => {
-        adapter.updateOne(state, { id: payload.userId, changes: payload });
-      },
+      updateAccount: reduceUpdateAccount,
       upsertOne: adapter.upsertOne,
       removeOne: adapter.removeOne,
     },

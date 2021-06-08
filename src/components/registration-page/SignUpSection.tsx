@@ -76,7 +76,6 @@ interface AccountInput {
   readonly bio: Bio;
 }
 
-// TODO: Delete the empty string fields once GraphQL Java 16.3 (currently unreleased) is used by Omni Chat Backend.
 function buildAccountInput(data: SignUpFormData): AccountInput {
   return {
     username: data.username.trim(),
