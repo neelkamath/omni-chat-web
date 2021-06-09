@@ -608,6 +608,12 @@ export namespace ChatsSlice {
     (chats: Dictionary<Chat>, chatId: number) => (chats[chatId] as GroupChat | undefined)?.isBroadcast,
   );
 
+  /** The publicity of the specified group chat. */
+  export const selectPublicity = createSelector(
+    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
+    (chats: Dictionary<Chat>, chatId: number) => (chats[chatId] as GroupChat | undefined)?.publicity,
+  );
+
   /** Whether the chats have been fetched. */
   export const selectIsLoaded = createSelector(
     (state: RootState) => state.chats.status,

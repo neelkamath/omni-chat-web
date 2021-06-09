@@ -19,6 +19,7 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
       if (await operateCreateTextMessage(chatId, text)) setValue('');
     } else message.error('Messages must contain characters other than spaces.', 5);
   };
+  // FIXME: Doesn't re-render when <chatId> changes.
   return (
     <Form name='createMessage'>
       <GfmFormItem value={value} setValue={setValue} maxLength={10_000} name='text' onPressEnter={onFinish} />
