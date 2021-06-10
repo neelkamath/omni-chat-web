@@ -31,16 +31,11 @@ export default function AddUsersSection({ chatId }: AddUsersSectionProps): React
     if (result !== undefined) message.success('User added.', 3);
   };
   return (
-    <Space direction='vertical'>
-      <Typography.Text strong>Add Users</Typography.Text>
-      <SearchUsersSection
-        extraRenderer={(userId) =>
-          userIdList.includes(userId) ? <ParticipantIndicator /> : <NonparticipantIndicator />
-        }
-        popconfirmation={{ title: 'Add user', onConfirm }}
-        type='CONTACTS'
-      />
-    </Space>
+    <SearchUsersSection
+      extraRenderer={(userId) => (userIdList.includes(userId) ? <ParticipantIndicator /> : <NonparticipantIndicator />)}
+      popconfirmation={{ title: 'Add user', onConfirm }}
+      type='CONTACTS'
+    />
   );
 }
 

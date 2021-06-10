@@ -34,7 +34,6 @@ export default function ActionableUserCard({
   extraRenderer,
 }: ActionableUserCardProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
-  const [isLoading, setLoading] = useState(false);
   const card = <UserCard extraRenderer={extraRenderer} account={account} onClick={() => setVisible(true)} />;
   if (popconfirmation === undefined)
     return (
@@ -43,21 +42,11 @@ export default function ActionableUserCard({
         <ProfileModal account={account} isVisible={isVisible} onCancel={() => setVisible(false)} hasChatButton={true} />
       </>
     );
-  const onConfirm = async () => {
-    setLoading(true);
-    await popconfirmation.onConfirm(account.userId);
-    setLoading(false);
-    setVisible(false);
-  };
   return (
     <Popconfirm
       title={popconfirmation.title}
-      visible={isVisible}
       placement='right'
-      onConfirm={onConfirm}
-      okButtonProps={{ loading: isLoading }}
-      onCancel={() => setVisible(false)}
-      onVisibleChange={() => setVisible(!isVisible)}
+      onConfirm={() => popconfirmation.onConfirm(account.userId)}
     >
       {card}
     </Popconfirm>

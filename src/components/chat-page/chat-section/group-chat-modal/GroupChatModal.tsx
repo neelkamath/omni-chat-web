@@ -1,12 +1,12 @@
 import React, { ReactElement } from 'react';
-import { Divider, Modal, Row } from 'antd';
+import { Collapse, Divider, Modal, Row } from 'antd';
 import PicSection from './pic-section/PicSection';
 import StatementSection from './StatementSection';
 import BroadcastSection from './BroadcastSection';
 import PublicitySection from './PublicitySection';
 import LeaveSection from './LeaveSection';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../../store/store';
+import { RootState, useThunkDispatch } from '../../../../store/store';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import { Storage } from '../../../../Storage';
 import AddUsersSection from './AddUsersSection';
@@ -33,7 +33,6 @@ interface GroupChatSectionProps {
 }
 
 function GroupChatSection({ chatId }: GroupChatSectionProps): ReactElement {
-  const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   return (
     <Row style={{ padding: 16 }}>
       <PicSection chatId={chatId} />
@@ -45,20 +44,33 @@ function GroupChatSection({ chatId }: GroupChatSectionProps): ReactElement {
       <BroadcastSection chatId={chatId} />
       <Divider />
       <PublicitySection chatId={chatId} />
-      {isAdmin && (
-        <>
-          <Divider />
-          <AddUsersSection chatId={chatId} />
-        </>
-      )}
-      {isAdmin && (
-        <>
-          <Divider />
-          <RemoveUsersSection chatId={chatId} />
-        </>
-      )}
+      <Divider />
+      <UsersAccordion chatId={chatId} />
       <Divider />
       <LeaveSection chatId={chatId} />
     </Row>
+  );
+}
+
+interface UsersAccordionProps {
+  readonly chatId: number;
+}
+
+function UsersAccordion({ chatId }: UsersAccordionProps): ReactElement {
+  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
+  return (
+    <Collapse accordion ghost>
+      {isAdmin && (
+        <Collapse.Panel header='Add users' key={1}>
+          <AddUsersSection chatId={chatId} />
+        </Collapse.Panel>
+      )}
+      {isAdmin && (
+        <Collapse.Panel header='Remove users' key={2}>
+          <RemoveUsersSection chatId={chatId} />
+        </Collapse.Panel>
+      )}
+    </Collapse>
   );
 }

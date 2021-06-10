@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { message, Space, Spin, Typography } from 'antd';
+import { message, Spin, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import { queryOrMutate } from '@neelkamath/omni-chat';
 import { RootState, useThunkDispatch } from '../../../../store/store';
@@ -18,25 +18,27 @@ export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps):
   const userId = Storage.readUserId()!;
   if (participants === undefined) return <Spin />;
   const onConfirm = async (userId: number) => {
+    message.info('Removing the user...', 3);
     const result = await removeGroupChatUsers(chatId, [userId]);
     if (result?.removeGroupChatUsers === null) message.success('User removed.', 3);
   };
+  const cards = participants
+    .filter((participant) => participant.userId !== userId)
+    .map((participant) => (
+      <ActionableUserCard
+        key={participant.userId}
+        account={participant}
+        popconfirmation={{ title: 'Remove user', onConfirm }}
+      />
+    ));
   return (
-    <Space direction='vertical'>
+    <>
       <Typography.Text strong>Remove Users</Typography.Text>
       <Typography.Paragraph>
         Removed users&apos; messages and votes on polls won&apos;t get deleted.
       </Typography.Paragraph>
-      {participants
-        .filter((participant) => participant.userId !== userId)
-        .map((participant) => (
-          <ActionableUserCard
-            key={participant.userId}
-            account={participant}
-            popconfirmation={{ title: 'Remove user', onConfirm }}
-          />
-        ))}
-    </Space>
+      {cards.length === 0 ? "You're the only participant." : cards}
+    </>
   );
 }
 
