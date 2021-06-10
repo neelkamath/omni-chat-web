@@ -51,7 +51,6 @@ Here's how to test the production build:
   - It's consistent to store state only in one state manager.
   - Redux is faster.
   - When using React Context, you need to remember to keep the React component using it nested inside of it.
-- TypeScript interfaces which specify Ant Design form fields (e.g., [`interface ResetPasswordFormData`](src/components/sign-in-page/ResetPasswordSection.tsx)) must be named using the format `<FORM>FormData`, where `<FORM>` is the name of the form.
 - Here's an example of how to name images when importing them in TypeScript: To import `happy-news.svg`, write:
 
   ```typescript

@@ -12,7 +12,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import logOut from '../../logOut';
-import MenuChats from './menu-chats/MenuChats';
+import MenuChats from './MenuChats';
 import { useDispatch, useSelector } from 'react-redux';
 import { PicsSlice } from '../../store/slices/PicsSlice';
 import { RootState, useThunkDispatch } from '../../store/store';

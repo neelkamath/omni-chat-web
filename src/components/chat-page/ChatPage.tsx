@@ -7,7 +7,7 @@ import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { useSelector } from 'react-redux';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import AccountEditor from './account-editor/AccountEditor';
-import SearchUsersSection from './search-users-section/SearchUsersSection';
+import SearchUsersSection from './SearchUsersSection';
 import ChatPageSupportSection from './ChatPageSupportSection';
 import DevelopersSection from '../DevelopersSection';
 import ChatSection from './chat-section/ChatSection';

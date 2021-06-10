@@ -1,16 +1,51 @@
 import React, { ReactElement, ReactNode } from 'react';
-import { Col, Row, Tooltip, Typography } from 'antd';
-import { useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../store/store';
-import { ChatsSlice } from '../../../store/slices/ChatsSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { ChatsSlice } from '../../store/slices/ChatsSlice';
+import { Card, Col, Row, Spin, Tooltip, Typography } from 'antd';
+import { RootState, useThunkDispatch } from '../../store/store';
+import ChatPic from './ChatPic';
+import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import TimeAgo from 'timeago-react';
 import { CheckCircleTwoTone, ClockCircleTwoTone } from '@ant-design/icons';
 
-export interface ChatMetadataProps {
+export default function MenuChats(): ReactElement {
+  const chats = useSelector(ChatsSlice.selectChats);
+  const isLoading = !useSelector(ChatsSlice.selectIsLoaded);
+  useThunkDispatch(ChatsSlice.fetchChats());
+  if (isLoading) return <Spin style={{ padding: 16 }} />;
+  const cards = chats.map((chat) => <ChatCard key={chat.chatId} chat={chat} />);
+  return <>{cards}</>;
+}
+
+interface ChatCardProps {
   readonly chat: ChatsSlice.Chat;
 }
 
-export default function ChatMetadata({ chat }: ChatMetadataProps): ReactElement {
+function ChatCard({ chat }: ChatCardProps): ReactElement {
+  const dispatch = useDispatch();
+  return (
+    <Card
+      size='small'
+      hoverable={true}
+      onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_SECTION', chatId: chat.chatId }))}
+    >
+      <Row gutter={16}>
+        <Col>
+          <ChatPic chat={chat} />
+        </Col>
+        <Col>
+          <ChatMetadata chat={chat} />
+        </Col>
+      </Row>
+    </Card>
+  );
+}
+
+interface ChatMetadataProps {
+  readonly chat: ChatsSlice.Chat;
+}
+
+function ChatMetadata({ chat }: ChatMetadataProps): ReactElement {
   return (
     <>
       <Row gutter={16} justify='space-between'>

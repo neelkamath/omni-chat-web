@@ -632,6 +632,15 @@ export namespace ChatsSlice {
     },
   );
 
+  /** Returns the IDs of users in the specified group chat, or `undefined` if the chat hasn't been fetched. */
+  export const selectUserIdList = createSelector(
+    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
+    (chats: Dictionary<Chat>, chatId: number) => {
+      const chat = chats[chatId] as GroupChat | undefined;
+      return chat?.users.edges.map(({ node }) => node.userId);
+    },
+  );
+
   /** Whether the specified private chat belongs to a user who deleted their account, and therefore deleted the chat. */
   export const selectIsDeletedPrivateChat = createSelector(
     [(state: RootState) => state.chats.deletedPrivateChatIdList, (_: RootState, chatId: number) => chatId],

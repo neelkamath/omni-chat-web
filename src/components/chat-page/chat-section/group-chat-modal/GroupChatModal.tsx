@@ -5,6 +5,11 @@ import StatementSection from './StatementSection';
 import BroadcastSection from './BroadcastSection';
 import PublicitySection from './PublicitySection';
 import LeaveSection from './LeaveSection';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../store/store';
+import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
+import { Storage } from '../../../../Storage';
+import AddUsersSection from './AddUsersSection';
 
 export interface GroupChatModalProps {
   /** Whether the modal is visible. */
@@ -27,6 +32,7 @@ interface GroupChatSectionProps {
 }
 
 function GroupChatSection({ chatId }: GroupChatSectionProps): ReactElement {
+  const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   return (
     <Row style={{ padding: 16 }}>
       <PicSection chatId={chatId} />
@@ -38,6 +44,12 @@ function GroupChatSection({ chatId }: GroupChatSectionProps): ReactElement {
       <BroadcastSection chatId={chatId} />
       <Divider />
       <PublicitySection chatId={chatId} />
+      {isAdmin && (
+        <>
+          <Divider />
+          <AddUsersSection chatId={chatId} />
+        </>
+      )}
       <Divider />
       <LeaveSection chatId={chatId} />
     </Row>
