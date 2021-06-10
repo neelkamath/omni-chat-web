@@ -126,6 +126,11 @@ export namespace ChatsSlice {
 
   export interface GroupChatUserAccount {
     readonly userId: number;
+    readonly username: Username;
+    readonly emailAddress: string;
+    readonly firstName: Name;
+    readonly lastName: Name;
+    readonly bio: Bio;
   }
 
   async function operateReadChats(): Promise<ChatsConnection | undefined> {
@@ -211,6 +216,11 @@ export namespace ChatsSlice {
         edges {
           node {
             userId
+            username
+            emailAddress
+            firstName
+            lastName
+            bio
           }
         }
       }
@@ -404,6 +414,16 @@ export namespace ChatsSlice {
 
   interface UpdatedGroupChatAccount {
     readonly userId: number;
+    readonly username: Username;
+    readonly emailAddress: string;
+    readonly firstName: Name;
+    readonly lastName: Name;
+    readonly bio: Bio;
+  }
+
+  interface ExitedUsers {
+    readonly chatId: number;
+    readonly userIdList: number[];
   }
 
   function reduceUpdateGroupChat(state: Draft<State>, { payload }: PayloadAction<UpdatedGroupChat>): State | void {
@@ -441,6 +461,15 @@ export namespace ChatsSlice {
       if (payload.userId === node?.sender.userId) node.sender = payload;
       if (entity?.__typename === 'PrivateChat' && payload.userId === (entity as PrivateChat).user.userId)
         (entity as Draft<PrivateChat>).user = payload;
+    });
+  }
+
+  function reduceRemoveGroupChatUsers(state: Draft<State>, { payload }: PayloadAction<ExitedUsers>): State | void {
+    Object.values(state.entities).forEach((entity) => {
+      if (entity === undefined || entity.chatId !== payload.chatId) return;
+      const { chatId, users } = entity as Draft<GroupChat>;
+      if (chatId === payload.chatId)
+        users.edges = users.edges.filter(({ node }) => !payload.userIdList.includes(node.userId));
     });
   }
 
@@ -511,6 +540,7 @@ export namespace ChatsSlice {
       deleteMessage: reduceDeleteMessage,
       removeUserChatMessages: reduceRemoveUserChatMessages,
       addMessage: reduceAddMessage,
+      removeGroupChatUsers: reduceRemoveGroupChatUsers,
     },
     extraReducers: (builder) => {
       builder
@@ -551,6 +581,7 @@ export namespace ChatsSlice {
     deleteMessage,
     removeUserChatMessages,
     addMessage,
+    removeGroupChatUsers,
   } = slice.actions;
 
   const { selectAll } = adapter.getSelectors((state: RootState) => state.chats);
@@ -633,11 +664,20 @@ export namespace ChatsSlice {
   );
 
   /** Returns the IDs of users in the specified group chat, or `undefined` if the chat hasn't been fetched. */
-  export const selectUserIdList = createSelector(
+  export const selectParticipantIdList = createSelector(
     [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
     (chats: Dictionary<Chat>, chatId: number) => {
       const chat = chats[chatId] as GroupChat | undefined;
       return chat?.users.edges.map(({ node }) => node.userId);
+    },
+  );
+
+  /** Returns the specified group chat's participants, or `undefined` if the chat hasn't been fetched. */
+  export const selectParticipants = createSelector(
+    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
+    (chats: Dictionary<Chat>, chatId: number) => {
+      const chat = chats[chatId] as GroupChat | undefined;
+      return chat?.users.edges.map(({ node }) => node);
     },
   );
 

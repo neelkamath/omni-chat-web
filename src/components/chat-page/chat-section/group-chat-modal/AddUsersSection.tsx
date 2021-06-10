@@ -16,7 +16,7 @@ export interface AddUsersSectionProps {
 
 export default function AddUsersSection({ chatId }: AddUsersSectionProps): ReactElement {
   useThunkDispatch(ChatsSlice.fetchChat(chatId));
-  const userIdList = useSelector((state: RootState) => ChatsSlice.selectUserIdList(state, chatId));
+  const userIdList = useSelector((state: RootState) => ChatsSlice.selectParticipantIdList(state, chatId));
   useEffect(() => {
     SearchedUsersSlice.clear();
     SearchedUsersSlice.fetchInitialState('CONTACTS');
@@ -32,7 +32,7 @@ export default function AddUsersSection({ chatId }: AddUsersSectionProps): React
   };
   return (
     <Space direction='vertical'>
-      <Typography.Text strong>Add users</Typography.Text>
+      <Typography.Text strong>Add Users</Typography.Text>
       <SearchUsersSection
         extraRenderer={(userId) =>
           userIdList.includes(userId) ? <ParticipantIndicator /> : <NonparticipantIndicator />

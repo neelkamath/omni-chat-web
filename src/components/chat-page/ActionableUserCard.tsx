@@ -57,6 +57,7 @@ export default function ActionableUserCard({
       onConfirm={onConfirm}
       okButtonProps={{ loading: isLoading }}
       onCancel={() => setVisible(false)}
+      onVisibleChange={() => setVisible(!isVisible)}
     >
       {card}
     </Popconfirm>

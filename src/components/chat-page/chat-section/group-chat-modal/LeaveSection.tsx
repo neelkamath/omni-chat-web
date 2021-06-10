@@ -1,44 +1,63 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, message, Space, Tooltip } from 'antd';
+import { Button, message, Popconfirm, Space, Typography } from 'antd';
 import { queryOrMutate } from '@neelkamath/omni-chat';
-import store, { useThunkDispatch } from '../../../../store/store';
-import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import { Storage } from '../../../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
-import { QuestionCircleOutlined } from '@ant-design/icons';
 import { ChatPageLayoutSlice } from '../../../../store/slices/ChatPageLayoutSlice';
+import { useDispatch } from 'react-redux';
 
 export interface LeaveSectionProps {
   readonly chatId: number;
 }
 
 export default function LeaveSection({ chatId }: LeaveSectionProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  return (
+    <Space direction='vertical'>
+      <Typography.Text strong>Leave Chat</Typography.Text>
+      <Typography.Paragraph>
+        Your messages and votes on polls will remain if you leave the chat. Messages you&apos;ve starred in the chat
+        will get unstarred for you.
+      </Typography.Paragraph>
+      <Typography.Paragraph>
+        You can&apos;t leave if the chat has other participants, and you&apos;re the last admin. In such a case,
+        you&apos;ll have to first appoint another participant as an admin.
+      </Typography.Paragraph>
+      <LeaveButton chatId={chatId} />
+    </Space>
+  );
+}
+
+interface LeaveButtonProps {
+  readonly chatId: number;
+}
+
+function LeaveButton({ chatId }: LeaveButtonProps): ReactElement {
+  const dispatch = useDispatch();
+  const [isVisible, setVisible] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const onClick = async () => {
+  const onConfirm = async () => {
     setLoading(true);
     const result = await leaveGroupChat(chatId);
     setLoading(false);
+    setVisible(false);
     if (result?.leaveGroupChat === null) {
       message.success('You left the chat.', 3);
-      store.dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
+      dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
     } else if (result?.leaveGroupChat.__typename === 'CannotLeaveChat')
       message.error('You must first appoint another participant as an admin.', 5);
   };
   return (
-    <Button danger onClick={onClick} loading={isLoading}>
-      <Tooltip
-        title={
-          "You can't leave if the chat has other participants, and you're the last admin. In such a case, you'll " +
-          'have to first appoint another participant as an admin.'
-        }
-        placement='right'
-      >
-        <Space>
-          Leave <QuestionCircleOutlined />
-        </Space>
-      </Tooltip>
-    </Button>
+    <Popconfirm
+      title='Leave'
+      visible={isVisible}
+      onConfirm={onConfirm}
+      okButtonProps={{ loading: isLoading }}
+      onCancel={() => setVisible(false)}
+    >
+      <Button onClick={() => setVisible(true)} danger>
+        Leave the chat
+      </Button>
+    </Popconfirm>
   );
 }
 

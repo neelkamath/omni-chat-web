@@ -10,6 +10,7 @@ import { RootState } from '../../../../store/store';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import { Storage } from '../../../../Storage';
 import AddUsersSection from './AddUsersSection';
+import RemoveUsersSection from './RemoveUsersSection';
 
 export interface GroupChatModalProps {
   /** Whether the modal is visible. */
@@ -48,6 +49,12 @@ function GroupChatSection({ chatId }: GroupChatSectionProps): ReactElement {
         <>
           <Divider />
           <AddUsersSection chatId={chatId} />
+        </>
+      )}
+      {isAdmin && (
+        <>
+          <Divider />
+          <RemoveUsersSection chatId={chatId} />
         </>
       )}
       <Divider />

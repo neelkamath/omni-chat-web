@@ -255,6 +255,11 @@ interface UpdatedGroupChat {
 
 interface UpdatedGroupChatAccount {
   readonly userId: number;
+  readonly username: Username;
+  readonly firstName: Name;
+  readonly lastName: Name;
+  readonly bio: Bio;
+  readonly emailAddress: string;
 }
 
 export type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
@@ -290,6 +295,11 @@ async function subscribeToChats(): Promise<void> {
               description
               newUsers {
                 userId
+                username
+                firstName
+                lastName
+                emailAddress
+                bio
               }
               removedUsers {
                 userId
@@ -318,6 +328,7 @@ async function subscribeToChats(): Promise<void> {
             store.dispatch(ChatsSlice.fetchChat(message.chatId));
             break;
           case 'ExitedUsers':
+            store.dispatch(ChatsSlice.removeGroupChatUsers(message));
             if (message.userIdList.includes(Storage.readUserId()!))
               store.dispatch(ChatsSlice.removeOne(message.chatId));
             break;
