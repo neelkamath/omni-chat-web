@@ -17,6 +17,18 @@ export default function PublicityRadioGroup({
   isPublicDisabled,
   isRequired,
 }: PublicityRadioGroupProps): ReactElement {
+  return (
+    <Form.Item name='publicity' label={<Label />} rules={[{ required: isRequired, message: 'Specify the publicity.' }]}>
+      <Radio.Group onChange={onChange}>
+        <NotInvitableRadio isDisabled={isNotInvitableDisabled} />
+        <InvitableRadio isDisabled={isInvitableDisabled} />
+        <PublicRadio isDisabled={isPublicDisabled} />
+      </Radio.Group>
+    </Form.Item>
+  );
+}
+
+function Label(): ReactElement {
   const title = (
     <Typography.Paragraph>
       Chats can switch between being <Typography.Text strong>not invitable</Typography.Text> and{' '}
@@ -25,25 +37,12 @@ export default function PublicityRadioGroup({
       have their publicity changed.
     </Typography.Paragraph>
   );
-  const label = (
+  return (
     <Tooltip color='white' title={title} placement='right'>
       <Space>
         Publicity <QuestionCircleOutlined />
       </Space>
     </Tooltip>
-  );
-  return (
-    <Form.Item
-      name='publicity'
-      label={label}
-      rules={isRequired === true ? [{ required: true, message: 'Specify the publicity.' }] : []}
-    >
-      <Radio.Group onChange={onChange}>
-        <NotInvitableRadio isDisabled={isNotInvitableDisabled} />
-        <InvitableRadio isDisabled={isInvitableDisabled} />
-        <PublicRadio isDisabled={isPublicDisabled} />
-      </Radio.Group>
-    </Form.Item>
   );
 }
 

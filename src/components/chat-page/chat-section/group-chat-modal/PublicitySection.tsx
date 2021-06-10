@@ -23,7 +23,7 @@ export default function PublicitySection({ chatId }: PublicitySectionProps): Rea
   };
   // FIXME: Doesn't re-render when <chatId> changes.
   return (
-    <Form name='updatePublicity' layout='vertical' initialValues={{ publicity }}>
+    <Form name='updatePublicity' layout='inline' initialValues={{ publicity }}>
       <PublicityRadioGroup
         isInvitableDisabled={!isAdmin || publicity === 'PUBLIC'}
         isNotInvitableDisabled={!isAdmin || publicity === 'PUBLIC'}

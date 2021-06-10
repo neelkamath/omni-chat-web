@@ -4,6 +4,7 @@ import PicSection from './pic-section/PicSection';
 import StatementSection from './StatementSection';
 import BroadcastSection from './BroadcastSection';
 import PublicitySection from './PublicitySection';
+import LeaveSection from './LeaveSection';
 
 export interface GroupChatModalProps {
   /** Whether the modal is visible. */
@@ -37,6 +38,8 @@ function GroupChatSection({ chatId }: GroupChatSectionProps): ReactElement {
       <BroadcastSection chatId={chatId} />
       <Divider />
       <PublicitySection chatId={chatId} />
+      <Divider />
+      <LeaveSection chatId={chatId} />
     </Row>
   );
 }
