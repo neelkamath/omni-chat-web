@@ -22,6 +22,7 @@
     "typescript": "4.2.3"
   },
   "dependencies": {
+    "@ant-design/colors": "6.0.0",
     "@ant-design/icons": "4.6.2",
     "@neelkamath/omni-chat": "1.0.0",
     "@reduxjs/toolkit": "1.5.0",

@@ -53,6 +53,7 @@ function LeaveButton({ chatId }: LeaveButtonProps): ReactElement {
       onConfirm={onConfirm}
       okButtonProps={{ loading: isLoading }}
       onCancel={() => setVisible(false)}
+      onVisibleChange={() => setVisible(!isVisible)}
     >
       <Button onClick={() => setVisible(true)} danger>
         Leave the chat

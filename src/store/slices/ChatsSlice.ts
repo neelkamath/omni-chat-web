@@ -598,31 +598,31 @@ export namespace ChatsSlice {
     },
   );
 
-  export type GroupChatStatementType = 'TITLE' | 'DESCRIPTION';
-
-  export const selectGroupChatStatement = createSelector(
-    [
-      (state: RootState) => state.chats.entities,
-      (_: RootState, chatId: number) => chatId,
-      (_state: RootState, _chatId: number, type: GroupChatStatementType) => type,
-    ],
-    (chats: Dictionary<Chat>, chatId: number, type: GroupChatStatementType) => {
-      const chat = chats[chatId] as GroupChat | undefined;
-      switch (type) {
-        case 'TITLE':
-          return chat?.title;
-        case 'DESCRIPTION':
-          return chat?.description;
-      }
-    },
+  /** Returns the specified group chat, or `undefined` if the chat hasn't been fetched. */
+  const selectGroupChat = createSelector(
+    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
+    (chats: Dictionary<Chat>, chatId: number) => chats[chatId] as GroupChat | undefined,
   );
 
+  /** Returns the title of the specified group chat, or `undefined` if the chat hasn't been fetched. */
+  export const selectGroupChatTitle = createSelector([selectGroupChat], (chat: GroupChat | undefined) => chat?.title);
+
+  /** Returns the title of the specified group chat, or `undefined` if the chat hasn't been fetched. */
+  export const selectGroupChatDescription = createSelector(
+    [selectGroupChat],
+    (chat: GroupChat | undefined) => chat?.description,
+  );
+
+  /** Returns the specified chat, or `undefined` if it hasn't been fetched. */
   export const selectChat = createSelector(
     [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
     (chats: Dictionary<Chat>, chatId: number) => chats[chatId],
   );
 
-  /** Whether the specified user is an admin of the specified group chat. */
+  /**
+   * Returns whether the specified user is an admin of the specified group chat, or `undefined` if the chat hasn't been
+   * fetched.
+   */
   export const selectIsAdmin = createSelector(
     [
       (state: RootState) => state.chats.entities,
@@ -633,17 +633,14 @@ export namespace ChatsSlice {
       (chats[chatId] as GroupChat | undefined)?.adminIdList.includes(userId),
   );
 
-  /** Whether the specified group chat is a broadcast chat. */
+  /** Returns whether the specified group chat is a broadcast chat, or `undefined` if the chat hasn't been fetched. */
   export const selectIsBroadcast = createSelector(
-    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
-    (chats: Dictionary<Chat>, chatId: number) => (chats[chatId] as GroupChat | undefined)?.isBroadcast,
+    [selectGroupChat],
+    (chat: GroupChat | undefined) => chat?.isBroadcast,
   );
 
-  /** The publicity of the specified group chat. */
-  export const selectPublicity = createSelector(
-    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
-    (chats: Dictionary<Chat>, chatId: number) => (chats[chatId] as GroupChat | undefined)?.publicity,
-  );
+  /** Returns the publicity of the specified group chat, or `undefined` if the chat hasn't been fetched.. */
+  export const selectPublicity = createSelector([selectGroupChat], (chat: GroupChat | undefined) => chat?.publicity);
 
   /** Whether the chats have been fetched. */
   export const selectIsLoaded = createSelector(
@@ -655,30 +652,25 @@ export namespace ChatsSlice {
    * If the specified chat has been fetched, and it has a last message, it'll be selected. Otherwise, `undefined` will
    * be selected.
    */
-  export const selectLastMessage = createSelector(
-    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
-    (chats: Dictionary<Chat>, chatId: number) => {
-      const edges = chats[chatId]?.messages.edges;
-      return edges === undefined ? undefined : edges[edges.length - 1]?.node;
-    },
-  );
+  export const selectLastMessage = createSelector([selectChat], (chat: Chat | undefined) => {
+    const edges = chat?.messages.edges;
+    return edges === undefined ? undefined : edges[edges.length - 1]?.node;
+  });
 
   /** Returns the IDs of users in the specified group chat, or `undefined` if the chat hasn't been fetched. */
-  export const selectParticipantIdList = createSelector(
-    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
-    (chats: Dictionary<Chat>, chatId: number) => {
-      const chat = chats[chatId] as GroupChat | undefined;
-      return chat?.users.edges.map(({ node }) => node.userId);
-    },
+  export const selectParticipantIdList = createSelector([selectGroupChat], (chat: GroupChat | undefined) =>
+    chat?.users.edges.map(({ node }) => node.userId),
   );
 
   /** Returns the specified group chat's participants, or `undefined` if the chat hasn't been fetched. */
-  export const selectParticipants = createSelector(
-    [(state: RootState) => state.chats.entities, (_: RootState, chatId: number) => chatId],
-    (chats: Dictionary<Chat>, chatId: number) => {
-      const chat = chats[chatId] as GroupChat | undefined;
-      return chat?.users.edges.map(({ node }) => node);
-    },
+  export const selectParticipants = createSelector([selectGroupChat], (chat: GroupChat | undefined) =>
+    chat?.users.edges.map(({ node }) => node),
+  );
+
+  /** Returns the IDs of each admin in the specified group chat, or `undefined` if the chat hasn't been fetched. */
+  export const selectAdminIdList = createSelector(
+    [selectGroupChat],
+    (chat: GroupChat | undefined) => chat?.adminIdList,
   );
 
   /** Whether the specified private chat belongs to a user who deleted their account, and therefore deleted the chat. */

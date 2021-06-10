@@ -1,7 +1,6 @@
 import React, { ReactElement } from 'react';
 import { Collapse, Divider, Modal, Row } from 'antd';
 import PicSection from './pic-section/PicSection';
-import StatementSection from './StatementSection';
 import BroadcastSection from './BroadcastSection';
 import PublicitySection from './PublicitySection';
 import LeaveSection from './LeaveSection';
@@ -11,6 +10,9 @@ import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import { Storage } from '../../../../Storage';
 import AddUsersSection from './AddUsersSection';
 import RemoveUsersSection from './RemoveUsersSection';
+import UsersSection from './UsersSection';
+import TitleSection from './TitleSection';
+import DescriptionSection from './DescriptionSection';
 
 export interface GroupChatModalProps {
   /** Whether the modal is visible. */
@@ -37,9 +39,9 @@ function GroupChatSection({ chatId }: GroupChatSectionProps): ReactElement {
     <Row style={{ padding: 16 }}>
       <PicSection chatId={chatId} />
       <Divider />
-      <StatementSection type='TITLE' chatId={chatId} />
+      <TitleSection chatId={chatId} />
       <Divider />
-      <StatementSection type='DESCRIPTION' chatId={chatId} />
+      <DescriptionSection chatId={chatId} />
       <Divider />
       <BroadcastSection chatId={chatId} />
       <Divider />
@@ -61,13 +63,16 @@ function UsersAccordion({ chatId }: UsersAccordionProps): ReactElement {
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   return (
     <Collapse accordion ghost>
+      <Collapse.Panel key={1} header='Participants'>
+        <UsersSection chatId={chatId} />
+      </Collapse.Panel>
       {isAdmin && (
-        <Collapse.Panel header='Add users' key={1}>
+        <Collapse.Panel key={2} header='Add users'>
           <AddUsersSection chatId={chatId} />
         </Collapse.Panel>
       )}
       {isAdmin && (
-        <Collapse.Panel header='Remove users' key={2}>
+        <Collapse.Panel key={3} header='Remove users'>
           <RemoveUsersSection chatId={chatId} />
         </Collapse.Panel>
       )}

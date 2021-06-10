@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect } from 'react';
-import { message, Space, Spin, Typography } from 'antd';
+import { message, Space, Spin } from 'antd';
 import { useSelector } from 'react-redux';
 import { Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
 import { RootState, useThunkDispatch } from '../../../../store/store';
@@ -40,21 +40,17 @@ export default function AddUsersSection({ chatId }: AddUsersSectionProps): React
 }
 
 function ParticipantIndicator(): ReactElement {
-  const style = { color: 'green' };
   return (
-    <Space>
-      <CheckCircleOutlined style={style} />
-      <Typography.Text style={style}>Added</Typography.Text>
+    <Space style={{ color: 'green' }}>
+      <CheckCircleOutlined /> Added
     </Space>
   );
 }
 
 function NonparticipantIndicator(): ReactElement {
-  const style = { color: 'red' };
   return (
-    <Space>
-      <CloseCircleOutlined style={style} />
-      <Typography.Text style={style}>Not added</Typography.Text>
+    <Space style={{ color: 'red' }}>
+      <CloseCircleOutlined /> Not added
     </Space>
   );
 }
