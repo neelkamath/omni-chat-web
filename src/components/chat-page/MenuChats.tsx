@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
-import { Card, Col, Row, Spin, Tooltip, Typography } from 'antd';
+import { Card, Col, Row, Space, Spin, Tooltip, Typography } from 'antd';
 import { RootState, useThunkDispatch } from '../../store/store';
 import ChatPic from './ChatPic';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
@@ -121,8 +121,13 @@ function LastChatMessage({ chatId }: LastChatMessageTextProps): ReactElement {
   const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
   if (lastMessage === undefined) return <></>;
   return (
-    <Typography.Text ellipsis={true} style={{ width: 300 }}>
-      {lastMessage.sender.username}: <LastChatMessageContent message={lastMessage} />
+    <Typography.Text ellipsis style={{ width: 300 }}>
+      <Space>
+        <Typography.Paragraph>{lastMessage.sender.username}:</Typography.Paragraph>
+        <Typography.Paragraph style={{ height: 22 }}>
+          <LastChatMessageContent message={lastMessage} />
+        </Typography.Paragraph>
+      </Space>
     </Typography.Text>
   );
 }
