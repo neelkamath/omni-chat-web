@@ -98,7 +98,7 @@ export namespace AccountSlice {
 
   export const { update } = slice.actions;
 
-  /** @returns `undefined` if the {@link Account} hasn't been fetched yet. */
+  /** Returns `undefined` if the {@link Account} hasn't been fetched yet. */
   export const select = createSelector(
     (state: RootState) => state.account.data,
     (data: Account | undefined) => data,

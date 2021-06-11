@@ -18,7 +18,7 @@ export namespace Storage {
   }
 
   /**
-   * @return {@link TokenSet} if the user has already signed in, and `undefined` otherwise.
+   * @returns {@link TokenSet} if the user has already signed in, and `undefined` otherwise.
    * @see {@link readAccessToken}
    * @see {@link readRefreshToken}
    */
@@ -45,7 +45,7 @@ export namespace Storage {
     localStorage.removeItem('refreshToken');
   }
 
-  /** @return If an access token has been saved, the user's ID will be returned, and `undefined` otherwise. */
+  /** If an access token has been saved, the user's ID will be returned, and `undefined` otherwise. */
   export function readUserId(): number | undefined {
     const token = localStorage.getItem('accessToken');
     if (token === null) return undefined;

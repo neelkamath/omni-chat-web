@@ -1,17 +1,17 @@
 import React, { ReactElement, useState } from 'react';
 import { Form, message } from 'antd';
 import { isValidMessageTextScalar, MessageText, queryOrMutate } from '@neelkamath/omni-chat';
-import { httpApiConfig, operateGraphQlApi } from '../../../api';
-import { Storage } from '../../../Storage';
-import store from '../../../store/store';
-import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
-import GfmFormItem from '../GfmFormItem';
+import GfmFormItem from '../../GfmFormItem';
+import { ChatPageLayoutSlice } from '../../../../store/slices/ChatPageLayoutSlice';
+import store from '../../../../store/store';
+import { httpApiConfig, operateGraphQlApi } from '../../../../api';
+import { Storage } from '../../../../Storage';
 
-export interface MessageCreatorProps {
+export interface TextMessageCreatorProps {
   readonly chatId: number;
 }
 
-export default function MessageCreator({ chatId }: MessageCreatorProps): ReactElement {
+export default function TextMessageCreator({ chatId }: TextMessageCreatorProps): ReactElement {
   const [value, setValue] = useState('');
   const onFinish = async () => {
     const text = value.trim();
@@ -19,7 +19,6 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
       if (await operateCreateTextMessage(chatId, text)) setValue('');
     } else message.error('Messages must contain characters other than spaces.', 5);
   };
-  // FIXME: Doesn't re-render when <chatId> changes.
   return (
     <Form name='createMessage'>
       <GfmFormItem value={value} setValue={setValue} maxLength={10_000} name='text' onPressEnter={onFinish} />
@@ -27,7 +26,7 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
   );
 }
 
-/** @returns Whether the message was sent. */
+/** Returns whether the message was sent. */
 async function operateCreateTextMessage(chatId: number, text: MessageText): Promise<boolean> {
   const result = await createTextMessage(chatId, text);
   if (result?.createTextMessage === null) return true;

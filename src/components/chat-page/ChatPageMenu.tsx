@@ -163,10 +163,10 @@ function DevelopersItem(): ReactElement {
 function MoreCol(): ReactElement {
   const menu = (
     <Menu>
-      <Menu.Item>
+      <Menu.Item key={1}>
         <SupportItem />
       </Menu.Item>
-      <Menu.Item>
+      <Menu.Item key={2}>
         <DevelopersItem />
       </Menu.Item>
     </Menu>

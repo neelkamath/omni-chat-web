@@ -1,12 +1,22 @@
-import React, { ReactElement, ReactNode } from 'react';
+import React, { ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { Card, Col, Row, Spin, Tooltip, Typography } from 'antd';
 import { RootState, useThunkDispatch } from '../../store/store';
 import ChatPic from './ChatPic';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
+import {
+  AudioOutlined,
+  CheckCircleTwoTone,
+  ClockCircleTwoTone,
+  FileImageOutlined,
+  FileOutlined,
+  GroupOutlined,
+  VideoCameraOutlined,
+} from '@ant-design/icons';
+import gfm from 'remark-gfm';
+import ReactMarkdown from 'react-markdown';
 import TimeAgo from 'timeago-react';
-import { CheckCircleTwoTone, ClockCircleTwoTone } from '@ant-design/icons';
 
 export default function MenuChats(): ReactElement {
   const chats = useSelector(ChatsSlice.selectChats);
@@ -58,7 +68,7 @@ function ChatMetadata({ chat }: ChatMetadataProps): ReactElement {
       </Row>
       <Row gutter={16} justify='space-between'>
         <Col>
-          <LastChatMessageText chatId={chat.chatId} />
+          <LastChatMessage chatId={chat.chatId} />
         </Col>
         <Col>
           <LastMessageStatus chatId={chat.chatId} />
@@ -106,44 +116,44 @@ interface LastChatMessageTextProps {
   readonly chatId: number;
 }
 
-function LastChatMessageText({ chatId }: LastChatMessageTextProps): ReactElement {
-  const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
+function LastChatMessage({ chatId }: LastChatMessageTextProps): ReactElement {
   useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
   if (lastMessage === undefined) return <></>;
-  let message: ReactNode;
-  switch (lastMessage.__typename) {
-    case 'TextMessage':
-      message = (lastMessage as ChatsSlice.TextMessage).textMessage;
-      break;
-    case 'ActionMessage':
-      message = (lastMessage as ChatsSlice.ActionMessage).actionableMessage.text;
-      break;
-    case 'PicMessage': {
-      const caption = (lastMessage as ChatsSlice.PicMessage).caption;
-      if (caption === null) message = <Typography.Text strong>Sent a picture.</Typography.Text>;
-      else message = caption;
-      break;
-    }
-    case 'PollMessage':
-      message = (lastMessage as ChatsSlice.PollMessage).poll.title;
-      break;
-    case 'AudioMessage':
-      message = <Typography.Text strong>Sent an audio.</Typography.Text>;
-      break;
-    case 'DocMessage':
-      message = <Typography.Text strong>Sent a document.</Typography.Text>;
-      break;
-    case 'GroupChatInviteMessage':
-      message = <Typography.Text strong>Sent a group chat invite.</Typography.Text>;
-      break;
-    case 'VideoMessage':
-      message = <Typography.Text strong>Sent a video.</Typography.Text>;
-  }
   return (
     <Typography.Text ellipsis={true} style={{ width: 300 }}>
-      {lastMessage.sender.username}: {message}
+      {lastMessage.sender.username}: <LastChatMessageContent message={lastMessage} />
     </Typography.Text>
   );
+}
+
+interface LastChatMessageContentProps {
+  readonly message: ChatsSlice.Message;
+}
+
+function LastChatMessageContent({ message }: LastChatMessageContentProps): ReactElement {
+  switch (message.__typename) {
+    case 'TextMessage':
+      return <ReactMarkdown plugins={[gfm]}>{(message as ChatsSlice.TextMessage).textMessage}</ReactMarkdown>;
+    case 'ActionMessage':
+      return (
+        <ReactMarkdown plugins={[gfm]}>{(message as ChatsSlice.ActionMessage).actionableMessage.text}</ReactMarkdown>
+      );
+    case 'PicMessage': {
+      const caption = (message as ChatsSlice.PicMessage).caption;
+      return caption === null ? <FileImageOutlined /> : <ReactMarkdown plugins={[gfm]}>{caption}</ReactMarkdown>;
+    }
+    case 'PollMessage':
+      return <ReactMarkdown plugins={[gfm]}>{(message as ChatsSlice.PollMessage).poll.title}</ReactMarkdown>;
+    case 'AudioMessage':
+      return <AudioOutlined />;
+    case 'DocMessage':
+      return <FileOutlined />;
+    case 'GroupChatInviteMessage':
+      return <GroupOutlined />;
+    case 'VideoMessage':
+      return <VideoCameraOutlined />;
+  }
 }
 
 interface LastMessageStatusProps {

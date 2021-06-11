@@ -134,7 +134,7 @@ export namespace PicsSlice {
         .addCase(fetchPic.fulfilled, adapter.upsertOne)
         .addCase(fetchPic.pending, (state, { meta }) => {
           const id = generateId(meta.arg.type, meta.arg.id);
-          if (state.entities[id] === undefined) adapter.addOne(state, { id, type: meta.arg.type, isLoading: true });
+          if (state.entities[id] === undefined) adapter.upsertOne(state, { id, type: meta.arg.type, isLoading: true });
         });
     },
   });
@@ -162,7 +162,7 @@ export namespace PicsSlice {
   );
 
   /**
-   * @returns `undefined` if either the pic hasn't been fetched yet or no error occurred when the pic was being fetched.
+   * Returns `undefined` if either the pic hasn't been fetched yet or no error occurred when the pic was being fetched.
    * Otherwise, it'll either be a {@link NonexistentUserIdError} or {@link NonexistentChatError}.
    */
   export const selectError = createSelector(

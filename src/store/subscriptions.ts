@@ -21,6 +21,7 @@ import {
   Uuid,
 } from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../api';
+import { PicMessagesSlice } from './slices/PicMessagesSlice';
 
 /** `undefined` if no subscription is running. */
 type OnSubscriptionClose = OnSocketClose | undefined;
@@ -523,6 +524,7 @@ async function subscribeToMessages(): Promise<void> {
             break;
           case 'DeletedMessage':
             store.dispatch(ChatsSlice.deleteMessage(message));
+            store.dispatch(PicMessagesSlice.deleteMessage(message.messageId));
             break;
           case 'UserChatMessagesRemoval':
             store.dispatch(ChatsSlice.removeUserChatMessages(message));

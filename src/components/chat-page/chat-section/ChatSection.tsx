@@ -1,11 +1,11 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { Empty, Layout, message, Spin } from 'antd';
+import { Divider, Empty, Layout, message, Spin } from 'antd';
 import { useSelector } from 'react-redux';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { RootState, useThunkDispatch } from '../../../store/store';
-import ChatMessage from './ChatMessage';
-import MessageCreator from './MessageCreator';
 import Header from './Header';
+import MessageCreator from './message-creator/MessageCreator';
+import ChatMessage from './chat-message/ChatMessage';
 
 export interface ChatSectionProps {
   readonly chatId: number;
@@ -45,6 +45,7 @@ function ChatSegment({ chat }: ChatSegmentProps): ReactElement {
         {chat.messages.edges.map(({ node }) => (
           <ChatMessage key={node.messageId} message={node} />
         ))}
+        <Divider />
         {isBroadcast ? 'Only admins can send messages in this chat.' : <MessageCreator chatId={chat.chatId} />}
       </Layout.Content>
     </Layout>

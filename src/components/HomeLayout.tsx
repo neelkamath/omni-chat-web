@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from 'react';
-import { Layout, Menu, Typography } from 'antd';
+import { Layout, Menu, Space, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import { CodeOutlined, HomeOutlined, LoginOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Storage } from '../Storage';
@@ -28,12 +28,16 @@ function HeaderMenu(): ReactElement {
     <Menu theme='dark' mode='horizontal' defaultSelectedKeys={[location.pathname]}>
       <Menu.Item key='/'>
         <Link component={Typography.Link} to='/'>
-          <HomeOutlined /> Home
+          <Space>
+            <HomeOutlined /> Home
+          </Space>
         </Link>
       </Menu.Item>
       <Menu.Item key='/register'>
         <Link component={Typography.Link} to='/register'>
-          <UserAddOutlined /> Register
+          <Space>
+            <UserAddOutlined /> Register
+          </Space>
         </Link>
       </Menu.Item>
       <Menu.Item key='/sign-in'>
@@ -42,12 +46,16 @@ function HeaderMenu(): ReactElement {
             location.href = Storage.readTokenSet() === undefined ? '/sign-in' : '/chat';
           }}
         >
-          <LoginOutlined /> Sign In
+          <Space>
+            <LoginOutlined /> Sign In
+          </Space>
         </Typography.Link>
       </Menu.Item>
       <Menu.Item key='/developers'>
         <Link component={Typography.Link} to='/developers'>
-          <CodeOutlined /> Developers
+          <Space>
+            <CodeOutlined /> Developers
+          </Space>
         </Link>
       </Menu.Item>
     </Menu>

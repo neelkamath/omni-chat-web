@@ -59,7 +59,7 @@ export default function GfmFormItem({
   const [isShiftDown, setShiftDown] = useState(false);
   return (
     <Form.Item name={name} label={label}>
-      <Tabs tabBarExtraContent={<TabBarExtraContent isForm={onPressEnter !== undefined} />}>
+      <Tabs tabBarExtraContent={<TabBarExtraContent isForm={onPressEnter !== undefined} />} size='small'>
         <Tabs.TabPane tab={<EditTab />} key={1}>
           <Input.TextArea
             placeholder={placeholder}
