@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { Button, Form, message, Spin, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import { GroupChatDescription, Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
@@ -28,24 +28,24 @@ interface UpdateDescriptionFormProps {
   readonly chatId: number;
 }
 
+interface UpdateGroupChatDescriptionFormData {
+  readonly description: string;
+}
+
 function UpdateDescriptionForm({ chatId }: UpdateDescriptionFormProps): ReactElement {
   useThunkDispatch(ChatsSlice.fetchChat(chatId));
   const [isLoading, setLoading] = useState(false);
   const description = useSelector((state: RootState) => ChatsSlice.selectGroupChatDescription(state, chatId));
-  const [value, setValue] = useState(description);
-  useEffect(() => {
-    if (description !== undefined) setValue(description);
-  }, [description]);
-  if (value === undefined) return <Spin />;
-  const onFinish = async () => {
+  if (description === undefined) return <Spin />;
+  const onFinish = async ({ description }: UpdateGroupChatDescriptionFormData) => {
     setLoading(true);
-    const result = await updateGroupChatDescription(chatId, value.trim());
+    const result = await updateGroupChatDescription(chatId, description.trim());
     if (result !== undefined) message.success('Description updated.', 3);
     setLoading(false);
   };
   return (
     <Form onFinish={onFinish} layout='vertical' name='updateGroupChatDescription'>
-      <GfmFormItem value={value} setValue={setValue} maxLength={1_000} name='description' label='Description' />
+      <GfmFormItem maxLength={1_000} name='description' label='Description' initialValue={description} />
       <Form.Item>
         <Button type='primary' htmlType='submit' loading={isLoading}>
           Update

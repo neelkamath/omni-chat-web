@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { Button, Form, Input, message, Space, Spin } from 'antd';
 import { useSelector } from 'react-redux';
 import { AccountSlice } from '../../../store/slices/AccountSlice';
@@ -25,20 +25,17 @@ interface UpdateAccountFormData {
   readonly emailAddress: string;
   readonly firstName: string;
   readonly lastName: string;
+  readonly bio: string;
 }
 
 function UpdateAccountForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
-  const [bio, setBio] = useState('');
   const account = useSelector(AccountSlice.select);
   useThunkDispatch(AccountSlice.fetchAccount());
-  useEffect(() => {
-    if (account !== undefined) setBio(account.bio);
-  }, [account]);
   if (account === undefined) return <Spin />;
   const onFinish = async (data: UpdateAccountFormData) => {
     setLoading(true);
-    const update = buildAccountUpdate(data, bio);
+    const update = buildAccountUpdate(data);
     if (validateAccountUpdate(update)) await operateUpdateAccount(account.emailAddress, update);
     setLoading(false);
   };
@@ -66,7 +63,7 @@ function UpdateAccountForm(): ReactElement {
       <Form.Item name='lastName' label='Last name' initialValue={account.lastName}>
         <Input maxLength={30} />
       </Form.Item>
-      <GfmFormItem value={bio} setValue={setBio} maxLength={2_500} name='bio' label='Bio' />
+      <GfmFormItem initialValue={account.bio} maxLength={2_500} name='bio' label='Bio' />
       <Form.Item>
         <Button type='primary' htmlType='submit' loading={isLoading}>
           Submit
@@ -85,10 +82,13 @@ interface AccountUpdate {
   readonly bio: Bio;
 }
 
-function buildAccountUpdate(
-  { username, emailAddress, firstName, lastName }: UpdateAccountFormData,
-  bio: string,
-): AccountUpdate {
+function buildAccountUpdate({
+  username,
+  emailAddress,
+  firstName,
+  lastName,
+  bio,
+}: UpdateAccountFormData): AccountUpdate {
   return {
     username: username.trim(),
     password: null,

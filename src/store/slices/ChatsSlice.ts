@@ -81,10 +81,6 @@ export namespace ChatsSlice {
     readonly poll: Poll;
   }
 
-  export interface Poll {
-    readonly title: MessageText;
-  }
-
   export interface UserAccount {
     readonly username: Username;
     readonly userId: number;
@@ -190,6 +186,12 @@ export namespace ChatsSlice {
             ... on PollMessage {
               poll {
                 title
+                options {
+                  option
+                  votes {
+                    userId
+                  }
+                }
               }
             }
           }

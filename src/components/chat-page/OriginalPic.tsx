@@ -15,5 +15,5 @@ export default function OriginalPic({ url, type }: OriginalPicProps): ReactEleme
     case 'PROFILE_PIC':
       alt = 'Profile pic';
   }
-  return <Image style={{ width: '100%' }} alt={alt} preview={false} src={url} />;
+  return <Image style={{ maxWidth: 500 }} alt={alt} preview={false} src={url} />;
 }

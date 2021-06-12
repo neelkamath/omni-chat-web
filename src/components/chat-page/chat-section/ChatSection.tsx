@@ -45,7 +45,7 @@ function ChatSegment({ chat }: ChatSegmentProps): ReactElement {
         {chat.messages.edges.map(({ node }) => (
           <ChatMessage key={node.messageId} message={node} />
         ))}
-        <Divider />
+        {chat.messages.edges.length > 0 && <Divider />}
         {isBroadcast ? 'Only admins can send messages in this chat.' : <MessageCreator chatId={chat.chatId} />}
       </Layout.Content>
     </Layout>

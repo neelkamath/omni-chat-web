@@ -1,8 +1,9 @@
 import React, { ReactElement, useState } from 'react';
-import { Dropdown, Menu, Space } from 'antd';
-import { EditOutlined, MessageOutlined, PictureOutlined } from '@ant-design/icons';
+import { Col, Dropdown, Menu, Row, Space } from 'antd';
+import { EditOutlined, MessageOutlined, PictureOutlined, TableOutlined } from '@ant-design/icons';
 import PicMessageCreator from './PicMessageCreator';
 import TextMessageCreator from './TextMessageCreator';
+import PollMessageCreator from './PollMessageCreator';
 
 export interface MessageCreatorProps {
   readonly chatId: number;
@@ -11,27 +12,33 @@ export interface MessageCreatorProps {
 // FIXME: Doesn't re-render when <chatId> changes.
 export default function MessageCreator({ chatId }: MessageCreatorProps): ReactElement {
   const [creator, setCreator] = useState(<TextMessageCreator chatId={chatId} />);
-  const style = { fontSize: 24 };
   const menu = (
     <Menu>
       <Menu.Item key={1} onClick={() => setCreator(<TextMessageCreator chatId={chatId} />)}>
         <Space>
-          <EditOutlined style={style} /> Text
+          <EditOutlined /> Text
         </Space>
       </Menu.Item>
       <Menu.Item key={2} onClick={() => setCreator(<PicMessageCreator chatId={chatId} />)}>
         <Space>
-          <PictureOutlined style={style} /> Picture
+          <PictureOutlined /> Picture
+        </Space>
+      </Menu.Item>
+      <Menu.Item key={3} onClick={() => setCreator(<PollMessageCreator chatId={chatId} />)}>
+        <Space>
+          <TableOutlined /> Poll
         </Space>
       </Menu.Item>
     </Menu>
   );
   return (
-    <Space>
-      <Dropdown overlay={menu}>
-        <MessageOutlined style={style} />
-      </Dropdown>
-      {creator}
-    </Space>
+    <Row gutter={16}>
+      <Col>{creator}</Col>
+      <Col>
+        <Dropdown overlay={menu}>
+          <MessageOutlined style={{ fontSize: 24 }} />
+        </Dropdown>
+      </Col>
+    </Row>
   );
 }

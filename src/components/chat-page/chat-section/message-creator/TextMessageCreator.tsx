@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement } from 'react';
 import { Form, message } from 'antd';
 import { isValidMessageTextScalar, MessageText, queryOrMutate } from '@neelkamath/omni-chat';
 import GfmFormItem from '../../GfmFormItem';
@@ -12,16 +12,13 @@ export interface TextMessageCreatorProps {
 }
 
 export default function TextMessageCreator({ chatId }: TextMessageCreatorProps): ReactElement {
-  const [value, setValue] = useState('');
-  const onFinish = async () => {
-    const text = value.trim();
-    if (isValidMessageTextScalar(text)) {
-      if (await operateCreateTextMessage(chatId, text)) setValue('');
-    } else message.error('Messages must contain characters other than spaces.', 5);
+  const onPressEnter = async (text: string) => {
+    if (isValidMessageTextScalar(text)) await operateCreateTextMessage(chatId, text);
+    else message.error('Messages must contain characters other than spaces.', 5);
   };
   return (
-    <Form name='createMessage'>
-      <GfmFormItem value={value} setValue={setValue} maxLength={10_000} name='text' onPressEnter={onFinish} />
+    <Form name='createTextMessage'>
+      <GfmFormItem minLength={1} maxLength={10_000} name='text' onPressEnter={onPressEnter} />
     </Form>
   );
 }

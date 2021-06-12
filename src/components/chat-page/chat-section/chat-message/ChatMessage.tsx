@@ -12,6 +12,7 @@ import { Storage } from '../../../../Storage';
 import gfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
 import { PicMessagesSlice } from '../../../../store/slices/PicMessagesSlice';
+import PollMessageContent from './PollMessageContent';
 
 export interface ChatMessageProps {
   readonly message: ChatsSlice.Message;
@@ -46,6 +47,8 @@ function MessageContent({ message }: MessageContentProps): ReactElement {
       return <ReactMarkdown plugins={[gfm]}>{(message as ChatsSlice.TextMessage).textMessage}</ReactMarkdown>;
     case 'PicMessage':
       return <PicMessageContent messageId={message.messageId} />;
+    case 'PollMessage':
+      return <PollMessageContent message={message as ChatsSlice.PollMessage} />;
   }
 }
 
