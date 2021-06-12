@@ -52,8 +52,8 @@ function DeleteAccountForm(): ReactElement {
 }
 
 async function operateDeleteAccount(): Promise<void> {
-  const result = await deleteAccount();
-  if (result?.deleteAccount?.__typename === 'CannotDeleteAccount')
+  const response = await deleteAccount();
+  if (response?.deleteAccount?.__typename === 'CannotDeleteAccount')
     message.error(
       "You can't delete your account yet because you're the last admin of an otherwise nonempty group chat. You must" +
         'first assign another user as the admin.',

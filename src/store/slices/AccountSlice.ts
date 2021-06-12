@@ -17,8 +17,8 @@ export namespace AccountSlice {
   export const fetchAccount = createAsyncThunk(
     `${sliceName}/fetchAccount`,
     async () => {
-      const result = await readAccount();
-      return result?.readAccount;
+      const response = await readAccount();
+      return response?.readAccount;
     },
     {
       condition: (_, { getState }) => {

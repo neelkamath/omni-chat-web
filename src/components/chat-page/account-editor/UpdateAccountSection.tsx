@@ -119,13 +119,13 @@ function validateAccountUpdate({ username, firstName, lastName }: AccountUpdate)
 async function operateUpdateAccount(currentEmailAddress: string, update: AccountUpdate): Promise<void> {
   const isUpdatedAddress = update.emailAddress !== undefined && currentEmailAddress !== update.emailAddress;
   if (isUpdatedAddress) await setOnline(false);
-  const result = await updateAccount(update);
-  if (result?.updateAccount === null) {
+  const response = await updateAccount(update);
+  if (response?.updateAccount === null) {
     message.success('Account updated.', 3);
     if (isUpdatedAddress) await logOut();
-  } else if (result?.updateAccount?.__typename === 'UsernameTaken')
+  } else if (response?.updateAccount?.__typename === 'UsernameTaken')
     message.error('That username has already been taken.', 5);
-  else if (result?.updateAccount?.__typename === 'EmailAddressTaken')
+  else if (response?.updateAccount?.__typename === 'EmailAddressTaken')
     message.error('That email address has already been taken.', 5);
 }
 

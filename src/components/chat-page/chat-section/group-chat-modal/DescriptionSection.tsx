@@ -39,8 +39,8 @@ function UpdateDescriptionForm({ chatId }: UpdateDescriptionFormProps): ReactEle
   if (description === undefined) return <Spin />;
   const onFinish = async ({ description }: UpdateGroupChatDescriptionFormData) => {
     setLoading(true);
-    const result = await updateGroupChatDescription(chatId, description.trim());
-    if (result !== undefined) message.success('Description updated.', 3);
+    const response = await updateGroupChatDescription(chatId, description.trim());
+    if (response !== undefined) message.success('Description updated.', 3);
     setLoading(false);
   };
   return (

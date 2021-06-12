@@ -72,8 +72,8 @@ function validateGroupChatInput({ title }: GroupChatInput): boolean {
 }
 
 async function operateCreateGroupChat(chat: GroupChatInput): Promise<number | undefined> {
-  const result = await createGroupChat(chat);
-  return result?.createGroupChat.__typename === 'CreatedChatId' ? result.createGroupChat.chatId : undefined;
+  const response = await createGroupChat(chat);
+  return response?.createGroupChat.__typename === 'CreatedChatId' ? response.createGroupChat.chatId : undefined;
 }
 
 interface CreateGroupChatResult {

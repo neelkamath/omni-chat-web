@@ -19,8 +19,8 @@ export default function BroadcastSection({ chatId }: BroadcastSectionProps): Rea
   if (isBroadcast === undefined) return <Spin size='small' />;
   const onChange = async (isChecked: boolean) => {
     setLoading(true);
-    const result = await setBroadcast(chatId, isChecked);
-    if (result !== undefined) message.success('Broadcast status updated.', 3);
+    const response = await setBroadcast(chatId, isChecked);
+    if (response !== undefined) message.success('Broadcast status updated.', 3);
     setLoading(false);
   };
   return (

@@ -24,8 +24,8 @@ export namespace ContactsSlice {
   export const fetchContacts = createAsyncThunk(
     `${sliceName}/fetchContacts`,
     async () => {
-      const result = await readContacts();
-      return result?.readContacts.edges.map(({ node }) => node);
+      const response = await readContacts();
+      return response?.readContacts.edges.map(({ node }) => node);
     },
     {
       condition: (_, { getState }) => {

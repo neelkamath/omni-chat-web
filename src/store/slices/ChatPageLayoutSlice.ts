@@ -17,6 +17,7 @@ export namespace ChatPageLayoutSlice {
    * - `'SUPPORT_SECTION'` indicates `<ChatPageSupportSection />`.
    * - `'DEVELOPERS_SECTION'` indicates `<DevelopersSection />`.
    * - `'CHAT_SECTION'` indicates `<ChatSection />`.
+   * - `'SEARCH_PUBLIC_CHATS'` indicates `<SearchPublicChatsSection />`.
    */
   export type ElementType =
     | 'EMPTY'
@@ -27,7 +28,8 @@ export namespace ChatPageLayoutSlice {
     | 'SUPPORT_SECTION'
     | 'DEVELOPERS_SECTION'
     | 'CHAT_SECTION'
-    | 'CREATE_GROUP_CHAT';
+    | 'CREATE_GROUP_CHAT'
+    | 'SEARCH_PUBLIC_CHATS';
 
   function reduceUpdate(_: Draft<State>, { payload }: PayloadAction<State>): State | void {
     return payload;

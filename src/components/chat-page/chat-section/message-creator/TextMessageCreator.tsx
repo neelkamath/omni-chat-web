@@ -25,11 +25,11 @@ export default function TextMessageCreator({ chatId }: TextMessageCreatorProps):
 
 /** Returns whether the message was sent. */
 async function operateCreateTextMessage(chatId: number, text: MessageText): Promise<boolean> {
-  const result = await createTextMessage(chatId, text);
-  if (result?.createTextMessage === null) return true;
-  switch (result?.createTextMessage?.__typename) {
+  const response = await createTextMessage(chatId, text);
+  if (response?.createTextMessage === null) return true;
+  switch (response?.createTextMessage?.__typename) {
     case 'InvalidChatId':
-      message.error('The other user just deleted their account.', 5);
+      message.error("You're no longer in this chat.", 5);
       store.dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
       break;
     case 'InvalidMessageId':

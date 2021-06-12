@@ -19,8 +19,8 @@ export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps):
   if (participants === undefined) return <Spin />;
   const onConfirm = async (userId: number) => {
     message.info('Removing the user...', 3);
-    const result = await removeGroupChatUsers(chatId, [userId]);
-    if (result?.removeGroupChatUsers === null) message.success('User removed.', 3);
+    const response = await removeGroupChatUsers(chatId, [userId]);
+    if (response?.removeGroupChatUsers === null) message.success('User removed.', 3);
   };
   const cards = participants
     .filter((participant) => participant.userId !== userId)

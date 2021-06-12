@@ -64,8 +64,8 @@ async function operatePatchProfilePic(file: File): Promise<void> {
 
 function DeleteProfilePicButton(): ReactElement {
   const onClick = async () => {
-    const result = await deleteProfilePic();
-    if (result !== undefined) message.success('Profile picture deleted.', 3);
+    const response = await deleteProfilePic();
+    if (response !== undefined) message.success('Profile picture deleted.', 3);
   };
   return (
     <Button danger icon={<DeleteOutlined />} onClick={onClick}>

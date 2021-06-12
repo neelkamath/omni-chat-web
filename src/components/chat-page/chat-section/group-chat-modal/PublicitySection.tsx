@@ -18,8 +18,8 @@ export default function PublicitySection({ chatId }: PublicitySectionProps): Rea
   const publicity = useSelector((state: RootState) => ChatsSlice.selectPublicity(state, chatId));
   if (publicity === undefined) return <Spin size='small' />;
   const onChange = async ({ target }: RadioChangeEvent) => {
-    const result = await setInvitability(chatId, target.value);
-    if (result?.setInvitability === null) message.success('Publicity updated.', 3);
+    const response = await setInvitability(chatId, target.value);
+    if (response?.setInvitability === null) message.success('Publicity updated.', 3);
   };
   // FIXME: Doesn't re-render when <chatId> changes.
   return (

@@ -37,8 +37,8 @@ export namespace TypingStatusesSlice {
   export const fetchStatuses = createAsyncThunk(
     `${sliceName}/fetchStatuses`,
     async () => {
-      const result = await readTypingUsers();
-      return result?.readTypingUsers.flatMap(({ chatId, users }) =>
+      const response = await readTypingUsers();
+      return response?.readTypingUsers.flatMap(({ chatId, users }) =>
         users.map(({ userId }) => ({ id: generateId(userId, chatId), chatId, userId, isTyping: true })),
       );
     },

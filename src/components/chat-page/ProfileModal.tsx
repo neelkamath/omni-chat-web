@@ -99,12 +99,12 @@ function ChatButton({ userId }: ChatButtonProps): ReactElement {
 }
 
 async function operateCreatePrivateChat(userId: number): Promise<number | undefined> {
-  const result = await createPrivateChat(userId);
-  if (result?.createPrivateChat.__typename === 'InvalidUserId') {
+  const response = await createPrivateChat(userId);
+  if (response?.createPrivateChat.__typename === 'InvalidUserId') {
     message.warning('The user just deleted their account.', 5);
     return undefined;
   }
-  return result?.createPrivateChat.chatId;
+  return response?.createPrivateChat.chatId;
 }
 
 interface InvalidUserId {
@@ -167,9 +167,9 @@ function ContactButton({ userId }: ContactButtonProps): ReactElement {
 }
 
 async function operateCreateContact(userId: number): Promise<void> {
-  const result = await createContact(userId);
-  if (result?.createContact === true) message.success('Contact created.', 3);
-  else if (result?.createContact === false) message.warning('That user just deleted their account.', 5);
+  const response = await createContact(userId);
+  if (response?.createContact === true) message.success('Contact created.', 3);
+  else if (response?.createContact === false) message.warning('That user just deleted their account.', 5);
 }
 
 interface CreateContactResult {
@@ -195,9 +195,9 @@ async function createContact(id: number): Promise<CreateContactResult | undefine
 }
 
 async function operateDeleteContact(userId: number): Promise<void> {
-  const result = await deleteContact(userId);
-  if (result?.deleteContact === true) message.success('Contact deleted', 3);
-  else if (result?.deleteContact === false) message.warning('That user just deleted their account', 5);
+  const response = await deleteContact(userId);
+  if (response?.deleteContact === true) message.success('Contact deleted', 3);
+  else if (response?.deleteContact === false) message.warning('That user just deleted their account', 5);
 }
 
 interface DeleteContactResult {
@@ -246,9 +246,9 @@ function BlockButton({ userId }: BlockButtonProps): ReactElement {
 }
 
 async function operateUnblockUser(id: number): Promise<void> {
-  const result = await unblockUser(id);
-  if (result?.unblockUser === true) message.success('User unblocked.');
-  else if (result?.unblockUser === false) message.warning('That user just deleted their account.', 5);
+  const response = await unblockUser(id);
+  if (response?.unblockUser === true) message.success('User unblocked.');
+  else if (response?.unblockUser === false) message.warning('That user just deleted their account.', 5);
 }
 
 interface UnblockUserResult {
@@ -274,9 +274,9 @@ async function unblockUser(id: number): Promise<UnblockUserResult | undefined> {
 }
 
 async function operateBlockUser(id: number): Promise<void> {
-  const result = await blockUser(id);
-  if (result?.blockUser?.__typename === 'InvalidUserId') message.warning('That user just deleted their account.', 5);
-  else if (result !== undefined) message.success('User blocked.');
+  const response = await blockUser(id);
+  if (response?.blockUser?.__typename === 'InvalidUserId') message.warning('That user just deleted their account.', 5);
+  else if (response !== undefined) message.success('User blocked.');
 }
 
 interface BlockUserResult {

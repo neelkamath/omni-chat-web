@@ -37,13 +37,13 @@ function LeaveButton({ chatId }: LeaveButtonProps): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const onConfirm = async () => {
     setLoading(true);
-    const result = await leaveGroupChat(chatId);
+    const response = await leaveGroupChat(chatId);
     setLoading(false);
     setVisible(false);
-    if (result?.leaveGroupChat === null) {
+    if (response?.leaveGroupChat === null) {
       message.success('You left the chat.', 3);
       dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
-    } else if (result?.leaveGroupChat.__typename === 'CannotLeaveChat')
+    } else if (response?.leaveGroupChat.__typename === 'CannotLeaveChat')
       message.error('You must first appoint another participant as an admin.', 5);
   };
   return (

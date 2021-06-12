@@ -11,8 +11,8 @@ export interface DeletePicButtonProps {
 
 export default function DeletePicButton({ chatId }: DeletePicButtonProps): ReactElement {
   const onClick = async () => {
-    const result = await deleteGroupChatPic(chatId);
-    if (result !== undefined) message.success('Group chat picture deleted.', 3);
+    const response = await deleteGroupChatPic(chatId);
+    if (response !== undefined) message.success('Group chat picture deleted.', 3);
   };
   return (
     <Button danger icon={<DeleteOutlined />} onClick={onClick}>

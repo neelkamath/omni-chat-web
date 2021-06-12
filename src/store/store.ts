@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { ChatPageLayoutSlice } from './slices/ChatPageLayoutSlice';
 import { PicMessagesSlice } from './slices/PicMessagesSlice';
+import { SearchedPublicChatsSlice } from './slices/SearchedPublicChatsSlice';
 
 /**
  * - `'IDLE'` indicates that either the entities have never been fetched or an error occurred during the last fetch.
@@ -31,6 +32,7 @@ const store = configureStore({
     typingStatuses: TypingStatusesSlice.reducer,
     chatPageLayout: ChatPageLayoutSlice.reducer,
     picMessages: PicMessagesSlice.reducer,
+    searchedPublicChats: SearchedPublicChatsSlice.reducer,
   },
 });
 

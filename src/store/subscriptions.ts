@@ -22,6 +22,8 @@ import {
 } from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../api';
 import { PicMessagesSlice } from './slices/PicMessagesSlice';
+import { ChatPageLayoutSlice } from './slices/ChatPageLayoutSlice';
+import { message } from 'antd';
 
 /** `undefined` if no subscription is running. */
 type OnSubscriptionClose = OnSocketClose | undefined;
@@ -178,38 +180,38 @@ async function subscribeToAccounts(): Promise<void> {
       `,
       async ({ data, errors }: GraphQlResponse<SubscribeToAccountsResult>) => {
         if (errors !== undefined) await displayBugReporter(errors);
-        const message = data?.subscribeToAccounts;
-        switch (message?.__typename) {
+        const event = data?.subscribeToAccounts;
+        switch (event?.__typename) {
           case 'CreatedSubscription':
             resolve();
             break;
           case 'UpdatedAccount':
-            if (message.userId === Storage.readUserId()!) store.dispatch(AccountSlice.update(message));
-            store.dispatch(BlockedUsersSlice.updateAccount(message));
-            store.dispatch(ChatsSlice.updateAccount(message));
-            store.dispatch(ContactsSlice.updateOne(message));
+            if (event.userId === Storage.readUserId()!) store.dispatch(AccountSlice.update(event));
+            store.dispatch(BlockedUsersSlice.updateAccount(event));
+            store.dispatch(ChatsSlice.updateAccount(event));
+            store.dispatch(ContactsSlice.updateOne(event));
             break;
           case 'UpdatedProfilePic':
-            store.dispatch(PicsSlice.fetchPic({ id: message.userId, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
+            store.dispatch(PicsSlice.fetchPic({ id: event.userId, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
             break;
           case 'BlockedAccount':
-            store.dispatch(BlockedUsersSlice.upsertOne(message));
+            store.dispatch(BlockedUsersSlice.upsertOne(event));
             break;
           case 'DeletedContact':
-            store.dispatch(ContactsSlice.removeOne(message.userId));
+            store.dispatch(ContactsSlice.removeOne(event.userId));
             break;
           case 'NewContact':
-            store.dispatch(ContactsSlice.upsertOne(message));
+            store.dispatch(ContactsSlice.upsertOne(event));
             break;
           case 'UnblockedAccount':
-            store.dispatch(BlockedUsersSlice.removeOne(message.userId));
+            store.dispatch(BlockedUsersSlice.removeOne(event.userId));
             break;
           case 'DeletedAccount':
-            store.dispatch(BlockedUsersSlice.removeOne(message.userId));
-            store.dispatch(ChatsSlice.removePrivateChat(message.userId));
-            store.dispatch(OnlineStatusesSlice.removeOne(message.userId));
-            store.dispatch(PicsSlice.removeAccount(message.userId));
-            store.dispatch(TypingStatusesSlice.removeUser(message.userId));
+            store.dispatch(BlockedUsersSlice.removeOne(event.userId));
+            store.dispatch(ChatsSlice.removePrivateChat(event.userId));
+            store.dispatch(OnlineStatusesSlice.removeOne(event.userId));
+            store.dispatch(PicsSlice.removeAccount(event.userId));
+            store.dispatch(TypingStatusesSlice.removeUser(event.userId));
         }
       },
       onError,
@@ -320,27 +322,36 @@ async function subscribeToChats(): Promise<void> {
       `,
       async ({ data, errors }: GraphQlResponse<SubscribeToChatsResult>) => {
         if (errors !== undefined) await displayBugReporter(errors);
-        const message = data?.subscribeToChats;
-        switch (message?.__typename) {
+        const event = data?.subscribeToChats;
+        switch (event?.__typename) {
           case 'CreatedSubscription':
             resolve();
             break;
           case 'GroupChatId':
-            store.dispatch(ChatsSlice.fetchChat(message.chatId));
+            store.dispatch(ChatsSlice.fetchChat(event.chatId));
             break;
           case 'ExitedUsers':
-            store.dispatch(ChatsSlice.removeGroupChatUsers(message));
-            if (message.userIdList.includes(Storage.readUserId()!))
-              store.dispatch(ChatsSlice.removeOne(message.chatId));
+            store.dispatch(ChatsSlice.removeGroupChatUsers(event));
+            if (event.userIdList.includes(Storage.readUserId()!)) {
+              store.dispatch(ChatsSlice.removeOne(event.chatId));
+              if (ChatPageLayoutSlice.select(store.getState()).chatId === event.chatId) {
+                message.info("You're no longer in this chat.", 5);
+                store.dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
+              }
+            }
             break;
           case 'UpdatedGroupChat':
-            store.dispatch(ChatsSlice.updateGroupChat(message));
+            store.dispatch(ChatsSlice.updateGroupChat(event));
             break;
           case 'UpdatedGroupChatPic':
-            store.dispatch(PicsSlice.fetchPic({ id: message.chatId, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
+            store.dispatch(PicsSlice.fetchPic({ id: event.chatId, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
             break;
           case 'DeletedPrivateChat':
-            ChatsSlice.removeOne(message.chatId);
+            ChatsSlice.removeOne(event.chatId);
+            if (ChatPageLayoutSlice.select(store.getState()).chatId === event.chatId) {
+              message.info('The other user just deleted their account.', 5);
+              store.dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
+            }
         }
       },
       onError,
@@ -517,17 +528,17 @@ async function subscribeToMessages(): Promise<void> {
       `,
       async ({ data, errors }: GraphQlResponse<SubscribeToMessagesResult>) => {
         if (errors !== undefined) await displayBugReporter(errors);
-        const message = data?.subscribeToMessages;
-        switch (message?.__typename) {
+        const event = data?.subscribeToMessages;
+        switch (event?.__typename) {
           case 'CreatedSubscription':
             resolve();
             break;
           case 'DeletedMessage':
-            store.dispatch(ChatsSlice.deleteMessage(message));
-            store.dispatch(PicMessagesSlice.deleteMessage(message.messageId));
+            store.dispatch(ChatsSlice.deleteMessage(event));
+            store.dispatch(PicMessagesSlice.deleteMessage(event.messageId));
             break;
           case 'UserChatMessagesRemoval':
-            store.dispatch(ChatsSlice.removeUserChatMessages(message));
+            store.dispatch(ChatsSlice.removeUserChatMessages(event));
             break;
           case 'NewActionMessage':
           case 'NewAudioMessage':
@@ -537,7 +548,7 @@ async function subscribeToMessages(): Promise<void> {
           case 'NewPollMessage':
           case 'NewTextMessage':
           case 'NewVideoMessage':
-            store.dispatch(ChatsSlice.addMessage(message));
+            store.dispatch(ChatsSlice.addMessage(event));
         }
       },
       onError,
@@ -578,13 +589,13 @@ async function subscribeToOnlineStatuses(): Promise<void> {
       `,
       async ({ data, errors }: GraphQlResponse<SubscribeToOnlineStatuses>) => {
         if (errors !== undefined) await displayBugReporter(errors);
-        const message = data?.subscribeToOnlineStatuses;
-        switch (message?.__typename) {
+        const event = data?.subscribeToOnlineStatuses;
+        switch (event?.__typename) {
           case 'CreatedSubscription':
             resolve();
             break;
           case 'OnlineStatus':
-            store.dispatch(OnlineStatusesSlice.upsertOne(message));
+            store.dispatch(OnlineStatusesSlice.upsertOne(event));
         }
       },
       onError,
@@ -625,13 +636,13 @@ async function subscribeToTypingStatuses(): Promise<void> {
       `,
       async ({ data, errors }: GraphQlResponse<SubscribeToTypingStatusesResult>) => {
         if (errors !== undefined) await displayBugReporter(errors);
-        const message = data?.subscribeToTypingStatuses;
-        switch (message?.__typename) {
+        const event = data?.subscribeToTypingStatuses;
+        switch (event?.__typename) {
           case 'CreatedSubscription':
             resolve();
             break;
           case 'TypingStatus':
-            store.dispatch(TypingStatusesSlice.upsertOne(message));
+            store.dispatch(TypingStatusesSlice.upsertOne(event));
         }
       },
       onError,

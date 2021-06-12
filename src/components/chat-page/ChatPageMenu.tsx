@@ -4,6 +4,7 @@ import {
   CodeOutlined,
   ContactsOutlined,
   CustomerServiceOutlined,
+  FileSearchOutlined,
   LogoutOutlined,
   MoreOutlined,
   SearchOutlined,
@@ -30,7 +31,7 @@ export default function ChatPageMenu(): ReactElement {
         <ContactsCol />
         <SearchUsersCol />
         <CreateGroupChatCol />
-        <BlockedUsersCol />
+        <SearchPublicChatsCol />
         <LogOutCol />
         <MoreCol />
       </Row>
@@ -109,16 +110,15 @@ function CreateGroupChatCol(): ReactElement {
   );
 }
 
-function BlockedUsersCol(): ReactElement {
+function SearchPublicChatsCol(): ReactElement {
   const dispatch = useDispatch();
   return (
     <Col>
-      <Tooltip title='Blocked users'>
+      <Tooltip title='Search public chats'>
         <Button
-          icon={<StopOutlined />}
+          icon={<FileSearchOutlined />}
           onClick={() => {
-            dispatch(SearchedUsersSlice.clear());
-            dispatch(ChatPageLayoutSlice.update({ type: 'BLOCKED_USERS_SECTION' }));
+            dispatch(ChatPageLayoutSlice.update({ type: 'SEARCH_PUBLIC_CHATS' }));
           }}
         />
       </Tooltip>
@@ -163,6 +163,9 @@ function DevelopersItem(): ReactElement {
 function MoreCol(): ReactElement {
   const menu = (
     <Menu>
+      <Menu.Item key={0}>
+        <BlockedUsersItem />
+      </Menu.Item>
       <Menu.Item key={1}>
         <SupportItem />
       </Menu.Item>
@@ -177,5 +180,20 @@ function MoreCol(): ReactElement {
         <Button icon={<MoreOutlined />} />
       </Dropdown>
     </Col>
+  );
+}
+
+function BlockedUsersItem(): ReactElement {
+  const dispatch = useDispatch();
+  return (
+    <Button
+      icon={<StopOutlined />}
+      onClick={() => {
+        dispatch(SearchedUsersSlice.clear());
+        dispatch(ChatPageLayoutSlice.update({ type: 'BLOCKED_USERS_SECTION' }));
+      }}
+    >
+      Blocked users
+    </Button>
   );
 }

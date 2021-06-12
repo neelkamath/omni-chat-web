@@ -14,16 +14,17 @@ import ChatSection from './chat-section/ChatSection';
 import { queryOrMutate } from '@neelkamath/omni-chat';
 import setOnline from '../../setOnline';
 import CreateGroupChatSection from './CreateGroupChatSection';
+import SearchPublicChatsSection from './SearchPublicChatsSection';
 
 export default function ChatPage(): ReactElement {
   const [page, setPage] = useState(<LoadingPage />);
   useEffect(() => {
-    refreshTokenSet().then(async (result) => {
-      if (result === undefined) {
+    refreshTokenSet().then(async (response) => {
+      if (response === undefined) {
         location.href = '/sign-in';
         return;
       }
-      Storage.saveTokenSet(result.refreshTokenSet);
+      Storage.saveTokenSet(response.refreshTokenSet);
       await setOnline(true);
       await setUpSubscriptions();
       addEventListener('online', () => {
@@ -100,5 +101,7 @@ function LayoutContent(): ReactElement {
       return <ChatSection chatId={chatId!} />;
     case 'CREATE_GROUP_CHAT':
       return <CreateGroupChatSection />;
+    case 'SEARCH_PUBLIC_CHATS':
+      return <SearchPublicChatsSection />;
   }
 }

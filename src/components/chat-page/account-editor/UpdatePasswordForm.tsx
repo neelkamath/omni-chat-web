@@ -42,8 +42,8 @@ function validateAccountUpdate({ password }: AccountUpdate): boolean {
 }
 
 async function operateUpdateAccount(update: AccountUpdate): Promise<void> {
-  const result = await updateAccount(update);
-  if (result?.updateAccount === null) message.success('Account updated.', 3);
+  const response = await updateAccount(update);
+  if (response?.updateAccount === null) message.success('Account updated.', 3);
 }
 
 interface UsernameTaken {

@@ -100,10 +100,10 @@ function validateAccountInput({ username, password }: AccountInput): boolean {
 }
 
 async function operateCreateAccount(account: AccountInput): Promise<void> {
-  const result = await createAccount(account);
-  if (result?.createAccount === null)
+  const response = await createAccount(account);
+  if (response?.createAccount === null)
     message.success('Account created. Check your email for an account verification code.', 5);
-  switch (result?.createAccount?.__typename) {
+  switch (response?.createAccount?.__typename) {
     case 'EmailAddressTaken':
       message.error('That email address has already been registered.', 5);
       break;

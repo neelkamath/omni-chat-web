@@ -27,8 +27,8 @@ export default function AddUsersSection({ chatId }: AddUsersSectionProps): React
       message.info('That user is already a participant.', 5);
       return;
     }
-    const result = await addGroupChatUsers(chatId, [userId]);
-    if (result !== undefined) message.success('User added.', 3);
+    const response = await addGroupChatUsers(chatId, [userId]);
+    if (response !== undefined) message.success('User added.', 3);
   };
   return (
     <SearchUsersSection

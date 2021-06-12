@@ -51,11 +51,11 @@ function ResendEmailAddressVerificationCodeForm(): ReactElement {
 }
 
 async function operateEmailEmailAddressVerification(emailAddress: string): Promise<void> {
-  const result = await emailEmailAddressVerification(emailAddress);
-  if (result?.emailEmailAddressVerification === null) message.success('Resent verification code.', 3);
-  else if (result?.emailEmailAddressVerification?.__typename === 'EmailAddressVerified')
+  const response = await emailEmailAddressVerification(emailAddress);
+  if (response?.emailEmailAddressVerification === null) message.success('Resent verification code.', 3);
+  else if (response?.emailEmailAddressVerification?.__typename === 'EmailAddressVerified')
     message.warn('The account has already been verified.', 5);
-  else if (result?.emailEmailAddressVerification?.__typename === 'UnregisteredEmailAddress')
+  else if (response?.emailEmailAddressVerification?.__typename === 'UnregisteredEmailAddress')
     message.error("There's no account associated with that email address.", 5);
 }
 

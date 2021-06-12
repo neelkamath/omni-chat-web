@@ -71,11 +71,12 @@ function validatePassword(password: string): boolean {
 }
 
 async function operateResetPassword(data: ResetPasswordFormData): Promise<void> {
-  const result = await resetPassword(data);
-  if (result?.resetPassword === null) message.success('Password reset.', 3);
-  else if (result?.resetPassword?.__typename === 'UnregisteredEmailAddress')
+  const response = await resetPassword(data);
+  if (response?.resetPassword === null) message.success('Password reset.', 3);
+  else if (response?.resetPassword?.__typename === 'UnregisteredEmailAddress')
     message.error("That email address isn't registered.", 5);
-  else if (result?.resetPassword?.__typename === 'InvalidPasswordResetCode') message.error('Incorrect reset code.', 3);
+  else if (response?.resetPassword?.__typename === 'InvalidPasswordResetCode')
+    message.error('Incorrect reset code.', 3);
 }
 
 interface ResetPasswordResult {

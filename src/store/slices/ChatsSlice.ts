@@ -130,16 +130,16 @@ export namespace ChatsSlice {
   }
 
   async function operateReadChats(): Promise<ChatsConnection | undefined> {
-    const result = await readChats();
-    return result?.readChats;
+    const response = await readChats();
+    return response?.readChats;
   }
 
   async function operateReadChat(id: number): Promise<PrivateChat | GroupChat | undefined> {
-    const result = await readChat(id);
-    switch (result?.readChat.__typename) {
+    const response = await readChat(id);
+    switch (response?.readChat.__typename) {
       case 'GroupChat':
       case 'PrivateChat':
-        return result.readChat;
+        return response.readChat;
       case 'InvalidChatId':
       case undefined:
         return undefined;

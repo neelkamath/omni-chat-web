@@ -21,8 +21,8 @@ export namespace OnlineStatusesSlice {
   }
 
   async function operateReadOnlineStatus(userId: number): Promise<OnlineStatus | undefined> {
-    const result = await readOnlineStatus(userId);
-    return result?.readOnlineStatus.__typename === 'InvalidUserId' ? undefined : result?.readOnlineStatus;
+    const response = await readOnlineStatus(userId);
+    return response?.readOnlineStatus.__typename === 'InvalidUserId' ? undefined : response?.readOnlineStatus;
   }
 
   interface ReadOnlineStatusResult {

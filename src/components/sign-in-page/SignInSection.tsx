@@ -73,8 +73,8 @@ function validateLogin({ username, password }: Login): boolean {
 }
 
 async function operateRequestTokenSet(login: Login): Promise<void> {
-  const result = await requestTokenSet(login);
-  switch (result?.requestTokenSet.__typename) {
+  const response = await requestTokenSet(login);
+  switch (response?.requestTokenSet.__typename) {
     case 'IncorrectPassword':
       message.error('Incorrect password.', 3);
       break;
@@ -82,7 +82,7 @@ async function operateRequestTokenSet(login: Login): Promise<void> {
       message.error("That username doesn't exist.", 5);
       break;
     case 'TokenSet':
-      Storage.saveTokenSet(result.requestTokenSet);
+      Storage.saveTokenSet(response.requestTokenSet);
       location.href = '/chat';
       break;
     case 'UnverifiedEmailAddress':

@@ -56,11 +56,11 @@ function VerifyYourEmailAddressForm(): ReactElement {
 }
 
 async function operateVerifyEmailAddress(data: VerifyYourEmailAddressFormData): Promise<void> {
-  const result = await verifyEmailAddress(data);
-  if (result?.verifyEmailAddress === null) message.success('Email address verified.', 3);
-  else if (result?.verifyEmailAddress?.__typename === 'UnregisteredEmailAddress')
+  const response = await verifyEmailAddress(data);
+  if (response?.verifyEmailAddress === null) message.success('Email address verified.', 3);
+  else if (response?.verifyEmailAddress?.__typename === 'UnregisteredEmailAddress')
     message.error("That email address isn't registered.", 5);
-  else if (result?.verifyEmailAddress?.__typename === 'InvalidVerificationCode')
+  else if (response?.verifyEmailAddress?.__typename === 'InvalidVerificationCode')
     message.error('Incorrect verification code.', 3);
 }
 
