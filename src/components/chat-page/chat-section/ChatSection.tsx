@@ -24,7 +24,7 @@ export default function ChatSection({ chatId }: ChatSectionProps): ReactElement 
     if (isDeletedPrivateChat) onDeletedChat();
   }, [isDeletedPrivateChat]);
   useEffect(() => {
-    if (chat?.__typename) setSection(<ChatSegment chat={chat as ChatsSlice.PrivateChat} />);
+    if (chat?.__typename === 'PrivateChat') setSection(<ChatSegment chat={chat as ChatsSlice.PrivateChat} />);
     else if (chat?.__typename === 'GroupChat') setSection(<ChatSegment chat={chat as ChatsSlice.GroupChat} />);
   }, [chat]);
   return section;

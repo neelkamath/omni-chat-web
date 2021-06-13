@@ -4,8 +4,8 @@ import { UploadRequestOption } from 'rc-upload/lib/interface';
 import { Button, message, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { InvalidPicError, patchGroupChatPic } from '@neelkamath/omni-chat';
-import { httpApiConfig, operateRestApi } from '../../../../../api';
-import { Storage } from '../../../../../Storage';
+import { httpApiConfig, operateRestApi } from '../../../../api';
+import { Storage } from '../../../../Storage';
 
 export interface NewPicButtonProps {
   readonly chatId: number;

@@ -2,11 +2,11 @@ import React, { ReactElement, useState } from 'react';
 import { Button, Form, message, Spin, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import { GroupChatDescription, Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
-import { RootState, useThunkDispatch } from '../../../../store/store';
-import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
-import { Storage } from '../../../../Storage';
-import { httpApiConfig, operateGraphQlApi } from '../../../../api';
-import GfmFormItem from '../../GfmFormItem';
+import { RootState, useThunkDispatch } from '../../../store/store';
+import { ChatsSlice } from '../../../store/slices/ChatsSlice';
+import { Storage } from '../../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../../api';
+import GfmFormItem from '../GfmFormItem';
 
 export interface DescriptionSectionProps {
   readonly chatId: number;

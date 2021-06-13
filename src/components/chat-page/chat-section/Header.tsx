@@ -1,36 +1,36 @@
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
-import React, { ReactElement, ReactNode, useState } from 'react';
+import React, { MouseEventHandler, ReactElement, ReactNode, useState } from 'react';
 import { Button, Col, Row, Tag, Typography } from 'antd';
 import ChatPic from '../ChatPic';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import ProfileModal from '../ProfileModal';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState, useThunkDispatch } from '../../../store/store';
 import { OnlineStatusesSlice } from '../../../store/slices/OnlineStatusesSlice';
 import TimeAgo from 'timeago-react';
 import { TypingStatusesSlice } from '../../../store/slices/TypingStatusesSlice';
-import GroupChatModal from './group-chat-modal/GroupChatModal';
+import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
 
 export interface HeaderProps {
   readonly chat: ChatsSlice.PrivateChat | ChatsSlice.GroupChat;
 }
 
 export default function Header({ chat }: HeaderProps): ReactElement {
+  const dispatch = useDispatch();
   const [isVisible, setVisible] = useState(false);
-  const onCancel = () => setVisible(false);
-  let name, typingStatusSection, tags, modal;
+  let name: string, typingStatusSection: ReactElement, tags: ReactElement, onClick: MouseEventHandler<HTMLElement>;
   switch (chat.__typename) {
     case 'PrivateChat':
       name = chat.user.username;
       typingStatusSection = <PrivateChatTypingStatusSection userId={chat.user.userId} chatId={chat.chatId} />;
       tags = <Tag color='orange'>Private</Tag>;
-      modal = <ProfileModal account={chat.user} hasChatButton={false} isVisible={isVisible} onCancel={onCancel} />;
+      onClick = () => setVisible(true);
       break;
     case 'GroupChat':
       name = chat.title;
       typingStatusSection = <GroupChatTypingStatusSection chatId={chat.chatId} />;
       tags = <GroupChatTags chat={chat} />;
-      modal = <GroupChatModal isVisible={isVisible} onCancel={onCancel} chatId={chat.chatId} />;
+      onClick = () => dispatch(ChatPageLayoutSlice.update({ type: 'GROUP_CHAT_INFO', chatId: chat.chatId }));
   }
   return (
     <Row gutter={16}>
@@ -46,8 +46,15 @@ export default function Header({ chat }: HeaderProps): ReactElement {
       {typingStatusSection}
       <Col>
         {tags}
-        <Button ghost onClick={() => setVisible(true)} icon={<InfoCircleOutlined />} />
-        {modal}
+        <Button ghost onClick={onClick} icon={<InfoCircleOutlined />} />
+        {chat.__typename === 'PrivateChat' && (
+          <ProfileModal
+            account={chat.user}
+            hasChatButton={false}
+            isVisible={isVisible}
+            onCancel={() => setVisible(false)}
+          />
+        )}
       </Col>
     </Row>
   );

@@ -2,12 +2,12 @@ import React, { ReactElement, useEffect } from 'react';
 import { message, Space, Spin } from 'antd';
 import { useSelector } from 'react-redux';
 import { Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
-import { RootState, useThunkDispatch } from '../../../../store/store';
-import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
-import { Storage } from '../../../../Storage';
-import { httpApiConfig, operateGraphQlApi } from '../../../../api';
-import { SearchedUsersSlice } from '../../../../store/slices/SearchedUsersSlice';
-import SearchUsersSection from '../../SearchUsersSection';
+import { RootState, useThunkDispatch } from '../../../store/store';
+import { ChatsSlice } from '../../../store/slices/ChatsSlice';
+import { Storage } from '../../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../../api';
+import { SearchedUsersSlice } from '../../../store/slices/SearchedUsersSlice';
+import SearchUsersSection from '../SearchUsersSection';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 export interface AddUsersSectionProps {

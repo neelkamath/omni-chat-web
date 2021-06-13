@@ -1,42 +1,36 @@
 import React, { ReactElement } from 'react';
-import { Collapse, Divider, Modal, Row } from 'antd';
+import { Button, Collapse, Divider, Row } from 'antd';
 import PicSection from './pic-section/PicSection';
+import TitleSection from './TitleSection';
+import DescriptionSection from './DescriptionSection';
 import BroadcastSection from './BroadcastSection';
 import PublicitySection from './PublicitySection';
 import LeaveSection from './LeaveSection';
-import { useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../../store/store';
-import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
-import { Storage } from '../../../../Storage';
+import { RootState, useThunkDispatch } from '../../../store/store';
+import { ChatsSlice } from '../../../store/slices/ChatsSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { Storage } from '../../../Storage';
+import UsersSection from './UsersSection';
 import AddUsersSection from './AddUsersSection';
 import RemoveUsersSection from './RemoveUsersSection';
-import UsersSection from './UsersSection';
-import TitleSection from './TitleSection';
-import DescriptionSection from './DescriptionSection';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
 
-export interface GroupChatModalProps {
-  /** Whether the modal is visible. */
-  readonly isVisible: boolean;
-  /** Callback for when the user attempts to close the modal. You could set {@link isVisible} to `false` here. */
-  readonly onCancel: () => void;
+export interface GroupChatSectionProps {
   readonly chatId: number;
 }
 
-export default function GroupChatModal({ isVisible, onCancel, chatId }: GroupChatModalProps): ReactElement {
-  return (
-    <Modal footer={null} visible={isVisible} onCancel={onCancel}>
-      <GroupChatSection chatId={chatId} />
-    </Modal>
-  );
-}
-
-interface GroupChatSectionProps {
-  readonly chatId: number;
-}
-
-function GroupChatSection({ chatId }: GroupChatSectionProps): ReactElement {
+export default function GroupChatInfo({ chatId }: GroupChatSectionProps): ReactElement {
+  const dispatch = useDispatch();
   return (
     <Row style={{ padding: 16 }}>
+      <Button
+        icon={<ArrowLeftOutlined />}
+        onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_SECTION', chatId }))}
+      >
+        Chat
+      </Button>
+      <Divider />
       <PicSection chatId={chatId} />
       <Divider />
       <TitleSection chatId={chatId} />

@@ -2,10 +2,10 @@ import React, { ReactElement, useState } from 'react';
 import { message, Space, Spin, Switch, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import { Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
-import { RootState, useThunkDispatch } from '../../../../store/store';
-import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
-import { Storage } from '../../../../Storage';
-import { httpApiConfig, operateGraphQlApi } from '../../../../api';
+import { RootState, useThunkDispatch } from '../../../store/store';
+import { ChatsSlice } from '../../../store/slices/ChatsSlice';
+import { Storage } from '../../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../../api';
 
 export interface BroadcastSectionProps {
   readonly chatId: number;

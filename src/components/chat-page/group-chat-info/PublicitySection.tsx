@@ -2,11 +2,11 @@ import React, { ReactElement } from 'react';
 import { Form, message, RadioChangeEvent, Spin } from 'antd';
 import { useSelector } from 'react-redux';
 import { queryOrMutate } from '@neelkamath/omni-chat';
-import { RootState, useThunkDispatch } from '../../../../store/store';
-import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
-import { Storage } from '../../../../Storage';
-import { httpApiConfig, operateGraphQlApi } from '../../../../api';
-import PublicityRadioGroup from '../../PublicityRadioGroup';
+import { RootState, useThunkDispatch } from '../../../store/store';
+import { ChatsSlice } from '../../../store/slices/ChatsSlice';
+import { Storage } from '../../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../../api';
+import PublicityRadioGroup from '../PublicityRadioGroup';
 
 export interface PublicitySectionProps {
   readonly chatId: number;

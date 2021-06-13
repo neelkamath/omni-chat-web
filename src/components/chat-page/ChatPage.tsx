@@ -15,6 +15,7 @@ import { queryOrMutate } from '@neelkamath/omni-chat';
 import setOnline from '../../setOnline';
 import CreateGroupChatSection from './CreateGroupChatSection';
 import SearchPublicChatsSection from './SearchPublicChatsSection';
+import GroupChatInfo from './group-chat-info/GroupChatInfo';
 
 export default function ChatPage(): ReactElement {
   const [page, setPage] = useState(<LoadingPage />);
@@ -103,5 +104,7 @@ function LayoutContent(): ReactElement {
       return <CreateGroupChatSection />;
     case 'SEARCH_PUBLIC_CHATS':
       return <SearchPublicChatsSection />;
+    case 'GROUP_CHAT_INFO':
+      return <GroupChatInfo chatId={chatId!} />;
   }
 }

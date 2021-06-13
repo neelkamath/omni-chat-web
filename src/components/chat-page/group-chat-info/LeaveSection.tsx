@@ -1,9 +1,9 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, message, Popconfirm, Space, Typography } from 'antd';
 import { queryOrMutate } from '@neelkamath/omni-chat';
-import { Storage } from '../../../../Storage';
-import { httpApiConfig, operateGraphQlApi } from '../../../../api';
-import { ChatPageLayoutSlice } from '../../../../store/slices/ChatPageLayoutSlice';
+import { Storage } from '../../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../../api';
+import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
 import { useDispatch } from 'react-redux';
 
 export interface LeaveSectionProps {

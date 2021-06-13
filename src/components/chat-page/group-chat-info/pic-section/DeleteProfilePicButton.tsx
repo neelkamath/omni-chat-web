@@ -2,8 +2,8 @@ import React, { ReactElement } from 'react';
 import { Button, message } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
-import { httpApiConfig, operateGraphQlApi } from '../../../../../api';
-import { Storage } from '../../../../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../../../api';
+import { Storage } from '../../../../Storage';
 
 export interface DeletePicButtonProps {
   readonly chatId: number;

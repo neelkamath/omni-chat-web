@@ -2,10 +2,10 @@ import React, { ReactElement, useState } from 'react';
 import { Button, Form, Input, message, Spin, Typography } from 'antd';
 import { useSelector } from 'react-redux';
 import { GroupChatTitle, Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
-import { RootState, useThunkDispatch } from '../../../../store/store';
-import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
-import { Storage } from '../../../../Storage';
-import { httpApiConfig, operateGraphQlApi } from '../../../../api';
+import { RootState, useThunkDispatch } from '../../../store/store';
+import { ChatsSlice } from '../../../store/slices/ChatsSlice';
+import { Storage } from '../../../Storage';
+import { httpApiConfig, operateGraphQlApi } from '../../../api';
 
 export interface TitleSectionProps {
   readonly chatId: number;

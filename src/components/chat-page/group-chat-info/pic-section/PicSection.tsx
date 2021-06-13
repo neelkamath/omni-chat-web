@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { NonexistentChatError } from '@neelkamath/omni-chat';
 import DeletePicButton from './DeleteProfilePicButton';
 import NewPicButton from './NewPicButton';
-import { ChatsSlice } from '../../../../../store/slices/ChatsSlice';
-import { RootState, useThunkDispatch } from '../../../../../store/store';
-import { Storage } from '../../../../../Storage';
-import { PicsSlice } from '../../../../../store/slices/PicsSlice';
-import { ChatPageLayoutSlice } from '../../../../../store/slices/ChatPageLayoutSlice';
-import OriginalPic from '../../../OriginalPic';
+import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
+import { RootState, useThunkDispatch } from '../../../../store/store';
+import { Storage } from '../../../../Storage';
+import { PicsSlice } from '../../../../store/slices/PicsSlice';
+import { ChatPageLayoutSlice } from '../../../../store/slices/ChatPageLayoutSlice';
+import OriginalPic from '../../OriginalPic';
 
 interface PicSectionProps {
   readonly chatId: number;

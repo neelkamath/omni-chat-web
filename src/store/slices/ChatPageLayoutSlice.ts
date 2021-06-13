@@ -8,17 +8,6 @@ export namespace ChatPageLayoutSlice {
     readonly chatId?: number;
   }
 
-  /**
-   * - `'EMPTY'` indicates `<Empty />`.
-   * - `'BLOCKED_USERS_SECTION'` indicates `<BlockedUsersSection />`.
-   * - `'ACCOUNT_EDITOR'` indicates `<AccountEditor />`.
-   * - `'CONTACTS_SECTION'` indicates `<ContactsSection />`.
-   * - `'SEARCH_USERS_SECTION'` indicates `<SearchUsersSection />`.
-   * - `'SUPPORT_SECTION'` indicates `<ChatPageSupportSection />`.
-   * - `'DEVELOPERS_SECTION'` indicates `<DevelopersSection />`.
-   * - `'CHAT_SECTION'` indicates `<ChatSection />`.
-   * - `'SEARCH_PUBLIC_CHATS'` indicates `<SearchPublicChatsSection />`.
-   */
   export type ElementType =
     | 'EMPTY'
     | 'BLOCKED_USERS_SECTION'
@@ -29,7 +18,8 @@ export namespace ChatPageLayoutSlice {
     | 'DEVELOPERS_SECTION'
     | 'CHAT_SECTION'
     | 'CREATE_GROUP_CHAT'
-    | 'SEARCH_PUBLIC_CHATS';
+    | 'SEARCH_PUBLIC_CHATS'
+    | 'GROUP_CHAT_INFO';
 
   function reduceUpdate(_: Draft<State>, { payload }: PayloadAction<State>): State | void {
     return payload;

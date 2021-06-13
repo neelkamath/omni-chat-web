@@ -31,6 +31,10 @@ interface ChatCardProps {
   readonly chat: SearchedPublicChatsSlice.GroupChat;
 }
 
+/*
+FIXME: Opening a public chat the user isn't a participant of doesn't do anything: This should get automatically fixed in
+  Omni Chat Backend 0.21.0.
+ */
 function ChatCard({ chat }: ChatCardProps): ReactElement {
   const dispatch = useDispatch();
   const onClick = () => dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_SECTION', chatId: chat.chatId }));
