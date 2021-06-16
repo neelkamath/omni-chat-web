@@ -124,7 +124,8 @@ export namespace BlockedUsersSlice {
   export const { updateAccount, upsertOne, removeOne } = slice.actions;
 
   export const selectIsBlocked = createSelector(
-    [(state: RootState) => state.blockedUsers.ids, (_: RootState, userId: number) => userId],
+    (state: RootState) => state.blockedUsers.ids,
+    (_: RootState, userId: number) => userId,
     (ids: (string | number)[], userId: number) => ids.includes(userId),
   );
 

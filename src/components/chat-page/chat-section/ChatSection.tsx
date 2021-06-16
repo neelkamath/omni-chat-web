@@ -6,6 +6,7 @@ import { RootState, useThunkDispatch } from '../../../store/store';
 import Header from './Header';
 import MessageCreator from './message-creator/MessageCreator';
 import ChatMessage from './chat-message/ChatMessage';
+import { Storage } from '../../../Storage';
 
 export interface ChatSectionProps {
   readonly chatId: number;
@@ -35,7 +36,6 @@ interface ChatSegmentProps {
 }
 
 function ChatSegment({ chat }: ChatSegmentProps): ReactElement {
-  const isBroadcast = chat.__typename === 'GroupChat' && chat.isBroadcast;
   return (
     <Layout>
       <Layout.Header>
@@ -43,11 +43,29 @@ function ChatSegment({ chat }: ChatSegmentProps): ReactElement {
       </Layout.Header>
       <Layout.Content style={{ padding: 16 }}>
         {chat.messages.edges.map(({ node }) => (
-          <ChatMessage key={node.messageId} message={node} />
+          <ChatMessage chatId={chat.chatId} key={node.messageId} message={node} />
         ))}
         {chat.messages.edges.length > 0 && <Divider />}
-        {isBroadcast ? 'Only admins can send messages in this chat.' : <MessageCreator chatId={chat.chatId} />}
+        <MessageCreatorSection chat={chat} />
       </Layout.Content>
     </Layout>
   );
+}
+
+interface MessageCreatorSectionProps {
+  readonly chat: ChatsSlice.PrivateChat | ChatsSlice.GroupChat;
+}
+
+function MessageCreatorSection({ chat }: MessageCreatorSectionProps): ReactElement {
+  switch (chat.__typename) {
+    case 'PrivateChat':
+      return <MessageCreator chatId={chat.chatId} />;
+    case 'GroupChat': {
+      const isParticipant = chat.users.edges.find(({ node }) => node.userId === Storage.readUserId()) !== undefined;
+      const isAdmin = chat.adminIdList.includes(Storage.readUserId()!);
+      if (!isParticipant) return <>You must be a participant to send messages.</>;
+      else if (chat.isBroadcast && !isAdmin) return <>Only admins can send messages.</>;
+      else return <MessageCreator chatId={chat.chatId} />;
+    }
+  }
 }

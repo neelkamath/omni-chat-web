@@ -39,7 +39,7 @@ export default function ActionableUserCard({
     return (
       <>
         {card}
-        <ProfileModal account={account} isVisible={isVisible} onCancel={() => setVisible(false)} hasChatButton={true} />
+        <ProfileModal account={account} isVisible={isVisible} onCancel={() => setVisible(false)} hasChatButton />
       </>
     );
   return (
@@ -61,11 +61,7 @@ interface UserCardProps {
 
 function UserCard({ account, onClick, extraRenderer }: UserCardProps): ReactElement {
   return (
-    <Card
-      extra={extraRenderer === undefined ? undefined : extraRenderer(account.userId)}
-      hoverable={true}
-      onClick={onClick}
-    >
+    <Card extra={extraRenderer === undefined ? undefined : extraRenderer(account.userId)} hoverable onClick={onClick}>
       <Row gutter={16} align='middle'>
         <Col>
           <ProfilePic userId={account.userId} />

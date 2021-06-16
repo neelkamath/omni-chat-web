@@ -111,7 +111,8 @@ export namespace ContactsSlice {
   export const { updateOne, removeOne, upsertOne } = slice.actions;
 
   export const selectIsContact = createSelector(
-    [(state: RootState) => state.contacts.ids, (_: RootState, userId: number) => userId],
+    (state: RootState) => state.contacts.ids,
+    (_: RootState, userId: number) => userId,
     (ids: (string | number)[], userId: number) => ids.includes(userId),
   );
 

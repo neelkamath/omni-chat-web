@@ -17,11 +17,12 @@ import {
 import gfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
 import TimeAgo from 'timeago-react';
+import ChatName from './ChatName';
 
 export default function MenuChats(): ReactElement {
+  useThunkDispatch(ChatsSlice.fetchChats());
   const chats = useSelector(ChatsSlice.selectChats);
   const isLoading = !useSelector(ChatsSlice.selectIsLoaded);
-  useThunkDispatch(ChatsSlice.fetchChats());
   if (isLoading) return <Spin style={{ padding: 16 }} />;
   const cards = chats.map((chat) => <ChatCard key={chat.chatId} chat={chat} />);
   return <>{cards}</>;
@@ -75,26 +76,6 @@ function ChatMetadata({ chat }: ChatMetadataProps): ReactElement {
         </Col>
       </Row>
     </>
-  );
-}
-
-interface ChatNameProps {
-  readonly chat: ChatsSlice.Chat;
-}
-
-function ChatName({ chat }: ChatNameProps): ReactElement {
-  let name: string;
-  switch (chat.__typename) {
-    case 'GroupChat':
-      name = (chat as ChatsSlice.GroupChat).title;
-      break;
-    case 'PrivateChat':
-      name = (chat as ChatsSlice.PrivateChat).user.username;
-  }
-  return (
-    <Typography.Text ellipsis={true} strong style={{ width: 200 }}>
-      {name}
-    </Typography.Text>
   );
 }
 

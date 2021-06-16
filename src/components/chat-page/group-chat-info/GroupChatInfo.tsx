@@ -15,6 +15,7 @@ import AddUsersSection from './AddUsersSection';
 import RemoveUsersSection from './RemoveUsersSection';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
+import InviteSection from './InviteSection';
 
 export interface GroupChatSectionProps {
   readonly chatId: number;
@@ -30,6 +31,7 @@ export default function GroupChatInfo({ chatId }: GroupChatSectionProps): ReactE
       >
         Chat
       </Button>
+      <InviteSection chatId={chatId} />
       <Divider />
       <PicSection chatId={chatId} />
       <Divider />

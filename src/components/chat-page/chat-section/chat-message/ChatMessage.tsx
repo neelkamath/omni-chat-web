@@ -13,12 +13,14 @@ import gfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
 import { PicMessagesSlice } from '../../../../store/slices/PicMessagesSlice';
 import PollMessageContent from './PollMessageContent';
+import GroupChatInviteMessageContent from './GroupChatInviteMessageContent';
 
 export interface ChatMessageProps {
   readonly message: ChatsSlice.Message;
+  readonly chatId: number;
 }
 
-export default function ChatMessage({ message }: ChatMessageProps): ReactElement {
+export default function ChatMessage({ message, chatId }: ChatMessageProps): ReactElement {
   useThunkDispatch(AccountSlice.fetchAccount());
   const url = useSelector((state: RootState) =>
     PicsSlice.selectPic(state, 'PROFILE_PIC', message.sender.userId, 'THUMBNAIL'),
@@ -30,7 +32,7 @@ export default function ChatMessage({ message }: ChatMessageProps): ReactElement
       actions={actions}
       avatar={<CustomPic icon={<UserOutlined />} url={url} />}
       author={message.sender.username}
-      content={<MessageContent message={message} />}
+      content={<MessageContent chatId={chatId} message={message} />}
       datetime={message.sent}
     />
   );
@@ -38,10 +40,10 @@ export default function ChatMessage({ message }: ChatMessageProps): ReactElement
 
 interface MessageContentProps {
   readonly message: ChatsSlice.Message;
+  readonly chatId: number;
 }
 
-// @ts-ignore: Function lacks ending return statement and return type does not include 'undefined'.
-function MessageContent({ message }: MessageContentProps): ReactElement {
+function MessageContent({ message, chatId }: MessageContentProps): ReactElement {
   switch (message.__typename) {
     case 'TextMessage':
       return <ReactMarkdown plugins={[gfm]}>{(message as ChatsSlice.TextMessage).textMessage}</ReactMarkdown>;
@@ -49,6 +51,18 @@ function MessageContent({ message }: MessageContentProps): ReactElement {
       return <PicMessageContent messageId={message.messageId} />;
     case 'PollMessage':
       return <PollMessageContent message={message as ChatsSlice.PollMessage} />;
+    case 'GroupChatInviteMessage':
+      return (
+        <GroupChatInviteMessageContent
+          chatId={chatId}
+          inviteCode={(message as ChatsSlice.GroupChatInviteMessage).inviteCode}
+        />
+      );
+    case 'ActionMessage':
+    case 'AudioMessage':
+    case 'DocMessage':
+    case 'VideoMessage':
+      return <>Not implemented.</>;
   }
 }
 

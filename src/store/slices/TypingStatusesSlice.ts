@@ -127,17 +127,16 @@ export namespace TypingStatusesSlice {
   export const { upsertOne, removeUser } = slice.actions;
 
   export const selectIsTyping = createSelector(
-    [
-      (state: RootState) => state.typingStatuses.entities,
-      (_: RootState, userId: number) => userId,
-      (_state: RootState, _userId: number, chatId: number) => chatId,
-    ],
+    (state: RootState) => state.typingStatuses.entities,
+    (_: RootState, userId: number) => userId,
+    (_state: RootState, _userId: number, chatId: number) => chatId,
     (entities: Dictionary<Entity>, userId: number, chatId: number) =>
       entities[generateId(userId, chatId)]?.isTyping === true,
   );
 
   export const selectTyping = createSelector(
-    [(state: RootState) => state.typingStatuses.entities, (_: RootState, chatId: number) => chatId],
+    (state: RootState) => state.typingStatuses.entities,
+    (_: RootState, chatId: number) => chatId,
     (entities: Dictionary<Entity>, chatId: number) =>
       Object.values(entities)
         .filter((entity) => entity?.chatId === chatId)

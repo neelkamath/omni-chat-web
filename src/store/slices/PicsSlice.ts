@@ -144,12 +144,10 @@ export namespace PicsSlice {
   export const { removeAccount } = slice.actions;
 
   export const selectPic = createSelector(
-    [
-      (state: RootState) => state.pics.entities,
-      (_: RootState, type: EntityType) => type,
-      (_state: RootState, _type: EntityType, id: number) => id,
-      (_state: RootState, _type: EntityType, _id: number, picType: PicType) => picType,
-    ],
+    (state: RootState) => state.pics.entities,
+    (_: RootState, type: EntityType) => type,
+    (_state: RootState, _type: EntityType, id: number) => id,
+    (_state: RootState, _type: EntityType, _id: number, picType: PicType) => picType,
     (entities: Dictionary<Entity>, type: EntityType, id: number, picType: PicType) => {
       const entity = entities[generateId(type, id)];
       switch (picType) {
@@ -166,11 +164,9 @@ export namespace PicsSlice {
    * Otherwise, it'll either be a {@link NonexistentUserIdError} or {@link NonexistentChatError}.
    */
   export const selectError = createSelector(
-    [
-      (state: RootState) => state.pics.entities,
-      (_: RootState, type: EntityType) => type,
-      (_state: RootState, _type: EntityType, id: number) => id,
-    ],
+    (state: RootState) => state.pics.entities,
+    (_: RootState, type: EntityType) => type,
+    (_state: RootState, _type: EntityType, id: number) => id,
     (entities: Dictionary<Entity>, type: EntityType, id: number) => entities[generateId(type, id)]?.error,
   );
 }

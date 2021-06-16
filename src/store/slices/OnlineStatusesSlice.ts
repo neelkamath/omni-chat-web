@@ -93,7 +93,8 @@ export namespace OnlineStatusesSlice {
 
   /** `undefined` if the status hasn't been fetched yet. */
   export const select = createSelector(
-    [(state: RootState) => state.onlineStatuses.entities, (_: RootState, userId: number) => userId],
+    (state: RootState) => state.onlineStatuses.entities,
+    (_: RootState, userId: number) => userId,
     (entities: Dictionary<OnlineStatus>, userId: number) => entities[userId],
   );
 }

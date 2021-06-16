@@ -27,7 +27,7 @@ export default function PublicitySection({ chatId }: PublicitySectionProps): Rea
       <PublicityRadioGroup
         isInvitableDisabled={!isAdmin || publicity === 'PUBLIC'}
         isNotInvitableDisabled={!isAdmin || publicity === 'PUBLIC'}
-        isPublicDisabled={true}
+        isPublicDisabled
         onChange={onChange}
       />
     </Form>

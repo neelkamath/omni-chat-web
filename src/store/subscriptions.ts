@@ -25,6 +25,8 @@ import { PicMessagesSlice } from './slices/PicMessagesSlice';
 import { ChatPageLayoutSlice } from './slices/ChatPageLayoutSlice';
 import { message } from 'antd';
 
+// TODO: Maybe split this into multiple files. Make subscriptions smaller by externalizing the query and event handlers.
+
 /** `undefined` if no subscription is running. */
 type OnSubscriptionClose = OnSocketClose | undefined;
 

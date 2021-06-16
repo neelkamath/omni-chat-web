@@ -39,7 +39,7 @@ function ChatCard({ chat }: ChatCardProps): ReactElement {
   const dispatch = useDispatch();
   const onClick = () => dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_SECTION', chatId: chat.chatId }));
   return (
-    <Card hoverable={true} onClick={onClick}>
+    <Card hoverable onClick={onClick}>
       <Space>
         <GroupChatPic chatId={chat.chatId} />
         <Typography.Text strong>{chat.title}</Typography.Text>
