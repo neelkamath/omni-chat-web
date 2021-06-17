@@ -22,8 +22,7 @@ export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps):
   if (participants === undefined || adminIdList === undefined) return <Spin />;
   const onConfirm = async (userId: number) => {
     message.info('Removing the user...', 3);
-    const response = await removeGroupChatUsers(chatId, [userId]);
-    if (response?.removeGroupChatUsers === null) message.success('User removed.', 3);
+    await operateRemoveGroupChatUsers(chatId, userId);
   };
   const cards = participants
     .filter((participant) => participant.userId !== userId)
@@ -46,12 +45,23 @@ export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps):
   );
 }
 
+async function operateRemoveGroupChatUsers(chatId: number, userId: number): Promise<void> {
+  const response = await removeGroupChatUsers(chatId, [userId]);
+  if (response?.removeGroupChatUsers === null) message.success('User removed.', 3);
+  else if (response?.removeGroupChatUsers.__typename === 'MustBeAdmin')
+    message.error('You must be an admin to remove users.', 5);
+}
+
 interface CannotLeaveChat {
   readonly __typename: 'CannotLeaveChat';
 }
 
+interface MustBeAdmin {
+  readonly __typename: 'MustBeAdmin';
+}
+
 interface RemoveGroupChatUsersResult {
-  readonly removeGroupChatUsers: CannotLeaveChat | null;
+  readonly removeGroupChatUsers: CannotLeaveChat | MustBeAdmin | null;
 }
 
 async function removeGroupChatUsers(

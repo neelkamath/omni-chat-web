@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { Form, message, RadioChangeEvent, Spin } from 'antd';
+import { Form, message, Spin } from 'antd';
 import { useSelector } from 'react-redux';
 import { queryOrMutate } from '@neelkamath/omni-chat';
 import { RootState, useThunkDispatch } from '../../../store/store';
@@ -17,10 +17,6 @@ export default function PublicitySection({ chatId }: PublicitySectionProps): Rea
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   const publicity = useSelector((state: RootState) => ChatsSlice.selectPublicity(state, chatId));
   if (publicity === undefined) return <Spin size='small' />;
-  const onChange = async ({ target }: RadioChangeEvent) => {
-    const response = await setInvitability(chatId, target.value);
-    if (response?.setInvitability === null) message.success('Publicity updated.', 3);
-  };
   // FIXME: Doesn't re-render when <chatId> changes.
   return (
     <Form name='updatePublicity' layout='inline' initialValues={{ publicity }}>
@@ -28,29 +24,40 @@ export default function PublicitySection({ chatId }: PublicitySectionProps): Rea
         isInvitableDisabled={!isAdmin || publicity === 'PUBLIC'}
         isNotInvitableDisabled={!isAdmin || publicity === 'PUBLIC'}
         isPublicDisabled
-        onChange={onChange}
+        onChange={({ target }) => operateSetPublicity(chatId, target.value)}
       />
     </Form>
   );
+}
+
+async function operateSetPublicity(chatId: number, isInvitable: boolean): Promise<void> {
+  const response = await setPublicity(chatId, isInvitable);
+  if (response?.setPublicity === null) message.success('Publicity updated.', 3);
+  else if (response?.setPublicity.__typename === 'MustBeAdmin')
+    message.error('You must be an admin to update the publicity.', 5);
 }
 
 interface InvalidChatId {
   readonly __typename: 'InvalidChatId';
 }
 
-interface SetInvitabilityResult {
-  readonly setInvitability: InvalidChatId | null;
+interface SetPublicityResult {
+  readonly setPublicity: InvalidChatId | MustBeAdmin | null;
 }
 
-async function setInvitability(chatId: number, isInvitable: boolean): Promise<SetInvitabilityResult | undefined> {
+interface MustBeAdmin {
+  readonly __typename: 'MustBeAdmin';
+}
+
+async function setPublicity(chatId: number, isInvitable: boolean): Promise<SetPublicityResult | undefined> {
   return await operateGraphQlApi(
     async () =>
       await queryOrMutate(
         httpApiConfig,
         {
           query: `
-            mutation SetInvitability($chatId: Int!, $isInvitable: Boolean!) {
-              setInvitability(chatId: $chatId, isInvitable: $isInvitable) {
+            mutation SetPublicity($chatId: Int!, $isInvitable: Boolean!) {
+              setPublicity(chatId: $chatId, isInvitable: $isInvitable) {
                 ... on InvalidChatId {
                   __typename
                 }

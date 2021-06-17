@@ -17,7 +17,7 @@ export namespace AccountSlice {
   export const fetchAccount = createAsyncThunk(
     `${sliceName}/fetchAccount`,
     async () => {
-      const response = await readAccount();
+      const response = await readAccount(Storage.readUserId()!);
       return response?.readAccount;
     },
     {
@@ -41,15 +41,15 @@ export namespace AccountSlice {
     readonly readAccount: Account;
   }
 
-  async function readAccount(): Promise<ReadAccountResult | undefined> {
+  async function readAccount(userId: number): Promise<ReadAccountResult | undefined> {
     return await operateGraphQlApi(
       async () =>
         await queryOrMutate(
           httpApiConfig,
           {
             query: `
-              query ReadAccount {
-                readAccount {
+              query ReadAccount($userId: Int!) {
+                readAccount(userId: $userId) {
                   userId
                   username
                   emailAddress
@@ -59,6 +59,7 @@ export namespace AccountSlice {
                 }
               }
             `,
+            variables: { userId },
           },
           Storage.readAccessToken()!,
         ),

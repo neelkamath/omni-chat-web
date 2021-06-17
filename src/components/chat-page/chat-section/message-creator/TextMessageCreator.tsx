@@ -34,12 +34,19 @@ async function operateCreateTextMessage(chatId: number, text: MessageText): Prom
       break;
     case 'InvalidMessageId':
       message.error('The context message has just been deleted.', 5);
+      break;
+    case 'MustBeAdmin':
+      message.error("You must be the chat's admin to create a messge.", 5);
   }
   return false;
 }
 
 interface CreateTextMessageResult {
-  readonly createTextMessage: InvalidChatId | InvalidMessageId | null;
+  readonly createTextMessage: InvalidChatId | InvalidMessageId | MustBeAdmin | null;
+}
+
+interface MustBeAdmin {
+  readonly __typename: 'MustBeAdmin';
 }
 
 interface InvalidChatId {

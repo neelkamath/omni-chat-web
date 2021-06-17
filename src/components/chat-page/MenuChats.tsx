@@ -130,7 +130,7 @@ function LastChatMessageContent({ message }: LastChatMessageContentProps): React
       return caption === null ? <FileImageOutlined /> : <ReactMarkdown plugins={[gfm]}>{caption}</ReactMarkdown>;
     }
     case 'PollMessage':
-      return <ReactMarkdown plugins={[gfm]}>{(message as ChatsSlice.PollMessage).poll.title}</ReactMarkdown>;
+      return <ReactMarkdown plugins={[gfm]}>{(message as ChatsSlice.PollMessage).poll.question}</ReactMarkdown>;
     case 'AudioMessage':
       return <AudioOutlined />;
     case 'DocMessage':

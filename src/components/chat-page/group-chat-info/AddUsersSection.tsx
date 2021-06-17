@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect } from 'react';
 import { message, Space, Spin } from 'antd';
 import { useSelector } from 'react-redux';
-import { Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
+import { queryOrMutate } from '@neelkamath/omni-chat';
 import { RootState, useThunkDispatch } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Storage } from '../../../Storage';
@@ -23,12 +23,8 @@ export default function AddUsersSection({ chatId }: AddUsersSectionProps): React
   }, []);
   if (userIdList === undefined) return <Spin />;
   const onConfirm = async (userId: number) => {
-    if (userIdList.includes(userId)) {
-      message.info('That user is already a participant.', 5);
-      return;
-    }
-    const response = await addGroupChatUsers(chatId, [userId]);
-    if (response !== undefined) message.success('User added.', 3);
+    if (userIdList.includes(userId)) message.info('That user is already a participant.', 5);
+    else await operateAddGroupChatUsers(chatId, userId);
   };
   return (
     <SearchUsersSection
@@ -37,6 +33,13 @@ export default function AddUsersSection({ chatId }: AddUsersSectionProps): React
       type='CONTACTS'
     />
   );
+}
+
+async function operateAddGroupChatUsers(chatId: number, userId: number): Promise<void> {
+  const response = await addGroupChatUsers(chatId, [userId]);
+  if (response?.addGroupChatUsers?.__typename === null) message.success('User added.', 3);
+  else if (response?.addGroupChatUsers?.__typename === 'MustBeAdmin')
+    message.error('You must be an admin to add users.', 5);
 }
 
 function ParticipantIndicator(): ReactElement {
@@ -56,7 +59,11 @@ function NonparticipantIndicator(): ReactElement {
 }
 
 interface AddGroupChatUsersResult {
-  readonly addGroupChatUsers: Placeholder;
+  readonly addGroupChatUsers: MustBeAdmin | null;
+}
+
+interface MustBeAdmin {
+  readonly __typename: 'MustBeAdmin';
 }
 
 async function addGroupChatUsers(chatId: number, userIdList: number[]): Promise<AddGroupChatUsersResult | undefined> {
@@ -67,7 +74,9 @@ async function addGroupChatUsers(chatId: number, userIdList: number[]): Promise<
         {
           query: `
             mutation AddGroupChatUsers($chatId: Int!, $userIdList: [Int!]!) {
-              addGroupChatUsers(chatId: $chatId, userIdList: $userIdList)
+              addGroupChatUsers(chatId: $chatId, userIdList: $userIdList) {
+                __typename
+              }
             }
           `,
           variables: { chatId, userIdList },

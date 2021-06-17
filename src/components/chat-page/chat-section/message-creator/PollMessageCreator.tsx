@@ -11,7 +11,7 @@ export interface PollMessageCreatorProps {
 }
 
 interface CreatePollMessageFormData {
-  readonly title: string;
+  readonly question: string;
   readonly options: Option[] | undefined;
 }
 
@@ -29,12 +29,12 @@ export default function PollMessageCreator({ chatId }: PollMessageCreatorProps):
   return (
     <Form name='createPollMessage' onFinish={onFinish}>
       <GfmFormItem
-        rules={[{ required: true, message: 'Enter the title.' }]}
+        rules={[{ required: true, message: 'Enter the question.' }]}
         minLength={1}
         maxLength={10_000}
-        name='title'
+        name='question'
         placeholder='Where should we meet?'
-        label='Title'
+        label='Question'
       />
       <Divider />
       <Form.List name='options'>
@@ -71,21 +71,32 @@ export default function PollMessageCreator({ chatId }: PollMessageCreatorProps):
   );
 }
 
-async function operateCreatePollMessage(chatId: number, { title, options }: CreatePollMessageFormData): Promise<void> {
+async function operateCreatePollMessage(
+  chatId: number,
+  { question, options }: CreatePollMessageFormData,
+): Promise<void> {
   if (options === undefined || options.length < 2) {
     message.error('Enter at least two options.', 5);
     return;
   }
-  const poll = { title: title.trim(), options: options.map(({ option }) => option.trim()) };
-  if (poll.title.length === 0) message.error('Enter a title.', 3);
+  const poll = { question: question.trim(), options: options.map(({ option }) => option.trim()) };
+  if (poll.question.length === 0) message.error('Enter a question.', 3);
   else if (poll.options.find((option) => option.length === 0) !== undefined)
     message.error('Options must contain characters other than spaces.', 5);
   else if (new Set(poll.options).size < poll.options.length) message.error('Each option must be unique.', 5);
-  else await createPollMessage(chatId, poll);
+  else {
+    const response = await createPollMessage(chatId, poll);
+    if (response?.createTextMessage?.__typename === 'MustBeAdmin')
+      message.error("You must be the chat's admin to create a message.", 5);
+  }
 }
 
 interface CreatePollMessageResult {
-  readonly createTextMessage: InvalidChatId | InvalidMessageId | InvalidPoll | null;
+  readonly createTextMessage: InvalidChatId | InvalidMessageId | InvalidPoll | MustBeAdmin | null;
+}
+
+interface MustBeAdmin {
+  readonly __typename: 'MustBeAdmin';
 }
 
 interface InvalidChatId {
@@ -101,7 +112,7 @@ interface InvalidPoll {
 }
 
 interface PollInput {
-  readonly title: MessageText;
+  readonly question: MessageText;
   readonly options: MessageText[];
 }
 

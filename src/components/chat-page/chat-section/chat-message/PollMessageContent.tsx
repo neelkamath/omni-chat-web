@@ -14,7 +14,7 @@ export interface PollMessageContentProps {
 export default function PollMessageContent({ message }: PollMessageContentProps): ReactElement {
   return (
     <Space direction='vertical'>
-      <ReactMarkdown plugins={[gfm]}>{message.poll.title}</ReactMarkdown>
+      <ReactMarkdown plugins={[gfm]}>{message.poll.question}</ReactMarkdown>
       {[...message.poll.options]
         .sort((a, b) => b.votes.length - a.votes.length)
         .map((pollOption) => (

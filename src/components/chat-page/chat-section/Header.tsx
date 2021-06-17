@@ -10,6 +10,7 @@ import { OnlineStatusesSlice } from '../../../store/slices/OnlineStatusesSlice';
 import TimeAgo from 'timeago-react';
 import { TypingStatusesSlice } from '../../../store/slices/TypingStatusesSlice';
 import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
+import GroupChatTags from './GroupChatTags';
 
 export interface HeaderProps {
   readonly chat: ChatsSlice.PrivateChat | ChatsSlice.GroupChat;
@@ -29,7 +30,7 @@ export default function Header({ chat }: HeaderProps): ReactElement {
     case 'GroupChat':
       name = chat.title;
       typingStatusSection = <GroupChatTypingStatusSection chatId={chat.chatId} />;
-      tags = <GroupChatTags chat={chat} />;
+      tags = <GroupChatTags isBroadcast={chat.isBroadcast} publicity={chat.publicity} />;
       onClick = () => dispatch(ChatPageLayoutSlice.update({ type: 'GROUP_CHAT_INFO', chatId: chat.chatId }));
   }
   return (
@@ -104,35 +105,4 @@ function GroupChatTypingStatusSection({ chatId }: GroupChatTypingStatusSectionPr
   const userIdList = useSelector((state: RootState) => TypingStatusesSlice.selectTyping(state, chatId));
   // TODO: Instead of displaying the user ID, display the username. This can be done once AccountsSlice is implemented.
   return <Col flex='auto'>{userIdList.length === 0 ? `${userIdList[userIdList.length - 1]} is typing` : ''}</Col>;
-}
-
-interface GroupChatTagsProps {
-  readonly chat: ChatsSlice.GroupChat;
-}
-
-function GroupChatTags({ chat }: GroupChatTagsProps): ReactElement {
-  /*
-  In order to keep it visually consistent, the "Broadcast" tag will appear left-most because it may be toggled
-  relatively often, the "Public" tag will be to the left of the "Group" tag because it's relatively permanent compared
-  to the "Broadcast" tag, and the "Group" tag will be on the right because it's permanent.
-   */
-  const tags = [];
-  if (chat.isBroadcast)
-    tags.push(
-      <Tag key='broadcast' color='cyan'>
-        Broadcast
-      </Tag>,
-    );
-  if (chat.publicity === 'PUBLIC')
-    tags.push(
-      <Tag key='public' color='blue'>
-        Public
-      </Tag>,
-    );
-  tags.push(
-    <Tag key='group' color='green'>
-      Group
-    </Tag>,
-  );
-  return <>{tags}</>;
 }

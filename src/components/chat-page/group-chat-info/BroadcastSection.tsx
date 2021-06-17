@@ -1,7 +1,7 @@
 import React, { ReactElement, useState } from 'react';
 import { message, Space, Spin, Switch, Typography } from 'antd';
 import { useSelector } from 'react-redux';
-import { Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
+import { queryOrMutate } from '@neelkamath/omni-chat';
 import { RootState, useThunkDispatch } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Storage } from '../../../Storage';
@@ -19,8 +19,7 @@ export default function BroadcastSection({ chatId }: BroadcastSectionProps): Rea
   if (isBroadcast === undefined) return <Spin size='small' />;
   const onChange = async (isChecked: boolean) => {
     setLoading(true);
-    const response = await setBroadcast(chatId, isChecked);
-    if (response !== undefined) message.success('Broadcast status updated.', 3);
+    await operateSetBroadcast(chatId, isChecked);
     setLoading(false);
   };
   return (
@@ -31,8 +30,19 @@ export default function BroadcastSection({ chatId }: BroadcastSectionProps): Rea
   );
 }
 
+async function operateSetBroadcast(chatId: number, isBroadcast: boolean): Promise<void> {
+  const response = await setBroadcast(chatId, isBroadcast);
+  if (response?.setBroadcast === null) message.success('Broadcast status updated.', 3);
+  else if (response?.setBroadcast.__typename === 'MustBeAdmin')
+    message.error('You must be an admin to set the broadcast status.', 5);
+}
+
 interface SetBroadcastResult {
-  readonly setBroadcast: Placeholder;
+  readonly setBroadcast: MustBeAdmin | null;
+}
+
+interface MustBeAdmin {
+  readonly __typename: 'MustBeAdmin';
 }
 
 async function setBroadcast(chatId: number, isBroadcast: boolean): Promise<SetBroadcastResult | undefined> {
@@ -43,7 +53,9 @@ async function setBroadcast(chatId: number, isBroadcast: boolean): Promise<SetBr
         {
           query: `
             mutation SetBroadcast($chatId: Int!, $isBroadcast: Boolean!) {
-              setBroadcast(chatId: $chatId, isBroadcast: $isBroadcast)
+              setBroadcast(chatId: $chatId, isBroadcast: $isBroadcast) {
+                __typename
+              }
             }
           `,
           variables: { chatId, isBroadcast },

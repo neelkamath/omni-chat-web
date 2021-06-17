@@ -20,11 +20,8 @@ export const httpApiConfig: HttpApiConfig = {
 
 export const wsApiConfig: WsApiConfig = { apiUrl: process.env.API_URL!, protocol: process.env.WS as WebSocketProtocol };
 
-export async function operateGraphQlApi<T>(
-  operation: () => Promise<GraphQlResponse<T>>,
-  onUnauthorizedError: OnUnauthorizedError = logOut,
-): Promise<T | undefined> {
-  const response = await operateHttpApi(operation, onUnauthorizedError);
+export async function operateGraphQlApi<T>(operation: () => Promise<GraphQlResponse<T>>): Promise<T | undefined> {
+  const response = await operateHttpApi(operation);
   if (response === undefined) return undefined;
   if (response.errors !== undefined) await displayBugReporter(response.errors);
   return response.data;
@@ -34,16 +31,11 @@ export async function operateRestApi<T>(operation: () => Promise<T>): Promise<T 
   return await operateHttpApi(operation);
 }
 
-export type OnUnauthorizedError = () => Promise<void>;
-
-async function operateHttpApi<T>(
-  operation: () => Promise<T>,
-  onUnauthorizedError: OnUnauthorizedError = logOut,
-): Promise<T | undefined> {
+async function operateHttpApi<T>(operation: () => Promise<T>): Promise<T | undefined> {
   try {
     return await operation();
   } catch (error) {
-    if (error instanceof UnauthorizedError) await onUnauthorizedError();
+    if (error instanceof UnauthorizedError) await logOut();
     else if (error instanceof ConnectionError) message.error('The server is currently unreachable.');
     else if (error instanceof InternalServerError) await displayBugReporter(error);
     else throw error;

@@ -227,7 +227,6 @@ interface SubscribeToChatsResult {
     | GroupChatId
     | UpdatedGroupChatPic
     | UpdatedGroupChat
-    | ExitedUsers
     | DeletedPrivateChat;
 }
 
@@ -269,12 +268,6 @@ interface UpdatedGroupChatAccount {
 
 export type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
 
-interface ExitedUsers {
-  readonly __typename: 'ExitedUsers';
-  readonly chatId: number;
-  readonly userIdList: number[];
-}
-
 /** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToChats`. */
 async function subscribeToChats(): Promise<void> {
   verifyCreation(onGroupChatsSubscriptionClose);
@@ -289,10 +282,6 @@ async function subscribeToChats(): Promise<void> {
             __typename
             ... on GroupChatId {
               chatId
-            }
-            ... on ExitedUsers {
-              chatId
-              userIdList
             }
             ... on UpdatedGroupChat {
               chatId
@@ -332,18 +321,16 @@ async function subscribeToChats(): Promise<void> {
           case 'GroupChatId':
             store.dispatch(ChatsSlice.fetchChat(event.chatId));
             break;
-          case 'ExitedUsers':
-            store.dispatch(ChatsSlice.removeGroupChatUsers(event));
-            if (event.userIdList.includes(Storage.readUserId()!)) {
+          case 'UpdatedGroupChat':
+            store.dispatch(ChatsSlice.updateGroupChat(event));
+            // TODO: Test.
+            if (event?.removedUsers?.map(({ userId }) => userId).includes(Storage.readUserId()!)) {
               store.dispatch(ChatsSlice.removeOne(event.chatId));
               if (ChatPageLayoutSlice.select(store.getState()).chatId === event.chatId) {
                 message.info("You're no longer in this chat.", 5);
                 store.dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
               }
             }
-            break;
-          case 'UpdatedGroupChat':
-            store.dispatch(ChatsSlice.updateGroupChat(event));
             break;
           case 'UpdatedGroupChatPic':
             store.dispatch(PicsSlice.fetchPic({ id: event.chatId, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
@@ -365,6 +352,7 @@ interface SubscribeToMessagesResult {
   readonly subscribeToMessages:
     | CreatedSubscription
     | DeletedMessage
+    | UpdatedPollMessage
     | UserChatMessagesRemoval
     | NewActionMessage
     | NewAudioMessage
@@ -426,7 +414,7 @@ interface NewAudioMessage extends NewMessage {
 
 interface NewGroupChatInviteMessage extends NewMessage {
   readonly __typename: 'NewGroupChatInviteMessage';
-  readonly inviteCode: Uuid;
+  readonly inviteCode: Uuid | null;
 }
 
 interface NewDocMessage extends NewMessage {
@@ -443,7 +431,7 @@ interface NewPollMessage extends NewMessage {
 }
 
 interface Poll {
-  readonly title: MessageText;
+  readonly question: MessageText;
   readonly options: PollOption[];
 }
 
@@ -468,6 +456,15 @@ interface UserChatMessagesRemoval {
   readonly userId: number;
 }
 
+interface UpdatedPollMessage {
+  readonly __typename: 'UpdatedPollMessage';
+  readonly chatId: number;
+  readonly messageId: number;
+  readonly userId: number;
+  readonly option: MessageText;
+  readonly vote: boolean;
+}
+
 /** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToMessages`. */
 async function subscribeToMessages(): Promise<void> {
   verifyCreation(onMessagesSubscriptionClose);
@@ -481,6 +478,13 @@ async function subscribeToMessages(): Promise<void> {
         subscription SubscribeToMessages {
           subscribeToMessages {
             __typename
+            ... on UpdatedPollMessage {
+              chatId
+              messageId
+              userId
+              option
+              vote
+            }
             ... on DeletedMessage {
               chatId
               messageId
@@ -509,7 +513,7 @@ async function subscribeToMessages(): Promise<void> {
             }
             ... on NewPollMessage {
               poll {
-                title
+                question
                 options {
                   option
                   votes {
@@ -535,6 +539,9 @@ async function subscribeToMessages(): Promise<void> {
           case 'CreatedSubscription':
             resolve();
             break;
+          case 'UpdatedPollMessage':
+            store.dispatch(ChatsSlice.updatePoll(event));
+            break;
           case 'DeletedMessage':
             store.dispatch(ChatsSlice.deleteMessage(event));
             store.dispatch(PicMessagesSlice.deleteMessage(event.messageId));
@@ -550,7 +557,8 @@ async function subscribeToMessages(): Promise<void> {
           case 'NewPollMessage':
           case 'NewTextMessage':
           case 'NewVideoMessage':
-            store.dispatch(ChatsSlice.addMessage(event));
+            store.dispatch(ChatsSlice.addMessage(event)); // Adds the message if the chat is already in the store.
+            store.dispatch(ChatsSlice.fetchChat(event.chatId)); // Fetches the chat in case it wasn't in the store.
         }
       },
       onError,

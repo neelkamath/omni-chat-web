@@ -1,7 +1,7 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Form, message, Spin, Typography } from 'antd';
 import { useSelector } from 'react-redux';
-import { GroupChatDescription, Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
+import { GroupChatDescription, queryOrMutate } from '@neelkamath/omni-chat';
 import { RootState, useThunkDispatch } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Storage } from '../../../Storage';
@@ -39,8 +39,7 @@ function UpdateDescriptionForm({ chatId }: UpdateDescriptionFormProps): ReactEle
   if (description === undefined) return <Spin />;
   const onFinish = async ({ description }: UpdateGroupChatDescriptionFormData) => {
     setLoading(true);
-    const response = await updateGroupChatDescription(chatId, description.trim());
-    if (response !== undefined) message.success('Description updated.', 3);
+    await operateUpdateGroupChatDescription(chatId, description);
     setLoading(false);
   };
   return (
@@ -55,8 +54,19 @@ function UpdateDescriptionForm({ chatId }: UpdateDescriptionFormProps): ReactEle
   );
 }
 
+async function operateUpdateGroupChatDescription(chatId: number, description: string): Promise<void> {
+  const response = await updateGroupChatDescription(chatId, description.trim());
+  if (response?.updateGroupChatDescription === null) message.success('Description updated.', 3);
+  else if (response?.updateGroupChatDescription.__typename === 'MustBeAdmin')
+    message.error('You must be an admin to update the description.', 5);
+}
+
 interface UpdateGroupChatDescriptionResult {
-  readonly updateGroupChatDescription: Placeholder;
+  readonly updateGroupChatDescription: MustBeAdmin | null;
+}
+
+interface MustBeAdmin {
+  readonly __typename: 'MustBeAdmin';
 }
 
 async function updateGroupChatDescription(
@@ -70,7 +80,9 @@ async function updateGroupChatDescription(
         {
           query: `
             mutation UpdateGroupChatDescription($chatId: Int!, $description: GroupChatDescription!) {
-              updateGroupChatDescription(chatId: $chatId, description: $description)
+              updateGroupChatDescription(chatId: $chatId, description: $description) {
+                __typename
+              }
             }
           `,
           variables: { chatId, description },

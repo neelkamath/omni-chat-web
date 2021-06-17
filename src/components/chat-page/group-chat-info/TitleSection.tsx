@@ -1,7 +1,7 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Form, Input, message, Spin, Typography } from 'antd';
 import { useSelector } from 'react-redux';
-import { GroupChatTitle, Placeholder, queryOrMutate } from '@neelkamath/omni-chat';
+import { GroupChatTitle, queryOrMutate } from '@neelkamath/omni-chat';
 import { RootState, useThunkDispatch } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Storage } from '../../../Storage';
@@ -59,12 +59,18 @@ async function operateUpdateGroupChatTitle(chatId: number, title: GroupChatTitle
   if (title.length === 0) message.error("The title must contain at least one character which isn't a space.", 5);
   else {
     const response = await updateGroupChatTitle(chatId, title);
-    if (response !== undefined) message.success('Title updated.', 3);
+    if (response?.updateGroupChatTitle === null) message.success('Title updated.', 3);
+    else if (response?.updateGroupChatTitle.__typename === 'MustBeAdmin')
+      message.error('You must be an admin to update the title.', 5);
   }
 }
 
 interface UpdateGroupChatTitleResult {
-  readonly updateGroupChatTitle: Placeholder;
+  readonly updateGroupChatTitle: MustBeAdmin | null;
+}
+
+interface MustBeAdmin {
+  readonly __typename: 'MustBeAdmin';
 }
 
 async function updateGroupChatTitle(
@@ -78,7 +84,9 @@ async function updateGroupChatTitle(
         {
           query: `
             mutation UpdateGroupChatTitle($chatId: Int!, $title: GroupChatTitle!) {
-              updateGroupChatTitle(chatId: $chatId, title: $title)
+              updateGroupChatTitle(chatId: $chatId, title: $title) {
+                __typename
+              }
             }
           `,
           variables: { chatId, title },

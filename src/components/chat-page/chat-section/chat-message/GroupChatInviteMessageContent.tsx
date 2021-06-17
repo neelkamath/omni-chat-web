@@ -1,12 +1,13 @@
-import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { GroupChatDescription, GroupChatTitle, queryOrMutate, Uuid } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
 import { Storage } from '../../../../Storage';
-import { Card, Space, Spin, Tag } from 'antd';
+import { Card, Space, Spin } from 'antd';
 import GroupChatPic from '../../GroupChatPic';
+import GroupChatTags from '../GroupChatTags';
 
 export interface GroupChatInviteMessageContentProps {
-  readonly inviteCode: Uuid;
+  readonly inviteCode: Uuid | null;
   readonly chatId: number;
 }
 
@@ -14,21 +15,20 @@ export default function GroupChatInviteMessageContent({
   inviteCode,
   chatId,
 }: GroupChatInviteMessageContentProps): ReactElement {
-  const [section, setSection] = useState<ReactNode>(<Spin />);
+  const invalidCodeText = 'The chat is no longer accepting invitations.';
+  const [section, setSection] = useState(inviteCode === null ? invalidCodeText : <Spin />);
   useEffect(() => {
-    readGroupChat(inviteCode).then((response) => {
-      switch (response?.readGroupChat.__typename) {
-        case 'GroupChatInfo':
-          setSection(<GroupChatInvitation chatId={chatId} info={response.readGroupChat} />);
-          break;
-        case 'InvalidInviteCode':
-          setSection('The chat is no longer accepting invitations.');
-          break;
-        case undefined:
-          setSection('A bug prevented the chat from getting fetched. Refresh the page to see it.');
-      }
-    });
-  });
+    if (inviteCode !== null)
+      readGroupChat(inviteCode).then((response) => {
+        switch (response?.readGroupChat.__typename) {
+          case 'GroupChatInfo':
+            setSection(<GroupChatInvitation chatId={chatId} info={response.readGroupChat} />);
+            break;
+          case 'InvalidInviteCode':
+            setSection(invalidCodeText);
+        }
+      });
+  }, [chatId, inviteCode]);
   return <>{section}</>;
 }
 
@@ -95,38 +95,4 @@ async function readGroupChat(inviteCode: Uuid): Promise<ReadGroupChatResult | un
         Storage.readAccessToken()!,
       ),
   );
-}
-
-// TODO: If you use the following, abstract it into another file because it's copy-pasted from another file.
-
-interface GroupChatTagsProps {
-  readonly isBroadcast: boolean;
-  readonly publicity: GroupChatPublicity;
-}
-
-function GroupChatTags({ isBroadcast, publicity }: GroupChatTagsProps): ReactElement {
-  /*
-  In order to keep it visually consistent, the "Broadcast" tag will appear left-most because it may be toggled
-  relatively often, the "Public" tag will be to the left of the "Group" tag because it's relatively permanent compared
-  to the "Broadcast" tag, and the "Group" tag will be on the right because it's permanent.
-   */
-  const tags = [];
-  if (isBroadcast)
-    tags.push(
-      <Tag key='broadcast' color='cyan'>
-        Broadcast
-      </Tag>,
-    );
-  if (publicity === 'PUBLIC')
-    tags.push(
-      <Tag key='public' color='blue'>
-        Public
-      </Tag>,
-    );
-  tags.push(
-    <Tag key='group' color='green'>
-      Group
-    </Tag>,
-  );
-  return <>{tags}</>;
 }

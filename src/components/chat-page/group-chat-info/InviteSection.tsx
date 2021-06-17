@@ -7,7 +7,7 @@ import { ShareAltOutlined } from '@ant-design/icons';
 import ChatPic from '../ChatPic';
 import ChatName from '../ChatName';
 import { queryOrMutate } from '@neelkamath/omni-chat';
-import { httpApiConfig, OnUnauthorizedError, operateGraphQlApi } from '../../../api';
+import { httpApiConfig, operateGraphQlApi } from '../../../api';
 import { Storage } from '../../../Storage';
 
 export interface InviteSectionProps {
@@ -36,15 +36,18 @@ interface ChatsProps {
   readonly invitedChatId: number;
 }
 
+// TODO: Allow inviting your contacts who you don't have chats with as well.
 function Chats({ invitedChatId }: ChatsProps): ReactElement {
   useThunkDispatch(ChatsSlice.fetchChats());
   const chats = useSelector(ChatsSlice.selectChats);
   const isLoading = !useSelector(ChatsSlice.selectIsLoaded);
   if (isLoading) return <Spin style={{ padding: 16 }} />;
   const cards = chats
-    .filter((chat) => chat.chatId !== invitedChatId)
+    .filter(({ chatId }) => chatId !== invitedChatId)
     .map((chat) => <ChatCard invitedChatId={invitedChatId} key={chat.chatId} chat={chat} />);
-  return <Space direction='vertical'>{cards}</Space>;
+  return (
+    <Space direction='vertical'>{cards.length === 0 ? "You're not in any chats to send invitations to." : cards}</Space>
+  );
 }
 
 interface ChatCardProps {
@@ -55,12 +58,9 @@ interface ChatCardProps {
 function ChatCard({ chat, invitedChatId }: ChatCardProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const publicity = useSelector((state: RootState) => ChatsSlice.selectPublicity(state, invitedChatId));
-  const participantIdList = useSelector((state: RootState) => ChatsSlice.selectParticipantIdList(state, invitedChatId));
-  if (publicity === undefined || participantIdList === undefined) return <Spin />;
   const onConfirm = async () => {
     setLoading(true);
-    await operateCreateGroupChatInviteMessage(chat.chatId, invitedChatId, publicity, participantIdList);
+    await operateCreateGroupChatInviteMessage(chat.chatId, invitedChatId);
     setLoading(false);
     setVisible(false);
   };
@@ -83,30 +83,21 @@ function ChatCard({ chat, invitedChatId }: ChatCardProps): ReactElement {
   );
 }
 
-async function operateCreateGroupChatInviteMessage(
-  chatId: number,
-  invitedChatId: number,
-  publicity: ChatsSlice.GroupChatPublicity,
-  participantIdList: number[],
-): Promise<void> {
-  const onUnauthorizedError = async () => {
-    if (participantIdList.includes(Storage.readUserId()!))
-      message.error("You're not allowed to message in that chat.", 5);
-    else message.error("You're no longer in that chat.", 5);
-  };
-  const response = await createGroupChatInviteMessage(chatId, invitedChatId, onUnauthorizedError);
+async function operateCreateGroupChatInviteMessage(chatId: number, invitedChatId: number): Promise<void> {
+  const response = await createGroupChatInviteMessage(chatId, invitedChatId);
   if (response?.createGroupChatInviteMessage === null) message.success('Invitation sent.', 3);
   else if (response?.createGroupChatInviteMessage?.__typename === 'InvalidChatId')
-    message.error("You're no longer in that chat.", 5);
-  else if (response?.createGroupChatInviteMessage?.__typename === 'InvalidInvitedChat') {
-    if (publicity === 'NOT_INVITABLE') message.error('This chat no longer accepts invitations.', 5);
-    else if (!participantIdList.includes(Storage.readUserId()!))
-      message.error("You can't send an invitation because you're no longer in this chat.", 7.5);
-  }
+    message.error("You're no longer in the chat.", 5);
+  else if (response?.createGroupChatInviteMessage?.__typename === 'InvalidInvitedChat')
+    message.error('This chat no longer accepts invitations.', 5);
 }
 
 interface CreateGroupChatInviteMessageResult {
-  readonly createGroupChatInviteMessage: InvalidChatId | InvalidInvitedChat | InvalidMessageId | null;
+  readonly createGroupChatInviteMessage: InvalidChatId | MustBeAdmin | InvalidInvitedChat | InvalidMessageId | null;
+}
+
+interface MustBeAdmin {
+  readonly __typename: 'MustBeAdmin';
 }
 
 interface InvalidChatId {
@@ -124,7 +115,6 @@ interface InvalidMessageId {
 async function createGroupChatInviteMessage(
   chatId: number,
   invitedChatId: number,
-  onUnauthorizedError: OnUnauthorizedError,
 ): Promise<CreateGroupChatInviteMessageResult | undefined> {
   return await operateGraphQlApi(
     async () =>
@@ -142,6 +132,5 @@ async function createGroupChatInviteMessage(
         },
         Storage.readAccessToken()!,
       ),
-    onUnauthorizedError,
   );
 }

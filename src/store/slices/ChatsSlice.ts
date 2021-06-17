@@ -66,7 +66,7 @@ export namespace ChatsSlice {
 
   export interface GroupChatInviteMessage extends Message {
     readonly __typename: 'GroupChatInviteMessage';
-    readonly inviteCode: Uuid;
+    readonly inviteCode: Uuid | null;
   }
 
   export interface ActionMessage extends Message {
@@ -193,7 +193,7 @@ export namespace ChatsSlice {
             }
             ... on PollMessage {
               poll {
-                title
+                question
                 options {
                   option
                   votes {
@@ -381,7 +381,7 @@ export namespace ChatsSlice {
 
   export interface NewGroupChatInviteMessage extends NewMessage {
     readonly __typename: 'NewGroupChatInviteMessage';
-    readonly inviteCode: Uuid;
+    readonly inviteCode: Uuid | null;
   }
 
   export interface NewDocMessage extends NewMessage {
@@ -398,7 +398,7 @@ export namespace ChatsSlice {
   }
 
   export interface Poll {
-    readonly title: MessageText;
+    readonly question: MessageText;
     readonly options: PollOption[];
   }
 
@@ -422,6 +422,14 @@ export namespace ChatsSlice {
     readonly publicity: GroupChatPublicity | null;
   }
 
+  interface UpdatedPollMessage {
+    readonly chatId: number;
+    readonly messageId: number;
+    readonly userId: number;
+    readonly option: MessageText;
+    readonly vote: boolean;
+  }
+
   interface UpdatedGroupChatAccount {
     readonly userId: number;
     readonly username: Username;
@@ -429,11 +437,6 @@ export namespace ChatsSlice {
     readonly firstName: Name;
     readonly lastName: Name;
     readonly bio: Bio;
-  }
-
-  interface ExitedUsers {
-    readonly chatId: number;
-    readonly userIdList: number[];
   }
 
   function reduceUpdateGroupChat(state: Draft<State>, { payload }: PayloadAction<UpdatedGroupChat>): State | void {
@@ -474,12 +477,23 @@ export namespace ChatsSlice {
     });
   }
 
-  function reduceRemoveGroupChatUsers(state: Draft<State>, { payload }: PayloadAction<ExitedUsers>): State | void {
-    Object.values(state.entities).forEach((entity) => {
-      if (entity === undefined || entity.chatId !== payload.chatId) return;
-      const { chatId, users } = entity as Draft<GroupChat>;
-      if (chatId === payload.chatId)
-        users.edges = users.edges.filter(({ node }) => !payload.userIdList.includes(node.userId));
+  function reduceUpdatePoll(state: Draft<State>, { payload }: PayloadAction<UpdatedPollMessage>): State | void {
+    const messages = state.entities[payload.chatId]?.messages;
+    if (messages === undefined) return;
+    messages.edges = messages.edges.map((edge) => {
+      if (edge.node.messageId === payload.messageId) {
+        const poll = (edge.node as Draft<PollMessage>).poll;
+        poll.options = poll.options.map((option) => {
+          if (option.option === payload.option) {
+            if (payload.vote) {
+              const vote = { userId: payload.userId };
+              if (!option.votes.includes(vote)) option.votes.push(vote);
+            } else option.votes = option.votes.filter(({ userId }) => userId !== payload.userId);
+          }
+          return option;
+        });
+      }
+      return edge;
     });
   }
 
@@ -498,6 +512,7 @@ export namespace ChatsSlice {
       messages.edges = messages.edges.filter(({ node }) => node.sender.userId !== payload.userId);
   }
 
+  /** Adds the message to the chat if it's in the store. Use {@link fetchChat} for adding a message to a new chat. */
   function reduceAddMessage(state: Draft<State>, { payload }: PayloadAction<NewMessage>): State | void {
     const node: any = {
       __typename: '',
@@ -550,7 +565,7 @@ export namespace ChatsSlice {
       deleteMessage: reduceDeleteMessage,
       removeUserChatMessages: reduceRemoveUserChatMessages,
       addMessage: reduceAddMessage,
-      removeGroupChatUsers: reduceRemoveGroupChatUsers,
+      updatePoll: reduceUpdatePoll,
     },
     extraReducers: (builder) => {
       builder
@@ -591,7 +606,7 @@ export namespace ChatsSlice {
     deleteMessage,
     removeUserChatMessages,
     addMessage,
-    removeGroupChatUsers,
+    updatePoll,
   } = slice.actions;
 
   const { selectAll } = adapter.getSelectors((state: RootState) => state.chats);
