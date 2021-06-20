@@ -1,7 +1,7 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { Button, Form, Input, message, Space, Spin } from 'antd';
-import { useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
 import { Storage } from '../../../Storage';
 import logOut from '../../../logOut';
@@ -26,8 +26,11 @@ interface DeleteAccountFormData {
 function DeleteAccountForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const userId = Storage.readUserId()!;
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(AccountsSlice.fetch(userId));
+  }, [dispatch, userId]);
   const username = useSelector((state: RootState) => AccountsSlice.select(state, userId))?.username;
-  useThunkDispatch(AccountsSlice.fetch(userId));
   if (username === undefined) return <Spin />;
   const onFinish = async (data: DeleteAccountFormData) => {
     setLoading(true);
@@ -56,8 +59,8 @@ async function operateDeleteAccount(): Promise<void> {
   const response = await deleteAccount();
   if (response?.deleteAccount?.__typename === 'CannotDeleteAccount')
     message.error(
-      "You can't delete your account yet because you're the last admin of an otherwise nonempty group chat. You must" +
-        'first assign another user as the admin.',
+      'You can\'t delete your account yet because you\'re the last admin of an otherwise nonempty group chat. You must' +
+      'first assign another user as the admin.',
       12.5,
     );
   else {

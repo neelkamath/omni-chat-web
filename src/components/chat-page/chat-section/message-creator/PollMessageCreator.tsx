@@ -87,7 +87,7 @@ async function operateCreatePollMessage(
   else {
     const response = await createPollMessage(chatId, poll);
     if (response?.createTextMessage?.__typename === 'MustBeAdmin')
-      message.error("You must be the chat's admin to create a message.", 5);
+      message.error('You must be the chat\'s admin to create a message.', 5);
   }
 }
 

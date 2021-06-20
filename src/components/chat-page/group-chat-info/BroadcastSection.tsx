@@ -1,8 +1,8 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { message, Space, Spin, Switch, Typography } from 'antd';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { queryOrMutate } from '@neelkamath/omni-chat';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { RootState } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Storage } from '../../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
@@ -12,7 +12,10 @@ export interface BroadcastSectionProps {
 }
 
 export default function BroadcastSection({ chatId }: BroadcastSectionProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const [isLoading, setLoading] = useState(false);
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   const isBroadcast = useSelector((state: RootState) => ChatsSlice.selectIsBroadcast(state, chatId));

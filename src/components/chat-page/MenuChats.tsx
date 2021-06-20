@@ -2,7 +2,6 @@ import React, { ReactElement, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { Card, Col, Row, Space, Spin, Tooltip, Typography } from 'antd';
-import { RootState, useThunkDispatch } from '../../store/store';
 import ChatPic from './ChatPic';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import {
@@ -21,7 +20,10 @@ import ChatName from './ChatName';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
 
 export default function MenuChats(): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChats());
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChats());
+  }, [dispatch]);
   const chats = useSelector(ChatsSlice.selectChats);
   const isLoading = !useSelector(ChatsSlice.selectIsLoaded);
   if (isLoading) return <Spin style={{ padding: 16 }} />;
@@ -99,9 +101,11 @@ interface LastChatMessageTextProps {
 }
 
 function LastChatMessage({ chatId }: LastChatMessageTextProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
-  const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
   const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
+  const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
   useEffect(() => {
     if (lastMessage?.sender.userId !== undefined) dispatch(AccountsSlice.fetch(lastMessage?.sender.userId));
   }, [dispatch, lastMessage]);

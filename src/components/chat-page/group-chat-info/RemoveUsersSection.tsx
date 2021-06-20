@@ -1,8 +1,8 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { message, Space, Spin, Typography } from 'antd';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { queryOrMutate } from '@neelkamath/omni-chat';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { RootState } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Storage } from '../../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
@@ -15,7 +15,10 @@ export interface RemoveUsersSectionProps {
 }
 
 export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const participants = useSelector((state: RootState) => ChatsSlice.selectParticipants(state, chatId));
   const adminIdList = useSelector((state: RootState) => ChatsSlice.selectAdminIdList(state, chatId));
   const userId = Storage.readUserId()!;
@@ -40,7 +43,7 @@ export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps):
       <Typography.Paragraph>
         Removed users&apos; messages and votes on polls won&apos;t get deleted.
       </Typography.Paragraph>
-      <Space direction='vertical'>{cards.length === 0 ? "You're the only participant." : cards}</Space>
+      <Space direction='vertical'>{cards.length === 0 ? 'You\'re the only participant.' : cards}</Space>
     </>
   );
 }

@@ -12,10 +12,10 @@ export interface SearchUsersSectionProps {
 }
 
 export default function SearchUsersSection({
-  type,
-  popconfirmation,
-  extraRenderer,
-}: SearchUsersSectionProps): ReactElement {
+                                             type,
+                                             popconfirmation,
+                                             extraRenderer,
+                                           }: SearchUsersSectionProps): ReactElement {
   const query = useSelector(SearchedUsersSlice.selectQuery);
   const dispatch = useDispatch();
   if (query === undefined) dispatch(SearchedUsersSlice.fetchInitialState(type));
@@ -25,7 +25,7 @@ export default function SearchUsersSection({
       text = 'contacts';
       break;
     case 'BLOCKED_USERS':
-      text = "users you've blocked";
+      text = 'users you\'ve blocked';
       break;
     case 'USERS':
       text = 'users';

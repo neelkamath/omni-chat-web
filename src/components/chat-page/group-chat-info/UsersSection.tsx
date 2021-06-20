@@ -1,7 +1,7 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { Space, Spin } from 'antd';
-import { useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import ActionableUserCard from '../ActionableUserCard';
 import AdminIndicator from './AdminIndicator';
@@ -12,7 +12,10 @@ export interface UsersSectionProps {
 }
 
 export default function UsersSection({ chatId }: UsersSectionProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const participants = useSelector((state: RootState) => ChatsSlice.selectParticipants(state, chatId));
   const adminIdList = useSelector((state: RootState) => ChatsSlice.selectAdminIdList(state, chatId));
   if (participants === undefined || adminIdList === undefined) return <Spin />;

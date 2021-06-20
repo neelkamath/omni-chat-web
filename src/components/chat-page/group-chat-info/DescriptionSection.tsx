@@ -1,8 +1,8 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { Button, Form, message, Spin, Typography } from 'antd';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { GroupChatDescription, queryOrMutate } from '@neelkamath/omni-chat';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { RootState } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Storage } from '../../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
@@ -13,7 +13,10 @@ export interface DescriptionSectionProps {
 }
 
 export default function DescriptionSection({ chatId }: DescriptionSectionProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   const description = useSelector((state: RootState) => ChatsSlice.selectGroupChatDescription(state, chatId));
   if (isAdmin) return <UpdateDescriptionForm chatId={chatId} />;
@@ -33,7 +36,10 @@ interface UpdateGroupChatDescriptionFormData {
 }
 
 function UpdateDescriptionForm({ chatId }: UpdateDescriptionFormProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const [isLoading, setLoading] = useState(false);
   const description = useSelector((state: RootState) => ChatsSlice.selectGroupChatDescription(state, chatId));
   if (description === undefined) return <Spin />;

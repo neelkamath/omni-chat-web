@@ -1,7 +1,7 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { Button, Form, Input, message, Space, Spin } from 'antd';
-import { useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 import { Storage } from '../../../Storage';
 import { Bio, isValidNameScalar, isValidUsernameScalar, Name, queryOrMutate, Username } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
@@ -32,7 +32,10 @@ function UpdateAccountForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const userId = Storage.readUserId()!;
   const account = useSelector((state: RootState) => AccountsSlice.select(state, userId));
-  useThunkDispatch(AccountsSlice.fetch(userId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(AccountsSlice.fetch(userId));
+  }, [dispatch, userId]);
   if (account === undefined) return <Spin />;
   const onFinish = async (data: UpdateAccountFormData) => {
     setLoading(true);
@@ -84,12 +87,12 @@ interface AccountUpdate {
 }
 
 function buildAccountUpdate({
-  username,
-  emailAddress,
-  firstName,
-  lastName,
-  bio,
-}: UpdateAccountFormData): AccountUpdate {
+                              username,
+                              emailAddress,
+                              firstName,
+                              lastName,
+                              bio,
+                            }: UpdateAccountFormData): AccountUpdate {
   return {
     username: username.trim(),
     password: null,
@@ -104,14 +107,14 @@ function validateAccountUpdate({ username, firstName, lastName }: AccountUpdate)
   if (username !== null && !isValidUsernameScalar(username)) {
     message.error(
       'A username must be 1-30 characters long. Only lowercase English letters (a-z), English numbers (0-9), ' +
-        'periods, and underscores are allowed.',
+      'periods, and underscores are allowed.',
       10,
     );
     return false;
   }
   const isInvalidName = (name: Name | null) => name !== null && !isValidNameScalar(name);
   if (isInvalidName(firstName) || isInvalidName(lastName)) {
-    message.error("Name mustn't contain spaces.", 5);
+    message.error('Name mustn\'t contain spaces.', 5);
     return false;
   }
   return true;

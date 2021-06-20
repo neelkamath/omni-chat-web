@@ -37,7 +37,7 @@ function CreateGroupChatForm(): ReactElement {
   };
   return (
     <Form onFinish={onFinish} name='createGroupChat' layout='vertical' initialValues={{ publicity: 'INVITABLE' }}>
-      <Form.Item name='title' label='Title' rules={[{ required: true, message: "Enter the chat's name." }]}>
+      <Form.Item name='title' label='Title' rules={[{ required: true, message: 'Enter the chat\'s name.' }]}>
         <Input placeholder='Fashion' maxLength={70} minLength={1} />
       </Form.Item>
       <PublicityRadioGroup isRequired />
@@ -65,7 +65,7 @@ function buildGroupChatInput({ title, publicity }: CreateGroupChatFormData): Gro
 
 function validateGroupChatInput({ title }: GroupChatInput): boolean {
   if (title.length === 0) {
-    message.error("The title must contain at least one character which isn't a space.", 5);
+    message.error('The title must contain at least one character which isn\'t a space.', 5);
     return false;
   }
   return true;

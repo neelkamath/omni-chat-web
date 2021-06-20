@@ -1,7 +1,6 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { Button, List, message, Modal, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../store/store';
 import { ContactsSlice } from '../../store/slices/ContactsSlice';
 import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
 import { PicsSlice } from '../../store/slices/PicsSlice';
@@ -38,9 +37,12 @@ interface ProfileSectionProps {
 }
 
 function ProfileSection({ account, hasChatButton }: ProfileSectionProps): ReactElement {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(PicsSlice.fetch({ id: account.userId, type: 'PROFILE_PIC' }));
+    dispatch(AccountsSlice.fetch(account.userId));
+  }, [dispatch, account]);
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.userId, 'ORIGINAL'));
-  useThunkDispatch(PicsSlice.fetch({ id: account.userId, type: 'PROFILE_PIC' }));
-  useThunkDispatch(AccountsSlice.fetch(account.userId));
   const user = useSelector((state: RootState) => AccountsSlice.select(state, account.userId));
   if (user === undefined) return <Spin />;
   const name = `${user.firstName} ${user.lastName}`.trim();
@@ -153,10 +155,13 @@ interface ContactButtonProps {
 }
 
 function ContactButton({ userId }: ContactButtonProps): ReactElement {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ContactsSlice.fetchContacts());
+  }, [dispatch]);
   const isButtonLoading = !useSelector(ContactsSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
   const isContact = useSelector((state: RootState) => ContactsSlice.selectIsContact(state, userId));
-  useThunkDispatch(ContactsSlice.fetchContacts());
   if (isButtonLoading) return <Spin size='small' />;
   const onClick = async () => {
     setLoading(true);
@@ -232,10 +237,13 @@ interface BlockButtonProps {
 }
 
 function BlockButton({ userId }: BlockButtonProps): ReactElement {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(BlockedUsersSlice.fetchUsers());
+  }, [dispatch]);
   const isBlocked = useSelector((state: RootState) => BlockedUsersSlice.selectIsBlocked(state, userId));
   const isButtonLoading = !useSelector(BlockedUsersSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
-  useThunkDispatch(BlockedUsersSlice.fetchUsers());
   if (isButtonLoading) return <Spin size='small' />;
   const onClick = async () => {
     setLoading(true);

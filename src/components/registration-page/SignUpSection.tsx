@@ -109,8 +109,8 @@ async function operateCreateAccount(account: AccountInput): Promise<void> {
       break;
     case 'InvalidDomain':
       message.error(
-        "This Omni Chat server disallows the provided email address's domain. For example, " +
-          '"john.doe@private.company.com" may be allowed but not "john.doe@gmail.com".',
+        'This Omni Chat server disallows the provided email address\'s domain. For example, ' +
+        '"john.doe@private.company.com" may be allowed but not "john.doe@gmail.com".',
         10,
       );
       break;

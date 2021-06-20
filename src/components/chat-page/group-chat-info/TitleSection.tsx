@@ -1,8 +1,8 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { Button, Form, Input, message, Spin, Typography } from 'antd';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { GroupChatTitle, queryOrMutate } from '@neelkamath/omni-chat';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { RootState } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Storage } from '../../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
@@ -12,7 +12,10 @@ export interface TitleSectionProps {
 }
 
 export default function TitleSection({ chatId }: TitleSectionProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   const title = useSelector((state: RootState) => ChatsSlice.selectGroupChatTitle(state, chatId));
   if (isAdmin) return <UpdateTitleForm chatId={chatId} />;
@@ -32,7 +35,10 @@ interface UpdateTitleFormProps {
 }
 
 function UpdateTitleForm({ chatId }: UpdateTitleFormProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const [isLoading, setLoading] = useState(false);
   const title = useSelector((state: RootState) => ChatsSlice.selectGroupChatTitle(state, chatId));
   if (title === undefined) return <Spin />;
@@ -56,7 +62,7 @@ function UpdateTitleForm({ chatId }: UpdateTitleFormProps): ReactElement {
 }
 
 async function operateUpdateGroupChatTitle(chatId: number, title: GroupChatTitle): Promise<void> {
-  if (title.length === 0) message.error("The title must contain at least one character which isn't a space.", 5);
+  if (title.length === 0) message.error('The title must contain at least one character which isn\'t a space.', 5);
   else {
     const response = await updateGroupChatTitle(chatId, title);
     if (response?.updateGroupChatTitle === null) message.success('Title updated.', 3);

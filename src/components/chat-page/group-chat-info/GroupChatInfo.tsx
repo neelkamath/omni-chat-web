@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { Button, Collapse, Divider, Row } from 'antd';
 import PicSection from './pic-section/PicSection';
 import TitleSection from './TitleSection';
@@ -6,7 +6,7 @@ import DescriptionSection from './DescriptionSection';
 import BroadcastSection from './BroadcastSection';
 import PublicitySection from './PublicitySection';
 import LeaveSection from './LeaveSection';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { RootState } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { Storage } from '../../../Storage';
@@ -55,7 +55,10 @@ interface UsersAccordionProps {
 }
 
 function UsersAccordion({ chatId }: UsersAccordionProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   return (
     <Collapse accordion ghost>

@@ -1,5 +1,5 @@
 import { Button, Col, Dropdown, Menu, Row, Tooltip } from 'antd';
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import {
   CodeOutlined,
   ContactsOutlined,
@@ -16,7 +16,6 @@ import logOut from '../../logOut';
 import MenuChats from './MenuChats';
 import { useDispatch, useSelector } from 'react-redux';
 import { PicsSlice } from '../../store/slices/PicsSlice';
-import { RootState, useThunkDispatch } from '../../store/store';
 import { Storage } from '../../Storage';
 import CustomPic from './CustomPic';
 import { NonexistentUserIdError } from '@neelkamath/omni-chat';
@@ -41,8 +40,10 @@ export default function ChatPageMenu(): ReactElement {
 }
 
 function EditAccountCol(): ReactElement {
-  useThunkDispatch(PicsSlice.fetch({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
   const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(PicsSlice.fetch({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
+  }, [dispatch]);
   const url = useSelector((state: RootState) =>
     PicsSlice.selectPic(state, 'PROFILE_PIC', Storage.readUserId()!, 'THUMBNAIL'),
   );

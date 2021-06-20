@@ -1,8 +1,8 @@
 import React, { ReactElement, useEffect } from 'react';
 import { message, Space, Spin } from 'antd';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { queryOrMutate } from '@neelkamath/omni-chat';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { RootState } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Storage } from '../../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
@@ -15,7 +15,10 @@ export interface AddUsersSectionProps {
 }
 
 export default function AddUsersSection({ chatId }: AddUsersSectionProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const userIdList = useSelector((state: RootState) => ChatsSlice.selectParticipantIdList(state, chatId));
   useEffect(() => {
     SearchedUsersSlice.clear();

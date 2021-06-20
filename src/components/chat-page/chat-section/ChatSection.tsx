@@ -1,8 +1,8 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import { Divider, Empty, Layout, message, Spin } from 'antd';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { RootState } from '../../../store/store';
 import Header from './Header';
 import MessageCreator from './message-creator/MessageCreator';
 import ChatMessage from './chat-message/ChatMessage';
@@ -14,7 +14,10 @@ export interface ChatSectionProps {
 
 export default function ChatSection({ chatId }: ChatSectionProps): ReactElement {
   const [section, setSection] = useState(<Spin style={{ padding: 16 }} />);
-  useThunkDispatch(ChatsSlice.fetchChat(chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const isDeletedPrivateChat = useSelector((state: RootState) => ChatsSlice.selectIsDeletedPrivateChat(state, chatId));
   const chat = useSelector((state: RootState) => ChatsSlice.selectChat(state, chatId));
   const onDeletedChat = () => {

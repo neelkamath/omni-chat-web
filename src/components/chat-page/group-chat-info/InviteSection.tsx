@@ -1,6 +1,6 @@
-import React, { ReactElement, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { Button, Card, Divider, message, Modal, Popconfirm, Space, Spin } from 'antd';
 import { ShareAltOutlined } from '@ant-design/icons';
@@ -38,7 +38,10 @@ interface ChatsProps {
 
 // TODO: Allow inviting your contacts who you don't have chats with as well.
 function Chats({ invitedChatId }: ChatsProps): ReactElement {
-  useThunkDispatch(ChatsSlice.fetchChats());
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChats());
+  }, [dispatch]);
   const chats = useSelector(ChatsSlice.selectChats);
   const isLoading = !useSelector(ChatsSlice.selectIsLoaded);
   if (isLoading) return <Spin style={{ padding: 16 }} />;
@@ -46,7 +49,7 @@ function Chats({ invitedChatId }: ChatsProps): ReactElement {
     .filter(({ chatId }) => chatId !== invitedChatId)
     .map((chat) => <ChatCard invitedChatId={invitedChatId} key={chat.chatId} chat={chat} />);
   return (
-    <Space direction='vertical'>{cards.length === 0 ? "You're not in any chats to send invitations to." : cards}</Space>
+    <Space direction='vertical'>{cards.length === 0 ? 'You\'re not in any chats to send invitations to.' : cards}</Space>
   );
 }
 
@@ -87,7 +90,7 @@ async function operateCreateGroupChatInviteMessage(chatId: number, invitedChatId
   const response = await createGroupChatInviteMessage(chatId, invitedChatId);
   if (response?.createGroupChatInviteMessage === null) message.success('Invitation sent.', 3);
   else if (response?.createGroupChatInviteMessage?.__typename === 'InvalidChatId')
-    message.error("You're no longer in the chat.", 5);
+    message.error('You\'re no longer in the chat.', 5);
   else if (response?.createGroupChatInviteMessage?.__typename === 'InvalidInvitedChat')
     message.error('This chat no longer accepts invitations.', 5);
 }

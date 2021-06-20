@@ -1,10 +1,9 @@
-import React, { ReactElement, ReactNode, useState } from 'react';
+import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
 import { Card, Col, Popconfirm, Row, Spin, Typography } from 'antd';
 import ProfileModal from './ProfileModal';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { PicsSlice } from '../../store/slices/PicsSlice';
-import { RootState, useThunkDispatch } from '../../store/store';
 import CustomPic from './CustomPic';
 import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
@@ -30,10 +29,10 @@ export interface PopconfirmationProps {
 }
 
 export default function ActionableUserCard({
-  account,
-  popconfirmation,
-  extraRenderer,
-}: ActionableUserCardProps): ReactElement {
+                                             account,
+                                             popconfirmation,
+                                             extraRenderer,
+                                           }: ActionableUserCardProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
   const card = <UserCard extraRenderer={extraRenderer} account={account} onClick={() => setVisible(true)} />;
   if (popconfirmation === undefined)
@@ -61,7 +60,10 @@ interface UserCardProps {
 }
 
 function UserCard({ account, onClick, extraRenderer }: UserCardProps): ReactElement {
-  useThunkDispatch(AccountsSlice.fetch(account.userId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(AccountsSlice.fetch(account.userId));
+  }, [dispatch, account]);
   const username = useSelector((state: RootState) => AccountsSlice.select(state, account.userId))?.username;
   const name = username === undefined ? <Spin size='small' /> : <Typography.Text strong>{username}</Typography.Text>;
   return (
@@ -81,12 +83,15 @@ interface ProfilePicProps {
 }
 
 function ProfilePic({ userId }: ProfilePicProps): ReactElement {
+  const dispatch = useDispatch();
   /*
   A <NonexistentUserIdError> will occur if a user who was to be displayed in the search results deleted their account in
   between being searched, and having the profile pic displayed. Since this rarely ever happens, and no harm comes from
   leaving the search result up, we ignore this possibility.
    */
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
-  useThunkDispatch(PicsSlice.fetch({ id: userId, type: 'PROFILE_PIC' }));
+  useEffect(() => {
+    dispatch(PicsSlice.fetch({ id: userId, type: 'PROFILE_PIC' }));
+  }, [dispatch, userId]);
   return <CustomPic icon={<UserOutlined />} url={url} />;
 }

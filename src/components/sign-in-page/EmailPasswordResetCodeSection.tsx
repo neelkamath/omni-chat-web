@@ -54,7 +54,7 @@ async function operateEmailPasswordResetCode(emailAddress: string): Promise<void
   const response = await emailPasswordResetCode(emailAddress);
   if (response?.emailPasswordResetCode === null) message.success('Password reset code sent to your email.', 5);
   else if (response?.emailPasswordResetCode?.__typename === 'UnregisteredEmailAddress')
-    message.error("That email address isn't registered.", 5);
+    message.error('That email address isn\'t registered.', 5);
 }
 
 interface EmailPasswordResetCodeResult {

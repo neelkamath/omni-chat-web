@@ -1,9 +1,9 @@
-import React, { ReactElement, ReactNode } from 'react';
+import React, { ReactElement, ReactNode, useEffect } from 'react';
 import { Comment, Image, Spin } from 'antd';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { UserOutlined } from '@ant-design/icons';
 import DeleteAction from './DeleteAction';
-import { RootState, useThunkDispatch } from '../../../../store/store';
+import { RootState } from '../../../../store/store';
 import { PicsSlice } from '../../../../store/slices/PicsSlice';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import CustomPic from '../../CustomPic';
@@ -21,8 +21,13 @@ export interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message, chatId }: ChatMessageProps): ReactElement {
-  useThunkDispatch(AccountsSlice.fetch(Storage.readUserId()!));
-  useThunkDispatch(PicsSlice.fetch({ id: message.sender.userId, type: 'PROFILE_PIC' }));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(AccountsSlice.fetch(Storage.readUserId()!));
+  }, [dispatch]);
+  useEffect(() => {
+    dispatch(PicsSlice.fetch({ id: message.sender.userId, type: 'PROFILE_PIC' }));
+  }, [dispatch, message]);
   const url = useSelector((state: RootState) =>
     PicsSlice.selectPic(state, 'PROFILE_PIC', message.sender.userId, 'THUMBNAIL'),
   );
@@ -74,7 +79,10 @@ interface PicMessageContentProps {
 }
 
 function PicMessageContent({ messageId }: PicMessageContentProps): ReactElement {
-  useThunkDispatch(PicMessagesSlice.fetch(messageId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(PicMessagesSlice.fetch(messageId));
+  }, [dispatch, messageId]);
   const url = useSelector((state: RootState) => PicMessagesSlice.selectPic(state, messageId)).originalUrl;
   return url === undefined ? <Spin size='small' /> : <Image src={url} width='50%' />;
 }

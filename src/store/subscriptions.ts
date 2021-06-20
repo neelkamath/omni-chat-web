@@ -38,7 +38,7 @@ let onTypingStatusesSubscriptionClose: OnSubscriptionClose;
 
 function verifyCreation(onSubscriptionClose: OnSubscriptionClose): void {
   // TODO: Automatically send back the error report instead, and show a ConnectionError instead.
-  if (onSubscriptionClose !== undefined) throw new Error("Previous subscription hasn't been closed.");
+  if (onSubscriptionClose !== undefined) throw new Error('Previous subscription hasn\'t been closed.');
 }
 
 /** Sets up the GraphQL subscriptions to keep the {@link store} up-to-date. */
@@ -304,7 +304,7 @@ async function subscribeToChats(): Promise<void> {
             if (event?.removedUsers?.map(({ userId }) => userId).includes(Storage.readUserId()!)) {
               store.dispatch(ChatsSlice.removeOne(event.chatId));
               if (ChatPageLayoutSlice.select(store.getState()).chatId === event.chatId) {
-                message.info("You're no longer in this chat.", 5);
+                message.info('You\'re no longer in this chat.', 5);
                 store.dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
               }
             }

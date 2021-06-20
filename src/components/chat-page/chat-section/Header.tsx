@@ -5,7 +5,7 @@ import ChatPic from '../ChatPic';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import ProfileModal from '../ProfileModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { RootState } from '../../../store/store';
 import { OnlineStatusesSlice } from '../../../store/slices/OnlineStatusesSlice';
 import TimeAgo from 'timeago-react';
 import { TypingStatusesSlice } from '../../../store/slices/TypingStatusesSlice';
@@ -77,8 +77,11 @@ interface OnlineStatusSectionProps {
 }
 
 function OnlineStatusSection({ userId }: OnlineStatusSectionProps): ReactElement {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(OnlineStatusesSlice.fetchStatus(userId));
+  }, [dispatch, userId]);
   const onlineStatus = useSelector((state: RootState) => OnlineStatusesSlice.select(state, userId));
-  useThunkDispatch(OnlineStatusesSlice.fetchStatus(userId));
   if (onlineStatus === undefined) return <></>;
   let status: ReactNode;
   if (onlineStatus.isOnline) status = 'online';
@@ -102,7 +105,10 @@ interface PrivateChatTypingStatusSectionProps {
 }
 
 function PrivateChatTypingStatusSection({ userId, chatId }: PrivateChatTypingStatusSectionProps): ReactElement {
-  useThunkDispatch(TypingStatusesSlice.fetchStatuses());
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(TypingStatusesSlice.fetchStatuses());
+  }, [dispatch]);
   const isTyping = useSelector((state: RootState) => TypingStatusesSlice.selectIsTyping(state, userId, chatId));
   return <Col flex='auto'>{isTyping ? 'typing...' : ''}</Col>;
 }
@@ -112,9 +118,11 @@ interface GroupChatTypingStatusSectionProps {
 }
 
 function GroupChatTypingStatusSection({ chatId }: GroupChatTypingStatusSectionProps): ReactElement {
-  useThunkDispatch(TypingStatusesSlice.fetchStatuses());
-  const userIdList = useSelector((state: RootState) => TypingStatusesSlice.selectTyping(state, chatId));
   const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(TypingStatusesSlice.fetchStatuses());
+  }, [dispatch]);
+  const userIdList = useSelector((state: RootState) => TypingStatusesSlice.selectTyping(state, chatId));
   const userId = userIdList[userIdList.length - 1];
   useEffect(() => {
     if (userId !== undefined) dispatch(AccountsSlice.fetch(userId));

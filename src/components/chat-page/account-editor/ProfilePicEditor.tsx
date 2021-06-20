@@ -1,8 +1,8 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import { Button, message, Space, Spin, Typography, Upload } from 'antd';
 import { Storage } from '../../../Storage';
-import { useSelector } from 'react-redux';
-import { RootState, useThunkDispatch } from '../../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../store/store';
 import { PicsSlice } from '../../../store/slices/PicsSlice';
 import {
   InvalidPicError,
@@ -30,10 +30,13 @@ export default function ProfilePicEditor(): ReactElement {
 
 function ProfilePic(): ReactElement {
   const userId = Storage.readUserId()!;
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(PicsSlice.fetch({ id: userId, type: 'PROFILE_PIC' }));
+  }, [dispatch, userId]);
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'ORIGINAL'));
   const error = useSelector((state: RootState) => PicsSlice.selectError(state, 'PROFILE_PIC', userId));
   if (error instanceof NonexistentUserIdError) logOut();
-  useThunkDispatch(PicsSlice.fetch({ id: userId, type: 'PROFILE_PIC' }));
   if (url === undefined) return <Spin size='small' />;
   else if (url === null) return <Typography.Text>No profile picture set.</Typography.Text>;
   else return <OriginalPic type='PROFILE_PIC' url={url} />;
@@ -57,7 +60,7 @@ async function operatePatchProfilePic(file: File): Promise<void> {
     await operateRestApi(() => patchProfilePic(httpApiConfig, Storage.readAccessToken()!, file));
     message.success('Profile picture updated.', 3);
   } catch (error) {
-    if (error instanceof InvalidPicError) message.error("The picture mustn't exceed 5 MB.", 5);
+    if (error instanceof InvalidPicError) message.error('The picture mustn\'t exceed 5 MB.', 5);
     else throw error;
   }
 }

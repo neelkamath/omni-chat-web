@@ -29,14 +29,14 @@ async function operateCreateTextMessage(chatId: number, text: MessageText): Prom
   if (response?.createTextMessage === null) return true;
   switch (response?.createTextMessage?.__typename) {
     case 'InvalidChatId':
-      message.error("You're no longer in this chat.", 5);
+      message.error('You\'re no longer in this chat.', 5);
       store.dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
       break;
     case 'InvalidMessageId':
       message.error('The context message has just been deleted.', 5);
       break;
     case 'MustBeAdmin':
-      message.error("You must be the chat's admin to create a messge.", 5);
+      message.error('You must be the chat\'s admin to create a messge.', 5);
   }
   return false;
 }

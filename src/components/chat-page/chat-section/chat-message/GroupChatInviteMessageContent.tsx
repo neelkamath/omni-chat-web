@@ -12,9 +12,9 @@ export interface GroupChatInviteMessageContentProps {
 }
 
 export default function GroupChatInviteMessageContent({
-  inviteCode,
-  chatId,
-}: GroupChatInviteMessageContentProps): ReactElement {
+                                                        inviteCode,
+                                                        chatId,
+                                                      }: GroupChatInviteMessageContentProps): ReactElement {
   const invalidCodeText = 'The chat is no longer accepting invitations.';
   const [section, setSection] = useState(inviteCode === null ? invalidCodeText : <Spin />);
   useEffect(() => {

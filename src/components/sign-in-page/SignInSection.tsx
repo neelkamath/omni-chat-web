@@ -62,7 +62,7 @@ interface Login {
 
 function validateLogin({ username, password }: Login): boolean {
   if (!isValidUsernameScalar(username)) {
-    message.error("That username doesn't exist.", 5);
+    message.error('That username doesn\'t exist.', 5);
     return false;
   }
   if (!isValidPasswordScalar(password)) {
@@ -79,7 +79,7 @@ async function operateRequestTokenSet(login: Login): Promise<void> {
       message.error('Incorrect password.', 3);
       break;
     case 'NonexistingUser':
-      message.error("That username doesn't exist.", 5);
+      message.error('That username doesn\'t exist.', 5);
       break;
     case 'TokenSet':
       Storage.saveTokenSet(response.requestTokenSet);

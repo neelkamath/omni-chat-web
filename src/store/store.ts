@@ -1,4 +1,4 @@
-import { AsyncThunkAction, configureStore } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import { PicsSlice } from './slices/PicsSlice';
 import { SearchedUsersSlice } from './slices/SearchedUsersSlice';
 import { BlockedUsersSlice } from './slices/BlockedUsersSlice';
@@ -6,8 +6,6 @@ import { ChatsSlice } from './slices/ChatsSlice';
 import { OnlineStatusesSlice } from './slices/OnlineStatusesSlice';
 import { TypingStatusesSlice } from './slices/TypingStatusesSlice';
 import { ContactsSlice } from './slices/ContactsSlice';
-import { useDispatch } from 'react-redux';
-import { useEffect } from 'react';
 import { ChatPageLayoutSlice } from './slices/ChatPageLayoutSlice';
 import { PicMessagesSlice } from './slices/PicMessagesSlice';
 import { SearchedPublicChatsSlice } from './slices/SearchedPublicChatsSlice';
@@ -39,32 +37,3 @@ const store = configureStore({
 export default store;
 
 export type RootState = ReturnType<typeof store.getState>;
-
-// TODO: Delete.
-/**
- * @example
- * When using React Redux, the following boilerplate is required to dispatch an action for an async thunk:
- *
- * ```typescript
- * function ProfilePic(): ReactElement {
- *   const dispatch = useDispatch();
- *   useEffect(() => {
- *     dispatch(ChatsSlice.fetchChat(3));
- *   }, [dispatch]);
- * }
- * ```
- *
- * This function removes the boilerplate as shown below:
- *
- * ```typescript
- * function ProfilePic(): ReactElement {
- *   useThunkDispatch(ChatsSlice.fetchChat(3));
- * }
- * ```
- */
-export function useThunkDispatch(actionCreator: AsyncThunkAction<any, any, any>): void {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(actionCreator);
-  }, [dispatch, actionCreator]);
-}
