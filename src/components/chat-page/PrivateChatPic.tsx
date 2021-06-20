@@ -15,6 +15,6 @@ export default function PrivateChatPic({ userId }: PrivateChatPicProps): ReactEl
   element to handle this accordingly.
    */
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
-  useThunkDispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
+  useThunkDispatch(PicsSlice.fetch({ id: userId, type: 'PROFILE_PIC' }));
   return <CustomPic icon={<UserOutlined />} url={url} />;
 }

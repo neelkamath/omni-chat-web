@@ -12,14 +12,11 @@ import { BlockedUsersSlice } from './BlockedUsersSlice';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import {
-  Bio,
   DateTime,
   GroupChatDescription,
   GroupChatTitle,
   MessageText,
-  Name,
   queryOrMutate,
-  Username,
   Uuid,
 } from '@neelkamath/omni-chat';
 
@@ -87,16 +84,10 @@ export namespace ChatsSlice {
   }
 
   export interface UserAccount {
-    readonly username: Username;
     readonly userId: number;
-    readonly firstName: Name;
-    readonly lastName: Name;
-    readonly emailAddress: string;
-    readonly bio: Bio;
   }
 
   export interface SenderAccount {
-    readonly username: Username;
     readonly userId: number;
   }
 
@@ -127,11 +118,6 @@ export namespace ChatsSlice {
 
   export interface GroupChatUserAccount {
     readonly userId: number;
-    readonly username: Username;
-    readonly emailAddress: string;
-    readonly firstName: Name;
-    readonly lastName: Name;
-    readonly bio: Bio;
   }
 
   async function operateReadChats(): Promise<ChatsConnection | undefined> {
@@ -173,7 +159,6 @@ export namespace ChatsSlice {
             __typename
             sent
             sender {
-              username
               userId
             }
             messageId
@@ -209,11 +194,6 @@ export namespace ChatsSlice {
     ... on PrivateChat {
       user {
         userId
-        username
-        firstName
-        lastName
-        emailAddress
-        bio
       }
     }
     ... on GroupChat {
@@ -226,11 +206,6 @@ export namespace ChatsSlice {
         edges {
           node {
             userId
-            username
-            emailAddress
-            firstName
-            lastName
-            bio
           }
         }
       }
@@ -313,15 +288,6 @@ export namespace ChatsSlice {
     },
   });
 
-  export interface UpdatedAccount {
-    readonly userId: number;
-    readonly username: Username;
-    readonly emailAddress: string;
-    readonly firstName: Name;
-    readonly lastName: Name;
-    readonly bio: Bio;
-  }
-
   /** Indicates that the messages the {@link userId} sent in the {@link chatId} are to be removed. */
   export interface UserChatMessagesRemoval {
     readonly chatId: number;
@@ -352,7 +318,6 @@ export namespace ChatsSlice {
 
   export interface NewMessageSender {
     readonly userId: number;
-    readonly username: Username;
   }
 
   export interface NewTextMessage extends NewMessage {
@@ -432,11 +397,6 @@ export namespace ChatsSlice {
 
   interface UpdatedGroupChatAccount {
     readonly userId: number;
-    readonly username: Username;
-    readonly emailAddress: string;
-    readonly firstName: Name;
-    readonly lastName: Name;
-    readonly bio: Bio;
   }
 
   function reduceUpdateGroupChat(state: Draft<State>, { payload }: PayloadAction<UpdatedGroupChat>): State | void {
@@ -462,19 +422,9 @@ export namespace ChatsSlice {
     const chat = Object.values(state.entities).find(
       (entity) => entity?.__typename === 'PrivateChat' && (entity as PrivateChat).user.userId === payload,
     );
-    if (chat !== undefined) {
-      state.deletedPrivateChatIdList.push(chat.chatId);
-      adapter.removeOne(state, chat.chatId);
-    }
-  }
-
-  function reduceUpdateAccount(state: Draft<State>, { payload }: PayloadAction<UpdatedAccount>): State | void {
-    Object.values(state.entities).forEach((entity) => {
-      const node = entity?.messages.edges[0]?.node;
-      if (payload.userId === node?.sender.userId) node.sender = payload;
-      if (entity?.__typename === 'PrivateChat' && payload.userId === (entity as PrivateChat).user.userId)
-        (entity as Draft<PrivateChat>).user = payload;
-    });
+    if (chat === undefined) return;
+    state.deletedPrivateChatIdList.push(chat.chatId);
+    adapter.removeOne(state, chat.chatId);
   }
 
   function reduceUpdatePoll(state: Draft<State>, { payload }: PayloadAction<UpdatedPollMessage>): State | void {
@@ -561,7 +511,6 @@ export namespace ChatsSlice {
       removeOne: adapter.removeOne,
       removePrivateChat: reduceRemovePrivateChat,
       updateGroupChat: reduceUpdateGroupChat,
-      updateAccount: reduceUpdateAccount,
       deleteMessage: reduceDeleteMessage,
       removeUserChatMessages: reduceRemoveUserChatMessages,
       addMessage: reduceAddMessage,
@@ -600,7 +549,6 @@ export namespace ChatsSlice {
 
   export const {
     removeOne,
-    updateAccount,
     removePrivateChat,
     updateGroupChat,
     deleteMessage,

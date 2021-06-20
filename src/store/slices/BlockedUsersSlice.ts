@@ -1,15 +1,8 @@
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  Draft,
-  PayloadAction,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { FetchStatus, RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
-import { Bio, Name, queryOrMutate, Username } from '@neelkamath/omni-chat';
+import { queryOrMutate } from '@neelkamath/omni-chat';
 
 export namespace BlockedUsersSlice {
   const adapter = createEntityAdapter<Account>({ selectId: ({ userId }) => userId });
@@ -44,11 +37,6 @@ export namespace BlockedUsersSlice {
 
   export interface Account {
     readonly userId: number;
-    readonly username: Username;
-    readonly emailAddress: string;
-    readonly firstName: Name;
-    readonly lastName: Name;
-    readonly bio: Bio;
   }
 
   interface ReadBlockedUsersResult {
@@ -67,11 +55,6 @@ export namespace BlockedUsersSlice {
                   edges {
                     node {
                       userId
-                      username
-                      emailAddress
-                      firstName
-                      lastName
-                      bio
                     }
                   }
                 }
@@ -85,22 +68,12 @@ export namespace BlockedUsersSlice {
 
   export interface UpdatedAccount {
     readonly userId: number;
-    readonly username: Username;
-    readonly emailAddress: string;
-    readonly firstName: Name;
-    readonly lastName: Name;
-    readonly bio: Bio;
-  }
-
-  function reduceUpdateAccount(state: Draft<State>, { payload }: PayloadAction<UpdatedAccount>): State | void {
-    adapter.updateOne(state, { id: payload.userId, changes: payload });
   }
 
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState({ status: 'IDLE' }) as State,
     reducers: {
-      updateAccount: reduceUpdateAccount,
       upsertOne: adapter.upsertOne,
       removeOne: adapter.removeOne,
     },
@@ -121,7 +94,7 @@ export namespace BlockedUsersSlice {
 
   export const { reducer } = slice;
 
-  export const { updateAccount, upsertOne, removeOne } = slice.actions;
+  export const { upsertOne, removeOne } = slice.actions;
 
   export const selectIsBlocked = createSelector(
     (state: RootState) => state.blockedUsers.ids,

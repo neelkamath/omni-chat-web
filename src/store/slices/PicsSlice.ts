@@ -88,8 +88,8 @@ export namespace PicsSlice {
     return { thumbnail, original };
   }
 
-  export const fetchPic = createAsyncThunk(
-    `${sliceName}/fetchPic`,
+  export const fetch = createAsyncThunk(
+    `${sliceName}/fetch`,
     async ({ id, type }: FetchPicData) => {
       const { thumbnail, original } = await getPic({ id, type });
       const generateUrl = (data: PicData) => (data instanceof Blob ? URL.createObjectURL(data) : data);
@@ -125,14 +125,14 @@ export namespace PicsSlice {
     reducers: { removeAccount: reduceRemoveAccount },
     extraReducers: (builder) => {
       builder
-        .addCase(fetchPic.rejected, ({ entities }, { meta, error }) => {
+        .addCase(fetch.rejected, ({ entities }, { meta, error }) => {
           const entity = entities[generateId(meta.arg.type, meta.arg.id)]!;
           entity.isLoading = false;
           if (error.name === NonexistentUserIdError.name) entity.error = new NonexistentUserIdError();
           else if (error.name === NonexistentChatError.name) entity.error = new NonexistentChatError();
         })
-        .addCase(fetchPic.fulfilled, adapter.upsertOne)
-        .addCase(fetchPic.pending, (state, { meta }) => {
+        .addCase(fetch.fulfilled, adapter.upsertOne)
+        .addCase(fetch.pending, (state, { meta }) => {
           const id = generateId(meta.arg.type, meta.arg.id);
           if (state.entities[id] === undefined) adapter.upsertOne(state, { id, type: meta.arg.type, isLoading: true });
         });

@@ -1,12 +1,12 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Form, Input, message, Space, Spin } from 'antd';
 import { useSelector } from 'react-redux';
-import { AccountSlice } from '../../../store/slices/AccountSlice';
-import { useThunkDispatch } from '../../../store/store';
+import { RootState, useThunkDispatch } from '../../../store/store';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
 import { Storage } from '../../../Storage';
 import logOut from '../../../logOut';
 import { queryOrMutate } from '@neelkamath/omni-chat';
+import { AccountsSlice } from '../../../store/slices/AccountsSlice';
 
 export default function DeleteAccountSection(): ReactElement {
   return (
@@ -25,8 +25,9 @@ interface DeleteAccountFormData {
 
 function DeleteAccountForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
-  const username = useSelector(AccountSlice.select)?.username;
-  useThunkDispatch(AccountSlice.fetchAccount());
+  const userId = Storage.readUserId()!;
+  const username = useSelector((state: RootState) => AccountsSlice.select(state, userId))?.username;
+  useThunkDispatch(AccountsSlice.fetch(userId));
   if (username === undefined) return <Spin />;
   const onFinish = async (data: DeleteAccountFormData) => {
     setLoading(true);

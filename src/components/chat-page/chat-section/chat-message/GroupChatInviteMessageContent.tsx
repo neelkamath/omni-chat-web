@@ -37,7 +37,7 @@ interface GroupChatInvitationProps {
   readonly chatId: number;
 }
 
-// TODO: Style the card as much as antd allows for it, and add a "Join" button.
+// TODO: Once Omni Chat 0.22.0 releases (to fix group chat invites), style the card as much as antd allows for it, and add a "Join" button.
 function GroupChatInvitation({ info, chatId }: GroupChatInvitationProps): ReactElement {
   return (
     <Card

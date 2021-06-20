@@ -1,6 +1,6 @@
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Draft } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-import { Cursor, Name, queryOrMutate, Username } from '@neelkamath/omni-chat';
+import { Cursor, queryOrMutate } from '@neelkamath/omni-chat';
 import { ForwardPagination } from '../../pagination';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { Storage } from '../../Storage';
@@ -32,11 +32,6 @@ export namespace SearchedUsersSlice {
 
   export interface Account {
     readonly userId: number;
-    readonly username: Username;
-    readonly firstName: Name;
-    readonly lastName: Name;
-    readonly emailAddress: string;
-    readonly bio: string;
   }
 
   const accountsConnectionFragment = `
@@ -47,11 +42,6 @@ export namespace SearchedUsersSlice {
       cursor
       node {
         userId
-        username
-        firstName
-        lastName
-        emailAddress
-        bio
       }
     }
   `;

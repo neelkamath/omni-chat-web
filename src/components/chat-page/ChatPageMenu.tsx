@@ -41,7 +41,7 @@ export default function ChatPageMenu(): ReactElement {
 }
 
 function EditAccountCol(): ReactElement {
-  useThunkDispatch(PicsSlice.fetchPic({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
+  useThunkDispatch(PicsSlice.fetch({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
   const dispatch = useDispatch();
   const url = useSelector((state: RootState) =>
     PicsSlice.selectPic(state, 'PROFILE_PIC', Storage.readUserId()!, 'THUMBNAIL'),

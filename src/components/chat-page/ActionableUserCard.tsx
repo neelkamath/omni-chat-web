@@ -1,12 +1,13 @@
 import React, { ReactElement, ReactNode, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
-import { Card, Col, Popconfirm, Row, Typography } from 'antd';
+import { Card, Col, Popconfirm, Row, Spin, Typography } from 'antd';
 import ProfileModal from './ProfileModal';
 import { useSelector } from 'react-redux';
 import { PicsSlice } from '../../store/slices/PicsSlice';
 import { RootState, useThunkDispatch } from '../../store/store';
 import CustomPic from './CustomPic';
 import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
+import { AccountsSlice } from '../../store/slices/AccountsSlice';
 
 /**
  * If `undefined`, then a {@link ProfileModal} will be displayed when the {@link ActionableUserCard} is clicked.
@@ -60,15 +61,16 @@ interface UserCardProps {
 }
 
 function UserCard({ account, onClick, extraRenderer }: UserCardProps): ReactElement {
+  useThunkDispatch(AccountsSlice.fetch(account.userId));
+  const username = useSelector((state: RootState) => AccountsSlice.select(state, account.userId))?.username;
+  const name = username === undefined ? <Spin size='small' /> : <Typography.Text strong>{username}</Typography.Text>;
   return (
     <Card extra={extraRenderer === undefined ? undefined : extraRenderer(account.userId)} hoverable onClick={onClick}>
       <Row gutter={16} align='middle'>
         <Col>
           <ProfilePic userId={account.userId} />
         </Col>
-        <Col>
-          <Typography.Text strong>{account.username}</Typography.Text>
-        </Col>
+        <Col>{name}</Col>
       </Row>
     </Card>
   );
@@ -85,6 +87,6 @@ function ProfilePic({ userId }: ProfilePicProps): ReactElement {
   leaving the search result up, we ignore this possibility.
    */
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
-  useThunkDispatch(PicsSlice.fetchPic({ id: userId, type: 'PROFILE_PIC' }));
+  useThunkDispatch(PicsSlice.fetch({ id: userId, type: 'PROFILE_PIC' }));
   return <CustomPic icon={<UserOutlined />} url={url} />;
 }

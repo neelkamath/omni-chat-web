@@ -6,7 +6,6 @@ import DeleteAction from './DeleteAction';
 import { RootState, useThunkDispatch } from '../../../../store/store';
 import { PicsSlice } from '../../../../store/slices/PicsSlice';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
-import { AccountSlice } from '../../../../store/slices/AccountSlice';
 import CustomPic from '../../CustomPic';
 import { Storage } from '../../../../Storage';
 import gfm from 'remark-gfm';
@@ -14,6 +13,7 @@ import ReactMarkdown from 'react-markdown';
 import { PicMessagesSlice } from '../../../../store/slices/PicMessagesSlice';
 import PollMessageContent from './PollMessageContent';
 import GroupChatInviteMessageContent from './GroupChatInviteMessageContent';
+import { AccountsSlice } from '../../../../store/slices/AccountsSlice';
 
 export interface ChatMessageProps {
   readonly message: ChatsSlice.Message;
@@ -21,17 +21,20 @@ export interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message, chatId }: ChatMessageProps): ReactElement {
-  useThunkDispatch(AccountSlice.fetchAccount());
+  useThunkDispatch(AccountsSlice.fetch(Storage.readUserId()!));
+  useThunkDispatch(PicsSlice.fetch({ id: message.sender.userId, type: 'PROFILE_PIC' }));
   const url = useSelector((state: RootState) =>
     PicsSlice.selectPic(state, 'PROFILE_PIC', message.sender.userId, 'THUMBNAIL'),
   );
+  const username = useSelector((state: RootState) => AccountsSlice.select(state, message.sender.userId))?.username;
+  if (username === undefined) return <Spin />;
   let actions: ReactNode[] | undefined;
   if (message.sender.userId === Storage.readUserId()) actions = [<DeleteAction key={1} message={message} />];
   return (
     <Comment
       actions={actions}
       avatar={<CustomPic icon={<UserOutlined />} url={url} />}
-      author={message.sender.username}
+      author={username}
       content={<MessageContent chatId={chatId} message={message} />}
       datetime={message.sent}
     />

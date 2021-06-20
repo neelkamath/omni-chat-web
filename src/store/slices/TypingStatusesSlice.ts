@@ -140,6 +140,6 @@ export namespace TypingStatusesSlice {
     (entities: Dictionary<Entity>, chatId: number) =>
       Object.values(entities)
         .filter((entity) => entity?.chatId === chatId)
-        .map((entity) => entity?.userId),
+        .map((entity) => entity!.userId),
   );
 }

@@ -38,7 +38,7 @@ function ChatPic({ chatId }: ChatPicProps): ReactElement {
     message.warning("You're no longer in this chat.", 5);
     dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
   }
-  useThunkDispatch(PicsSlice.fetchPic({ id: chatId, type: 'GROUP_CHAT_PIC' }));
+  useThunkDispatch(PicsSlice.fetch({ id: chatId, type: 'GROUP_CHAT_PIC' }));
   if (url === undefined) return <Spin size='small' />;
   else if (url === null) return <Typography.Text>No group chat pic set.</Typography.Text>;
   else return <OriginalPic type='CHAT_PIC' url={url} />;

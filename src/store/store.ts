@@ -1,6 +1,5 @@
 import { AsyncThunkAction, configureStore } from '@reduxjs/toolkit';
 import { PicsSlice } from './slices/PicsSlice';
-import { AccountSlice } from './slices/AccountSlice';
 import { SearchedUsersSlice } from './slices/SearchedUsersSlice';
 import { BlockedUsersSlice } from './slices/BlockedUsersSlice';
 import { ChatsSlice } from './slices/ChatsSlice';
@@ -12,6 +11,7 @@ import { useEffect } from 'react';
 import { ChatPageLayoutSlice } from './slices/ChatPageLayoutSlice';
 import { PicMessagesSlice } from './slices/PicMessagesSlice';
 import { SearchedPublicChatsSlice } from './slices/SearchedPublicChatsSlice';
+import { AccountsSlice } from './slices/AccountsSlice';
 
 /**
  * - `'IDLE'` indicates that either the entities have never been fetched or an error occurred during the last fetch.
@@ -22,7 +22,7 @@ export type FetchStatus = 'IDLE' | 'LOADING' | 'LOADED';
 
 const store = configureStore({
   reducer: {
-    account: AccountSlice.reducer,
+    accounts: AccountsSlice.reducer,
     blockedUsers: BlockedUsersSlice.reducer,
     chats: ChatsSlice.reducer,
     contacts: ContactsSlice.reducer,
@@ -40,6 +40,7 @@ export default store;
 
 export type RootState = ReturnType<typeof store.getState>;
 
+// TODO: Delete.
 /**
  * @example
  * When using React Redux, the following boilerplate is required to dispatch an action for an async thunk:

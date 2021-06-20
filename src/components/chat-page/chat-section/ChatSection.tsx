@@ -25,14 +25,14 @@ export default function ChatSection({ chatId }: ChatSectionProps): ReactElement 
     if (isDeletedPrivateChat) onDeletedChat();
   }, [isDeletedPrivateChat]);
   useEffect(() => {
-    if (chat?.__typename === 'PrivateChat') setSection(<ChatSegment chat={chat as ChatsSlice.PrivateChat} />);
-    else if (chat?.__typename === 'GroupChat') setSection(<ChatSegment chat={chat as ChatsSlice.GroupChat} />);
+    if (chat?.__typename === 'PrivateChat') setSection(<ChatSegment chat={chat} />);
+    else if (chat?.__typename === 'GroupChat') setSection(<ChatSegment chat={chat} />);
   }, [chat]);
   return section;
 }
 
 interface ChatSegmentProps {
-  readonly chat: ChatsSlice.PrivateChat | ChatsSlice.GroupChat;
+  readonly chat: ChatsSlice.Chat;
 }
 
 function ChatSegment({ chat }: ChatSegmentProps): ReactElement {
@@ -53,7 +53,7 @@ function ChatSegment({ chat }: ChatSegmentProps): ReactElement {
 }
 
 interface MessageCreatorSectionProps {
-  readonly chat: ChatsSlice.PrivateChat | ChatsSlice.GroupChat;
+  readonly chat: ChatsSlice.Chat;
 }
 
 function MessageCreatorSection({ chat }: MessageCreatorSectionProps): ReactElement {
@@ -61,10 +61,12 @@ function MessageCreatorSection({ chat }: MessageCreatorSectionProps): ReactEleme
     case 'PrivateChat':
       return <MessageCreator chatId={chat.chatId} />;
     case 'GroupChat': {
-      const isParticipant = chat.users.edges.find(({ node }) => node.userId === Storage.readUserId()) !== undefined;
-      const isAdmin = chat.adminIdList.includes(Storage.readUserId()!);
+      const isParticipant =
+        (chat as ChatsSlice.GroupChat).users.edges.find(({ node }) => node.userId === Storage.readUserId()) !==
+        undefined;
+      const isAdmin = (chat as ChatsSlice.GroupChat).adminIdList.includes(Storage.readUserId()!);
       if (!isParticipant) return <>You must be a participant to send messages.</>;
-      else if (chat.isBroadcast && !isAdmin) return <>Only admins can send messages.</>;
+      else if ((chat as ChatsSlice.GroupChat).isBroadcast && !isAdmin) return <>Only admins can send messages.</>;
       else return <MessageCreator chatId={chat.chatId} />;
     }
   }

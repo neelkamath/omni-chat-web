@@ -1,14 +1,14 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Form, Input, message, Space, Spin } from 'antd';
 import { useSelector } from 'react-redux';
-import { AccountSlice } from '../../../store/slices/AccountSlice';
-import { useThunkDispatch } from '../../../store/store';
+import { RootState, useThunkDispatch } from '../../../store/store';
 import { Storage } from '../../../Storage';
 import { Bio, isValidNameScalar, isValidUsernameScalar, Name, queryOrMutate, Username } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
 import GfmFormItem from '../GfmFormItem';
 import setOnline from '../../../setOnline';
 import logOut from '../../../logOut';
+import { AccountsSlice } from '../../../store/slices/AccountsSlice';
 
 export default function UpdateAccountSection(): ReactElement {
   return (
@@ -30,8 +30,9 @@ interface UpdateAccountFormData {
 
 function UpdateAccountForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
-  const account = useSelector(AccountSlice.select);
-  useThunkDispatch(AccountSlice.fetchAccount());
+  const userId = Storage.readUserId()!;
+  const account = useSelector((state: RootState) => AccountsSlice.select(state, userId));
+  useThunkDispatch(AccountsSlice.fetch(userId));
   if (account === undefined) return <Spin />;
   const onFinish = async (data: UpdateAccountFormData) => {
     setLoading(true);

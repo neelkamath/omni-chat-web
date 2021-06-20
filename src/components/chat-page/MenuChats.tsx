@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { Card, Col, Row, Space, Spin, Tooltip, Typography } from 'antd';
@@ -18,6 +18,7 @@ import gfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
 import TimeAgo from 'timeago-react';
 import ChatName from './ChatName';
+import { AccountsSlice } from '../../store/slices/AccountsSlice';
 
 export default function MenuChats(): ReactElement {
   useThunkDispatch(ChatsSlice.fetchChats());
@@ -100,11 +101,17 @@ interface LastChatMessageTextProps {
 function LastChatMessage({ chatId }: LastChatMessageTextProps): ReactElement {
   useThunkDispatch(ChatsSlice.fetchChat(chatId));
   const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (lastMessage?.sender.userId !== undefined) dispatch(AccountsSlice.fetch(lastMessage?.sender.userId));
+  }, [dispatch, lastMessage]);
+  const username = useSelector((state: RootState) => AccountsSlice.select(state, lastMessage?.sender.userId))?.username;
+  if (username === undefined) return <Spin />;
   if (lastMessage === undefined) return <></>;
   return (
     <Typography.Text ellipsis style={{ width: 300 }}>
       <Space>
-        <Typography.Paragraph>{lastMessage.sender.username}:</Typography.Paragraph>
+        <Typography.Paragraph>{username}:</Typography.Paragraph>
         <Typography.Paragraph style={{ height: 22 }}>
           <LastChatMessageContent message={lastMessage} />
         </Typography.Paragraph>

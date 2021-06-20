@@ -11,6 +11,7 @@ import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { queryOrMutate } from '@neelkamath/omni-chat';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
+import { AccountsSlice } from '../../store/slices/AccountsSlice';
 
 export interface ProfileModalProps {
   readonly account: ChatsSlice.UserAccount;
@@ -38,8 +39,11 @@ interface ProfileSectionProps {
 
 function ProfileSection({ account, hasChatButton }: ProfileSectionProps): ReactElement {
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.userId, 'ORIGINAL'));
-  useThunkDispatch(PicsSlice.fetchPic({ id: account.userId, type: 'PROFILE_PIC' }));
-  const name = `${account.firstName} ${account.lastName}`.trim();
+  useThunkDispatch(PicsSlice.fetch({ id: account.userId, type: 'PROFILE_PIC' }));
+  useThunkDispatch(AccountsSlice.fetch(account.userId));
+  const user = useSelector((state: RootState) => AccountsSlice.select(state, account.userId));
+  if (user === undefined) return <Spin />;
+  const name = `${user.firstName} ${user.lastName}`.trim();
   return (
     <List style={{ padding: 16 }}>
       {url === undefined && (
@@ -53,7 +57,7 @@ function ProfileSection({ account, hasChatButton }: ProfileSectionProps): ReactE
         </List.Item>
       )}
       <List.Item>
-        <Typography.Text strong>Username</Typography.Text>: {account.username}
+        <Typography.Text strong>Username</Typography.Text>: {user.username}
       </List.Item>
       {name.length > 0 && (
         <List.Item>
@@ -61,11 +65,11 @@ function ProfileSection({ account, hasChatButton }: ProfileSectionProps): ReactE
         </List.Item>
       )}
       <List.Item>
-        <Typography.Text strong>Email address</Typography.Text>: {account.emailAddress}
+        <Typography.Text strong>Email address</Typography.Text>: {user.emailAddress}
       </List.Item>
-      {account.bio.length > 0 && (
+      {user.bio.length > 0 && (
         <List.Item>
-          <Typography.Text strong>Bio</Typography.Text>: {account.bio}
+          <Typography.Text strong>Bio</Typography.Text>: {user.bio}
         </List.Item>
       )}
       <List.Item>

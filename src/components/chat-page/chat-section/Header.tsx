@@ -1,5 +1,5 @@
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
-import React, { MouseEventHandler, ReactElement, ReactNode, useState } from 'react';
+import React, { MouseEventHandler, ReactElement, ReactNode, useEffect, useState } from 'react';
 import { Button, Col, Row, Tag, Typography } from 'antd';
 import ChatPic from '../ChatPic';
 import { InfoCircleOutlined } from '@ant-design/icons';
@@ -11,26 +11,35 @@ import TimeAgo from 'timeago-react';
 import { TypingStatusesSlice } from '../../../store/slices/TypingStatusesSlice';
 import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
 import GroupChatTags from './GroupChatTags';
+import { AccountsSlice } from '../../../store/slices/AccountsSlice';
+import PrivateChatName from '../PrivateChatName';
 
 export interface HeaderProps {
-  readonly chat: ChatsSlice.PrivateChat | ChatsSlice.GroupChat;
+  readonly chat: ChatsSlice.Chat;
 }
 
 export default function Header({ chat }: HeaderProps): ReactElement {
   const dispatch = useDispatch();
   const [isVisible, setVisible] = useState(false);
-  let name: string, typingStatusSection: ReactElement, tags: ReactElement, onClick: MouseEventHandler<HTMLElement>;
+  let name: ReactNode, typingStatusSection: ReactElement, tags: ReactElement, onClick: MouseEventHandler<HTMLElement>;
   switch (chat.__typename) {
     case 'PrivateChat':
-      name = chat.user.username;
-      typingStatusSection = <PrivateChatTypingStatusSection userId={chat.user.userId} chatId={chat.chatId} />;
+      name = <PrivateChatName chat={chat as ChatsSlice.PrivateChat} />;
+      typingStatusSection = (
+        <PrivateChatTypingStatusSection userId={(chat as ChatsSlice.PrivateChat).user.userId} chatId={chat.chatId} />
+      );
       tags = <Tag color='orange'>Private</Tag>;
       onClick = () => setVisible(true);
       break;
     case 'GroupChat':
-      name = chat.title;
+      name = (chat as ChatsSlice.GroupChat).title;
       typingStatusSection = <GroupChatTypingStatusSection chatId={chat.chatId} />;
-      tags = <GroupChatTags isBroadcast={chat.isBroadcast} publicity={chat.publicity} />;
+      tags = (
+        <GroupChatTags
+          isBroadcast={(chat as ChatsSlice.GroupChat).isBroadcast}
+          publicity={(chat as ChatsSlice.GroupChat).publicity}
+        />
+      );
       onClick = () => dispatch(ChatPageLayoutSlice.update({ type: 'GROUP_CHAT_INFO', chatId: chat.chatId }));
   }
   return (
@@ -43,14 +52,16 @@ export default function Header({ chat }: HeaderProps): ReactElement {
           {name}
         </Typography.Text>
       </Col>
-      {chat.__typename === 'PrivateChat' && <OnlineStatusSection userId={chat.user.userId} />}
+      {chat.__typename === 'PrivateChat' && (
+        <OnlineStatusSection userId={(chat as ChatsSlice.PrivateChat).user.userId} />
+      )}
       {typingStatusSection}
       <Col>
         {tags}
         <Button ghost onClick={onClick} icon={<InfoCircleOutlined />} />
         {chat.__typename === 'PrivateChat' && (
           <ProfileModal
-            account={chat.user}
+            account={(chat as ChatsSlice.PrivateChat).user}
             hasChatButton={false}
             isVisible={isVisible}
             onCancel={() => setVisible(false)}
@@ -103,6 +114,11 @@ interface GroupChatTypingStatusSectionProps {
 function GroupChatTypingStatusSection({ chatId }: GroupChatTypingStatusSectionProps): ReactElement {
   useThunkDispatch(TypingStatusesSlice.fetchStatuses());
   const userIdList = useSelector((state: RootState) => TypingStatusesSlice.selectTyping(state, chatId));
-  // TODO: Instead of displaying the user ID, display the username. This can be done once AccountsSlice is implemented.
-  return <Col flex='auto'>{userIdList.length === 0 ? `${userIdList[userIdList.length - 1]} is typing` : ''}</Col>;
+  const dispatch = useDispatch();
+  const userId = userIdList[userIdList.length - 1];
+  useEffect(() => {
+    if (userId !== undefined) dispatch(AccountsSlice.fetch(userId));
+  }, [userId, dispatch]);
+  const username = useSelector((state: RootState) => AccountsSlice.select(state, userId))?.username;
+  return <Col flex='auto'>{username === undefined ? '' : `${username} is typing`}</Col>;
 }

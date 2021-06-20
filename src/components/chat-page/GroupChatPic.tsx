@@ -15,6 +15,6 @@ export default function GroupChatPic({ chatId }: GroupChatPicProps): ReactElemen
   handle this accordingly.
    */
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'GROUP_CHAT_PIC', chatId, 'THUMBNAIL'));
-  useThunkDispatch(PicsSlice.fetchPic({ id: chatId, type: 'GROUP_CHAT_PIC' }));
+  useThunkDispatch(PicsSlice.fetch({ id: chatId, type: 'GROUP_CHAT_PIC' }));
   return <CustomPic icon={<TeamOutlined />} url={url} />;
 }

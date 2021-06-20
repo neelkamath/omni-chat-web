@@ -1,6 +1,5 @@
 import { Storage } from '../Storage';
 import store from './store';
-import { AccountSlice } from './slices/AccountSlice';
 import { PicsSlice } from './slices/PicsSlice';
 import { BlockedUsersSlice } from './slices/BlockedUsersSlice';
 import { ChatsSlice } from './slices/ChatsSlice';
@@ -24,6 +23,7 @@ import { displayBugReporter, wsApiConfig } from '../api';
 import { PicMessagesSlice } from './slices/PicMessagesSlice';
 import { ChatPageLayoutSlice } from './slices/ChatPageLayoutSlice';
 import { message } from 'antd';
+import { AccountsSlice } from './slices/AccountsSlice';
 
 // TODO: Maybe split this into multiple files. Make subscriptions smaller by externalizing the query and event handlers.
 
@@ -103,11 +103,6 @@ interface DeletedContact {
 interface BlockedAccount {
   readonly __typename: 'BlockedAccount';
   readonly userId: number;
-  readonly username: Username;
-  readonly emailAddress: string;
-  readonly firstName: Name;
-  readonly lastName: Name;
-  readonly bio: Bio;
 }
 
 interface UpdatedProfilePic {
@@ -159,11 +154,6 @@ async function subscribeToAccounts(): Promise<void> {
             }
             ... on BlockedAccount {
               userId
-              username
-              emailAddress
-              firstName
-              lastName
-              bio
             }
             ... on DeletedContact {
               userId
@@ -188,13 +178,10 @@ async function subscribeToAccounts(): Promise<void> {
             resolve();
             break;
           case 'UpdatedAccount':
-            if (event.userId === Storage.readUserId()!) store.dispatch(AccountSlice.update(event));
-            store.dispatch(BlockedUsersSlice.updateAccount(event));
-            store.dispatch(ChatsSlice.updateAccount(event));
-            store.dispatch(ContactsSlice.updateOne(event));
+            if (event.userId === Storage.readUserId()!) store.dispatch(AccountsSlice.update(event));
             break;
           case 'UpdatedProfilePic':
-            store.dispatch(PicsSlice.fetchPic({ id: event.userId, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
+            store.dispatch(PicsSlice.fetch({ id: event.userId, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
             break;
           case 'BlockedAccount':
             store.dispatch(BlockedUsersSlice.upsertOne(event));
@@ -259,11 +246,6 @@ interface UpdatedGroupChat {
 
 interface UpdatedGroupChatAccount {
   readonly userId: number;
-  readonly username: Username;
-  readonly firstName: Name;
-  readonly lastName: Name;
-  readonly bio: Bio;
-  readonly emailAddress: string;
 }
 
 export type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
@@ -289,11 +271,6 @@ async function subscribeToChats(): Promise<void> {
               description
               newUsers {
                 userId
-                username
-                firstName
-                lastName
-                emailAddress
-                bio
               }
               removedUsers {
                 userId
@@ -333,7 +310,7 @@ async function subscribeToChats(): Promise<void> {
             }
             break;
           case 'UpdatedGroupChatPic':
-            store.dispatch(PicsSlice.fetchPic({ id: event.chatId, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
+            store.dispatch(PicsSlice.fetch({ id: event.chatId, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
             break;
           case 'DeletedPrivateChat':
             ChatsSlice.removeOne(event.chatId);
@@ -385,7 +362,6 @@ export type MessageState = 'SENT' | 'DELIVERED' | 'READ';
 
 interface Sender {
   readonly userId: number;
-  readonly username: Username;
 }
 
 interface NewTextMessage extends NewMessage {
@@ -494,7 +470,6 @@ async function subscribeToMessages(): Promise<void> {
               messageId
               sent
               sender {
-                username
                 userId
               }
               state
