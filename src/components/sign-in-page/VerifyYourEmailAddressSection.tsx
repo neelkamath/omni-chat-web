@@ -59,7 +59,7 @@ async function operateVerifyEmailAddress(data: VerifyYourEmailAddressFormData): 
   const response = await verifyEmailAddress(data);
   if (response?.verifyEmailAddress === null) message.success('Email address verified.', 3);
   else if (response?.verifyEmailAddress?.__typename === 'UnregisteredEmailAddress')
-    message.error('That email address isn\'t registered.', 5);
+    message.error("That email address isn't registered.", 5);
   else if (response?.verifyEmailAddress?.__typename === 'InvalidVerificationCode')
     message.error('Incorrect verification code.', 3);
 }
@@ -77,9 +77,9 @@ interface UnregisteredEmailAddress {
 }
 
 async function verifyEmailAddress({
-                                    emailAddress,
-                                    verificationCode,
-                                  }: VerifyYourEmailAddressFormData): Promise<VerifyEmailAddressResult | undefined> {
+  emailAddress,
+  verificationCode,
+}: VerifyYourEmailAddressFormData): Promise<VerifyEmailAddressResult | undefined> {
   return await operateGraphQlApi(async () =>
     queryOrMutate(httpApiConfig, {
       query: `

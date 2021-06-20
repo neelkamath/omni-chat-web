@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { PicsSlice } from '../../store/slices/PicsSlice';
 import CustomPic from './CustomPic';
 import { UserOutlined } from '@ant-design/icons';
+import { RootState } from '../../store/store';
 
 export interface PrivateChatPicProps {
   readonly userId: number;

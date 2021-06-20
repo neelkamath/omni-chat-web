@@ -49,7 +49,7 @@ function Chats({ invitedChatId }: ChatsProps): ReactElement {
     .filter(({ chatId }) => chatId !== invitedChatId)
     .map((chat) => <ChatCard invitedChatId={invitedChatId} key={chat.chatId} chat={chat} />);
   return (
-    <Space direction='vertical'>{cards.length === 0 ? 'You\'re not in any chats to send invitations to.' : cards}</Space>
+    <Space direction='vertical'>{cards.length === 0 ? "You're not in any chats to send invitations to." : cards}</Space>
   );
 }
 
@@ -90,7 +90,7 @@ async function operateCreateGroupChatInviteMessage(chatId: number, invitedChatId
   const response = await createGroupChatInviteMessage(chatId, invitedChatId);
   if (response?.createGroupChatInviteMessage === null) message.success('Invitation sent.', 3);
   else if (response?.createGroupChatInviteMessage?.__typename === 'InvalidChatId')
-    message.error('You\'re no longer in the chat.', 5);
+    message.error("You're no longer in the chat.", 5);
   else if (response?.createGroupChatInviteMessage?.__typename === 'InvalidInvitedChat')
     message.error('This chat no longer accepts invitations.', 5);
 }

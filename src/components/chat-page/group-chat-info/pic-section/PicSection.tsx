@@ -38,7 +38,7 @@ function ChatPic({ chatId }: ChatPicProps): ReactElement {
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'GROUP_CHAT_PIC', chatId, 'ORIGINAL'));
   const error = useSelector((state: RootState) => PicsSlice.selectError(state, 'GROUP_CHAT_PIC', chatId));
   if (error instanceof NonexistentChatError) {
-    message.warning('You\'re no longer in this chat.', 5);
+    message.warning("You're no longer in this chat.", 5);
     dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
   }
   if (url === undefined) return <Spin size='small' />;

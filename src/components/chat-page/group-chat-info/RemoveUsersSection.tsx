@@ -43,7 +43,7 @@ export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps):
       <Typography.Paragraph>
         Removed users&apos; messages and votes on polls won&apos;t get deleted.
       </Typography.Paragraph>
-      <Space direction='vertical'>{cards.length === 0 ? 'You\'re the only participant.' : cards}</Space>
+      <Space direction='vertical'>{cards.length === 0 ? "You're the only participant." : cards}</Space>
     </>
   );
 }

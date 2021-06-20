@@ -68,7 +68,8 @@
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-namespace": "off",
       "@typescript-eslint/no-explicit-any": "off",
-      "no-inner-declarations": "off"
+      "no-inner-declarations": "off",
+      "@typescript-eslint/no-empty-function": "off"
     },
     "settings": {
       "react": {

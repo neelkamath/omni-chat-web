@@ -1,5 +1,5 @@
 import { Storage } from './Storage';
-import { shutDownSubscriptions } from './store/subscriptions';
+import { shutDownSubscriptions } from './store/subscriptionManager';
 import setOnline from './setOnline';
 
 export default async function logOut(): Promise<void> {

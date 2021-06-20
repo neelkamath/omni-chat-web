@@ -29,7 +29,7 @@ async function operatePatchGroupChatPic(chatId: number, file: File): Promise<voi
     await operateRestApi(() => patchGroupChatPic(httpApiConfig, Storage.readAccessToken()!, chatId, file));
     message.success('Group chat picture updated.', 3);
   } catch (error) {
-    if (error instanceof InvalidPicError) message.error('The picture mustn\'t exceed 5 MB.', 5);
+    if (error instanceof InvalidPicError) message.error("The picture mustn't exceed 5 MB.", 5);
     else throw error;
   }
 }

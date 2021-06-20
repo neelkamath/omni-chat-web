@@ -1,7 +1,7 @@
 import { Empty, Layout, message, Row, Spin } from 'antd';
 import React, { ReactElement, useEffect, useState } from 'react';
 import ChatPageMenu from './ChatPageMenu';
-import { setUpSubscriptions } from '../../store/subscriptions';
+import { setUpSubscriptions } from '../../store/subscriptionManager';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { useSelector } from 'react-redux';

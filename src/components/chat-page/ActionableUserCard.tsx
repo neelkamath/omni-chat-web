@@ -7,6 +7,7 @@ import { PicsSlice } from '../../store/slices/PicsSlice';
 import CustomPic from './CustomPic';
 import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
+import { RootState } from '../../store/store';
 
 /**
  * If `undefined`, then a {@link ProfileModal} will be displayed when the {@link ActionableUserCard} is clicked.
@@ -29,10 +30,10 @@ export interface PopconfirmationProps {
 }
 
 export default function ActionableUserCard({
-                                             account,
-                                             popconfirmation,
-                                             extraRenderer,
-                                           }: ActionableUserCardProps): ReactElement {
+  account,
+  popconfirmation,
+  extraRenderer,
+}: ActionableUserCardProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
   const card = <UserCard extraRenderer={extraRenderer} account={account} onClick={() => setVisible(true)} />;
   if (popconfirmation === undefined)

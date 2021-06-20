@@ -21,6 +21,7 @@ import CustomPic from './CustomPic';
 import { NonexistentUserIdError } from '@neelkamath/omni-chat';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
+import { RootState } from '../../store/store';
 
 export default function ChatPageMenu(): ReactElement {
   return (

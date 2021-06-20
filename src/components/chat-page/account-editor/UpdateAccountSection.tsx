@@ -87,12 +87,12 @@ interface AccountUpdate {
 }
 
 function buildAccountUpdate({
-                              username,
-                              emailAddress,
-                              firstName,
-                              lastName,
-                              bio,
-                            }: UpdateAccountFormData): AccountUpdate {
+  username,
+  emailAddress,
+  firstName,
+  lastName,
+  bio,
+}: UpdateAccountFormData): AccountUpdate {
   return {
     username: username.trim(),
     password: null,
@@ -107,14 +107,14 @@ function validateAccountUpdate({ username, firstName, lastName }: AccountUpdate)
   if (username !== null && !isValidUsernameScalar(username)) {
     message.error(
       'A username must be 1-30 characters long. Only lowercase English letters (a-z), English numbers (0-9), ' +
-      'periods, and underscores are allowed.',
+        'periods, and underscores are allowed.',
       10,
     );
     return false;
   }
   const isInvalidName = (name: Name | null) => name !== null && !isValidNameScalar(name);
   if (isInvalidName(firstName) || isInvalidName(lastName)) {
-    message.error('Name mustn\'t contain spaces.', 5);
+    message.error("Name mustn't contain spaces.", 5);
     return false;
   }
   return true;

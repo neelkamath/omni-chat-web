@@ -11,12 +11,12 @@ export interface PublicityRadioGroupProps {
 }
 
 export default function PublicityRadioGroup({
-                                              onChange,
-                                              isNotInvitableDisabled,
-                                              isInvitableDisabled,
-                                              isPublicDisabled,
-                                              isRequired,
-                                            }: PublicityRadioGroupProps): ReactElement {
+  onChange,
+  isNotInvitableDisabled,
+  isInvitableDisabled,
+  isPublicDisabled,
+  isRequired,
+}: PublicityRadioGroupProps): ReactElement {
   return (
     <Form.Item name='publicity' label={<Label />} rules={[{ required: isRequired, message: 'Specify the publicity.' }]}>
       <Radio.Group onChange={onChange}>

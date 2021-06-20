@@ -62,7 +62,7 @@ function UpdateTitleForm({ chatId }: UpdateTitleFormProps): ReactElement {
 }
 
 async function operateUpdateGroupChatTitle(chatId: number, title: GroupChatTitle): Promise<void> {
-  if (title.length === 0) message.error('The title must contain at least one character which isn\'t a space.', 5);
+  if (title.length === 0) message.error("The title must contain at least one character which isn't a space.", 5);
   else {
     const response = await updateGroupChatTitle(chatId, title);
     if (response?.updateGroupChatTitle === null) message.success('Title updated.', 3);

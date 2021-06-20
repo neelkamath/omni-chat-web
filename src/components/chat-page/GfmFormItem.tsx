@@ -24,16 +24,16 @@ export interface GfmFormItemProps {
 
 // FIXME: Pressing enter doesn't clear the field.
 export default function GfmFormItem({
-                                      placeholder,
-                                      maxLength,
-                                      minLength,
-                                      name,
-                                      label,
-                                      fieldKey,
-                                      onPressEnter,
-                                      initialValue,
-                                      rules,
-                                    }: GfmFormItemProps): ReactElement {
+  placeholder,
+  maxLength,
+  minLength,
+  name,
+  label,
+  fieldKey,
+  onPressEnter,
+  initialValue,
+  rules,
+}: GfmFormItemProps): ReactElement {
   const [value, setValue] = useState(initialValue === undefined ? '' : initialValue);
   const [isShiftDown, setShiftDown] = useState(false);
   return (

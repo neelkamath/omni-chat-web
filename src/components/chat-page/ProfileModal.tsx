@@ -11,6 +11,7 @@ import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { queryOrMutate } from '@neelkamath/omni-chat';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
+import { RootState } from '../../store/store';
 
 export interface ProfileModalProps {
   readonly account: ChatsSlice.UserAccount;

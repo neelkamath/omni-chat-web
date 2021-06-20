@@ -18,6 +18,7 @@ import ReactMarkdown from 'react-markdown';
 import TimeAgo from 'timeago-react';
 import ChatName from './ChatName';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
+import { RootState } from '../../store/store';
 
 export default function MenuChats(): ReactElement {
   const dispatch = useDispatch();

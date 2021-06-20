@@ -56,7 +56,7 @@ async function operateEmailEmailAddressVerification(emailAddress: string): Promi
   else if (response?.emailEmailAddressVerification?.__typename === 'EmailAddressVerified')
     message.warn('The account has already been verified.', 5);
   else if (response?.emailEmailAddressVerification?.__typename === 'UnregisteredEmailAddress')
-    message.error('There\'s no account associated with that email address.', 5);
+    message.error("There's no account associated with that email address.", 5);
 }
 
 interface EmailEmailAddressVerificationResult {
