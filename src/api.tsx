@@ -51,7 +51,7 @@ export async function displayBugReporter(error: Error | GraphQlResponseValue[]):
     message: 'Something Went Wrong',
     description: (
       <Typography.Text>
-        Please report this bug to <Typography.Link>neelkamathonline@gmail.com</Typography.Link>.
+        Please report this bug to <Typography.Link>{process.env.SUPPORT_EMAIL_ADDRESS}</Typography.Link>.
       </Typography.Text>
     ),
   });
