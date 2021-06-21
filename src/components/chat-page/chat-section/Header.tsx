@@ -24,7 +24,7 @@ export default function Header({ chat }: HeaderProps): ReactElement {
   let name: ReactNode, typingStatusSection: ReactElement, tags: ReactElement, onClick: MouseEventHandler<HTMLElement>;
   switch (chat.__typename) {
     case 'PrivateChat':
-      name = <PrivateChatName chat={chat as ChatsSlice.PrivateChat} />;
+      name = <PrivateChatName userId={(chat as ChatsSlice.PrivateChat).user.userId} />;
       typingStatusSection = (
         <PrivateChatTypingStatusSection userId={(chat as ChatsSlice.PrivateChat).user.userId} chatId={chat.chatId} />
       );

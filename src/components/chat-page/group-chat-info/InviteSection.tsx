@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
@@ -9,6 +9,8 @@ import ChatName from '../ChatName';
 import { queryOrMutate } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../api';
 import { Storage } from '../../../Storage';
+import { ContactsSlice } from '../../../store/slices/ContactsSlice';
+import PrivateChatPic from '../PrivateChatPic';
 
 export interface InviteSectionProps {
   readonly chatId: number;
@@ -36,34 +38,71 @@ interface ChatsProps {
   readonly invitedChatId: number;
 }
 
-// TODO: Allow inviting your contacts who you don't have chats with as well.
 function Chats({ invitedChatId }: ChatsProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(ChatsSlice.fetchChats());
+    dispatch(ContactsSlice.fetch());
   }, [dispatch]);
   const chats = useSelector(ChatsSlice.selectChats);
-  const isLoading = !useSelector(ChatsSlice.selectIsLoaded);
-  if (isLoading) return <Spin style={{ padding: 16 }} />;
-  const cards = chats
+  const privateChatUsers = useSelector(ChatsSlice.selectPrivateChatUsers);
+  const isChatsLoading = !useSelector(ChatsSlice.selectIsLoaded);
+  const contacts = useSelector(ContactsSlice.selectAll);
+  const isContactsLoading = !useSelector(ContactsSlice.selectIsLoaded);
+  if (isChatsLoading || isContactsLoading) return <Spin style={{ padding: 16 }} />;
+  const contactCards = contacts
+    .filter((userId) => !privateChatUsers!.includes(userId))
+    .map((userId) => <ChatCard key={userId} data={userId} invitedChatId={invitedChatId} />);
+  const chatCards = chats
     .filter(({ chatId }) => chatId !== invitedChatId)
-    .map((chat) => <ChatCard invitedChatId={invitedChatId} key={chat.chatId} chat={chat} />);
-  return (
-    <Space direction='vertical'>{cards.length === 0 ? "You're not in any chats to send invitations to." : cards}</Space>
-  );
+    .map((chat) => <ChatCard invitedChatId={invitedChatId} key={chat.chatId} data={chat} />);
+  return <Cards chatCards={chatCards} contactCards={contactCards} />;
+}
+
+interface CardsProps {
+  readonly chatCards: ReactElement[];
+  readonly contactCards: ReactElement[];
+}
+
+function Cards({ contactCards, chatCards }: CardsProps): ReactElement {
+  let section: ReactNode;
+  if (chatCards.length + contactCards.length === 0)
+    section = "You're not in any chats, and don't have any contacts to send invitations to.";
+  else
+    section = (
+      <>
+        {chatCards}
+        {contactCards}
+      </>
+    );
+  return <Space direction='vertical'>{section}</Space>;
 }
 
 interface ChatCardProps {
-  readonly chat: ChatsSlice.Chat;
+  /**
+   * Instead of passing a {@link ChatsSlice.PrivateChat}, a `number` can be passed which is the ID of the other user in
+   * the private chat.
+   */
+  readonly data: ChatsSlice.Chat | number;
   readonly invitedChatId: number;
 }
 
-function ChatCard({ chat, invitedChatId }: ChatCardProps): ReactElement {
+function ChatCard({ data, invitedChatId }: ChatCardProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const onConfirm = async () => {
     setLoading(true);
-    await operateCreateGroupChatInviteMessage(chat.chatId, invitedChatId);
+    if (typeof data === 'number') {
+      const chatId = await operateCreatePrivateChat(data);
+      if (chatId === undefined) {
+        setLoading(false);
+        setVisible(false);
+        return;
+      }
+      await operateCreateGroupChatInviteMessage(chatId, invitedChatId);
+    } else {
+      await operateCreateGroupChatInviteMessage(data.chatId, invitedChatId);
+    }
     setLoading(false);
     setVisible(false);
   };
@@ -78,8 +117,8 @@ function ChatCard({ chat, invitedChatId }: ChatCardProps): ReactElement {
     >
       <Card hoverable size='small' onClick={() => setVisible(true)}>
         <Space>
-          <ChatPic chat={chat} />
-          <ChatName chat={chat} />
+          {typeof data === 'number' ? <PrivateChatPic userId={data} /> : <ChatPic chat={data} />}
+          <ChatName data={data} />
         </Space>
       </Card>
     </Popconfirm>
@@ -132,6 +171,53 @@ async function createGroupChatInviteMessage(
             }
           `,
           variables: { chatId, invitedChatId },
+        },
+        Storage.readAccessToken()!,
+      ),
+  );
+}
+
+// TODO: If you use the following, abstract it from <ProfileModal> where it was copied from.
+
+async function operateCreatePrivateChat(userId: number): Promise<number | undefined> {
+  const response = await createPrivateChat(userId);
+  if (response?.createPrivateChat.__typename === 'InvalidUserId') {
+    message.warning('The user just deleted their account.', 5);
+    return undefined;
+  }
+  return response?.createPrivateChat.chatId;
+}
+
+interface InvalidUserId {
+  readonly __typename: 'InvalidUserId';
+}
+
+interface CreatedChatId {
+  readonly __typename: 'CreatedChatId';
+  readonly chatId: number;
+}
+
+interface CreatePrivateChatResult {
+  readonly createPrivateChat: InvalidUserId | CreatedChatId;
+}
+
+async function createPrivateChat(userId: number): Promise<CreatePrivateChatResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(
+        httpApiConfig,
+        {
+          query: `
+            mutation CreatePrivateChat($userId: Int!) {
+              createPrivateChat(userId: $userId) {
+                __typename
+                ... on CreatedChatId {
+                  chatId
+                }
+              }
+            }
+          `,
+          variables: { userId },
         },
         Storage.readAccessToken()!,
       ),

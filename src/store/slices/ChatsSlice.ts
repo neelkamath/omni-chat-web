@@ -646,4 +646,16 @@ export namespace ChatsSlice {
     (_: RootState, chatId: number) => chatId,
     (chatIdList: number[], chatId: number) => chatIdList.includes(chatId),
   );
+
+  /**
+   * Returns the IDs of users in private chats with the signed in user excluding the signed in user, or `undefined` if
+   * the chats haven't been fetched.
+   */
+  export const selectPrivateChatUsers = createSelector(
+    (state: RootState) =>
+      Object.values(state.chats.entities)
+        .filter((chat) => chat?.__typename === 'PrivateChat')
+        .map((chat) => (chat as PrivateChat).user.userId),
+    (userIdList: number[] | undefined) => userIdList,
+  );
 }

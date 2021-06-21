@@ -158,7 +158,7 @@ interface ContactButtonProps {
 function ContactButton({ userId }: ContactButtonProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(ContactsSlice.fetchContacts());
+    dispatch(ContactsSlice.fetch());
   }, [dispatch]);
   const isButtonLoading = !useSelector(ContactsSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);

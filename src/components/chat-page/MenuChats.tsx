@@ -65,7 +65,7 @@ function ChatMetadata({ chat }: ChatMetadataProps): ReactElement {
     <>
       <Row gutter={16} justify='space-between'>
         <Col>
-          <ChatName chat={chat} />
+          <ChatName data={chat} />
         </Col>
         <Col>
           <LastMessageTimeAgo chatId={chat.chatId} />

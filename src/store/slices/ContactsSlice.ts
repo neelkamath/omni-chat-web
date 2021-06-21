@@ -1,20 +1,26 @@
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityAdapter } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+  EntityAdapter,
+  EntityId,
+} from '@reduxjs/toolkit';
 import { FetchStatus, RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { queryOrMutate } from '@neelkamath/omni-chat';
 
 export namespace ContactsSlice {
-  const adapter: EntityAdapter<Account> = createEntityAdapter({ selectId: ({ userId }) => userId });
-
   const sliceName = 'contacts';
+  const adapter: EntityAdapter<Account> = createEntityAdapter({ selectId: ({ userId }) => userId });
 
   export interface State extends ReturnType<typeof adapter.getInitialState> {
     readonly status: FetchStatus;
   }
 
-  export const fetchContacts = createAsyncThunk(
-    `${sliceName}/fetchContacts`,
+  export const fetch = createAsyncThunk(
+    `${sliceName}/fetch`,
     async () => {
       const response = await readContacts();
       return response?.readContacts.edges.map(({ node }) => node);
@@ -76,13 +82,13 @@ export namespace ContactsSlice {
     reducers: { removeOne: adapter.removeOne, upsertOne: adapter.upsertOne },
     extraReducers: (builder) => {
       builder
-        .addCase(fetchContacts.pending, (state) => {
+        .addCase(fetch.pending, (state) => {
           state.status = 'LOADING';
         })
-        .addCase(fetchContacts.rejected, (state) => {
+        .addCase(fetch.rejected, (state) => {
           state.status = 'IDLE';
         })
-        .addCase(fetchContacts.fulfilled, (state, { payload }) => {
+        .addCase(fetch.fulfilled, (state, { payload }) => {
           state.status = 'LOADED';
           if (payload !== undefined) adapter.upsertMany(state, payload);
         });
@@ -103,5 +109,10 @@ export namespace ContactsSlice {
   export const selectIsLoaded = createSelector(
     (state: RootState) => state.contacts.status,
     (status: FetchStatus) => status === 'LOADED',
+  );
+
+  export const selectAll = createSelector(
+    (state: RootState) => state.contacts.ids,
+    (idList: EntityId[]) => idList.map((id) => parseInt(id.toString())),
   );
 }
