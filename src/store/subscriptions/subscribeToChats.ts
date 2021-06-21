@@ -105,7 +105,6 @@ async function onMessage(
       break;
     case 'UpdatedGroupChat':
       store.dispatch(ChatsSlice.updateGroupChat(event));
-      // TODO: Test.
       if (event?.removedUsers?.map(({ userId }) => userId).includes(Storage.readUserId()!)) {
         store.dispatch(ChatsSlice.removeOne(event.chatId));
         if (ChatPageLayoutSlice.select(store.getState()).chatId === event.chatId) {
