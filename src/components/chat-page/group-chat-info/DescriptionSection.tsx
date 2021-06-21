@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { Button, Form, message, Spin, Typography } from 'antd';
+import { Button, Divider, Form, message, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { GroupChatDescription, queryOrMutate } from '@neelkamath/omni-chat';
 import { RootState } from '../../../store/store';
@@ -19,9 +19,12 @@ export default function DescriptionSection({ chatId }: DescriptionSectionProps):
   }, [dispatch, chatId]);
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   const description = useSelector((state: RootState) => ChatsSlice.selectGroupChatDescription(state, chatId));
+  if (isAdmin === undefined || description === undefined) return <Spin />;
   if (isAdmin) return <UpdateDescriptionForm chatId={chatId} />;
+  if (description.length === 0) return <></>;
   return (
     <>
+      <Divider />
       <Typography.Text strong>Description</Typography.Text>: {description}
     </>
   );

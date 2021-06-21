@@ -36,7 +36,6 @@ export default function GroupChatInfo({ chatId }: GroupChatSectionProps): ReactE
       <PicSection chatId={chatId} />
       <Divider />
       <TitleSection chatId={chatId} />
-      <Divider />
       <DescriptionSection chatId={chatId} />
       <Divider />
       <BroadcastSection chatId={chatId} />
