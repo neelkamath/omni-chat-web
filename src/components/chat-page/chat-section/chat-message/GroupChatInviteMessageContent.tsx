@@ -15,8 +15,7 @@ export default function GroupChatInviteMessageContent({
   inviteCode,
   chatId,
 }: GroupChatInviteMessageContentProps): ReactElement {
-  const invalidCodeText = 'The chat is no longer accepting invitations.';
-  const [section, setSection] = useState(inviteCode === null ? invalidCodeText : <Spin />);
+  const [section, setSection] = useState(inviteCode === null ? <InvalidGroupChatInvite /> : <Spin />);
   useEffect(() => {
     if (inviteCode !== null)
       readGroupChat(inviteCode).then((response) => {
@@ -25,11 +24,19 @@ export default function GroupChatInviteMessageContent({
             setSection(<GroupChatInvitation chatId={chatId} info={response.readGroupChat} />);
             break;
           case 'InvalidInviteCode':
-            setSection(invalidCodeText);
+            setSection(<InvalidGroupChatInvite />);
         }
       });
   }, [chatId, inviteCode]);
   return <>{section}</>;
+}
+
+function InvalidGroupChatInvite(): ReactElement {
+  return (
+    <Card size='small'>
+      This group chat invite has become invalid because the chat it&apos;s for is no longer accepting invitations.
+    </Card>
+  );
 }
 
 interface GroupChatInvitationProps {
