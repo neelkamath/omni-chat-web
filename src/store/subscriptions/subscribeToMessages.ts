@@ -230,7 +230,6 @@ export async function subscribeToMessages(): Promise<void> {
       wsApiConfig,
       Storage.readAccessToken()!,
       '/messages-subscription',
-      // TODO: Instead of duplicating account info everywhere, use a slice which gets users from their ID.
       query,
       (response: GraphQlResponse<SubscribeToMessagesResult>) => onMessage(resolve, response),
       onSubscriptionError,
