@@ -7,11 +7,14 @@ import { subscribeToAccounts } from './subscriptions/subscribeToAccounts';
 
 export type PromiseResolver = (value: void | PromiseLike<void>) => void;
 
-const onAccountsSubscriptionClose: OnSocketClose = () => {};
-const onGroupChatsSubscriptionClose: OnSocketClose = () => {};
-const onMessagesSubscriptionClose: OnSocketClose = () => {};
-const onOnlineStatusesSubscriptionClose: OnSocketClose = () => {};
-const onTypingStatusesSubscriptionClose: OnSocketClose = () => {};
+/** `undefined` if no subscription is running. */
+type OnSubscriptionClose = OnSocketClose | undefined;
+
+let onAccountsSubscriptionClose: OnSubscriptionClose;
+let onGroupChatsSubscriptionClose: OnSubscriptionClose;
+let onMessagesSubscriptionClose: OnSubscriptionClose;
+let onOnlineStatusesSubscriptionClose: OnSubscriptionClose;
+let onTypingStatusesSubscriptionClose: OnSubscriptionClose;
 
 export const subscriptionClosers = {
   onAccountsSubscriptionClose,
@@ -21,7 +24,7 @@ export const subscriptionClosers = {
   onTypingStatusesSubscriptionClose,
 };
 
-export function verifySubscriptionCreation(onSubscriptionClose: OnSocketClose): void {
+export function verifySubscriptionCreation(onSubscriptionClose: OnSubscriptionClose): void {
   // TODO: Automatically send back the error report instead, and show a ConnectionError instead.
   if (onSubscriptionClose !== undefined) throw new Error("Previous subscription hasn't been closed.");
 }
@@ -46,7 +49,7 @@ export function shutDownSubscriptions(): void {
     onOnlineStatusesSubscriptionClose,
     onTypingStatusesSubscriptionClose,
   ].forEach((onClose) => {
-    onClose();
+    if (onClose !== undefined) onClose();
   });
 }
 
