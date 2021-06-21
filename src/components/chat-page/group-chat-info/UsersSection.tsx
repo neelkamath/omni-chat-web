@@ -22,8 +22,8 @@ export default function UsersSection({ chatId }: UsersSectionProps): ReactElemen
   const cards = participants.map((participant) => (
     <ActionableUserCard
       extraRenderer={(userId) => (adminIdList.includes(userId) ? <AdminIndicator /> : <NonAdminIndicator />)}
-      key={participant.userId}
-      account={participant}
+      key={participant}
+      userId={participant}
     />
   ));
   return <Space direction='vertical'>{cards}</Space>;

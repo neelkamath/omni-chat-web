@@ -61,7 +61,7 @@ export default function Header({ chat }: HeaderProps): ReactElement {
         <Button ghost onClick={onClick} icon={<InfoCircleOutlined />} />
         {chat.__typename === 'PrivateChat' && (
           <ProfileModal
-            account={(chat as ChatsSlice.PrivateChat).user}
+            userId={(chat as ChatsSlice.PrivateChat).user.userId}
             hasChatButton={false}
             isVisible={isVisible}
             onCancel={() => setVisible(false)}

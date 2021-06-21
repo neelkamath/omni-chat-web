@@ -5,7 +5,6 @@ import ProfileModal from './ProfileModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { PicsSlice } from '../../store/slices/PicsSlice';
 import CustomPic from './CustomPic';
-import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
 import { RootState } from '../../store/store';
 
@@ -19,7 +18,7 @@ export type CardPopconfirmation = PopconfirmationProps;
 export type CardExtra = (userId: number) => ReactNode;
 
 export interface ActionableUserCardProps {
-  readonly account: SearchedUsersSlice.Account;
+  readonly userId: number;
   readonly popconfirmation?: CardPopconfirmation;
   readonly extraRenderer?: CardExtra;
 }
@@ -30,48 +29,44 @@ export interface PopconfirmationProps {
 }
 
 export default function ActionableUserCard({
-  account,
+  userId,
   popconfirmation,
   extraRenderer,
 }: ActionableUserCardProps): ReactElement {
   const [isVisible, setVisible] = useState(false);
-  const card = <UserCard extraRenderer={extraRenderer} account={account} onClick={() => setVisible(true)} />;
+  const card = <UserCard extraRenderer={extraRenderer} userId={userId} onClick={() => setVisible(true)} />;
   if (popconfirmation === undefined)
     return (
       <>
         {card}
-        <ProfileModal account={account} isVisible={isVisible} onCancel={() => setVisible(false)} hasChatButton />
+        <ProfileModal userId={userId} isVisible={isVisible} onCancel={() => setVisible(false)} hasChatButton />
       </>
     );
   return (
-    <Popconfirm
-      title={popconfirmation.title}
-      placement='right'
-      onConfirm={() => popconfirmation.onConfirm(account.userId)}
-    >
+    <Popconfirm title={popconfirmation.title} placement='right' onConfirm={() => popconfirmation.onConfirm(userId)}>
       {card}
     </Popconfirm>
   );
 }
 
 interface UserCardProps {
-  readonly account: SearchedUsersSlice.Account;
+  readonly userId: number;
   readonly onClick: () => void;
   readonly extraRenderer?: (userId: number) => ReactNode;
 }
 
-function UserCard({ account, onClick, extraRenderer }: UserCardProps): ReactElement {
+function UserCard({ userId, onClick, extraRenderer }: UserCardProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(AccountsSlice.fetch(account.userId));
-  }, [dispatch, account]);
-  const username = useSelector((state: RootState) => AccountsSlice.select(state, account.userId))?.username;
+    dispatch(AccountsSlice.fetch(userId));
+  }, [dispatch, userId]);
+  const username = useSelector((state: RootState) => AccountsSlice.select(state, userId))?.username;
   const name = username === undefined ? <Spin size='small' /> : <Typography.Text strong>{username}</Typography.Text>;
   return (
-    <Card extra={extraRenderer === undefined ? undefined : extraRenderer(account.userId)} hoverable onClick={onClick}>
+    <Card extra={extraRenderer === undefined ? undefined : extraRenderer(userId)} hoverable onClick={onClick}>
       <Row gutter={16} align='middle'>
         <Col>
-          <ProfilePic userId={account.userId} />
+          <ProfilePic userId={userId} />
         </Col>
         <Col>{name}</Col>
       </Row>

@@ -632,9 +632,9 @@ export namespace ChatsSlice {
     chat?.users.edges.map(({ node }) => node.userId),
   );
 
-  /** Returns the specified group chat's participants, or `undefined` if the chat hasn't been fetched. */
+  /** Returns the ID of each participant in the specified group chat, or `undefined` if the chat hasn't been fetched. */
   export const selectParticipants = createSelector(selectGroupChat, (chat: GroupChat | undefined) =>
-    chat?.users.edges.map(({ node }) => node),
+    chat?.users.edges.map(({ node }) => node.userId),
   );
 
   /** Returns the IDs of each admin in the specified group chat, or `undefined` if the chat hasn't been fetched. */

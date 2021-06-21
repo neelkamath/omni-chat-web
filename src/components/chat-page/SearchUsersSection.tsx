@@ -56,7 +56,7 @@ function Users({ popconfirmation, extraRenderer }: UsersProps): ReactElement {
         extraRenderer={extraRenderer}
         popconfirmation={popconfirmation}
         key={node.userId}
-        account={node}
+        userId={node.userId}
       />
     ));
   return <Space direction='vertical'>{cards}</Space>;

@@ -9,14 +9,13 @@ import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { queryOrMutate } from '@neelkamath/omni-chat';
-import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
 import { RootState } from '../../store/store';
 import operateCreatePrivateChat from '../../operateCreatePrivateChat';
 
 export interface ProfileModalProps {
-  readonly account: ChatsSlice.UserAccount;
-  /** Whether to display a button which opens a private chat with this {@link account}. */
+  readonly userId: number;
+  /** Whether to display a button which opens a private chat with this {@link userId}. */
   readonly hasChatButton: boolean;
   /** Whether the modal is visible. */
   readonly isVisible: boolean;
@@ -24,28 +23,28 @@ export interface ProfileModalProps {
   readonly onCancel: () => void;
 }
 
-export default function ProfileModal({ account, hasChatButton, isVisible, onCancel }: ProfileModalProps): ReactElement {
+export default function ProfileModal({ userId, hasChatButton, isVisible, onCancel }: ProfileModalProps): ReactElement {
   return (
     <Modal footer={null} visible={isVisible} onCancel={onCancel}>
-      <ProfileSection account={account} hasChatButton={hasChatButton} />
+      <ProfileSection userId={userId} hasChatButton={hasChatButton} />
     </Modal>
   );
 }
 
 interface ProfileSectionProps {
-  readonly account: ChatsSlice.UserAccount;
+  readonly userId: number;
   /** Whether to display a button which opens a private chat with this {@link account}. */
   readonly hasChatButton: boolean;
 }
 
-function ProfileSection({ account, hasChatButton }: ProfileSectionProps): ReactElement {
+function ProfileSection({ userId, hasChatButton }: ProfileSectionProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(PicsSlice.fetch({ id: account.userId, type: 'PROFILE_PIC' }));
-    dispatch(AccountsSlice.fetch(account.userId));
-  }, [dispatch, account]);
-  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', account.userId, 'ORIGINAL'));
-  const user = useSelector((state: RootState) => AccountsSlice.select(state, account.userId));
+    dispatch(PicsSlice.fetch({ id: userId, type: 'PROFILE_PIC' }));
+    dispatch(AccountsSlice.fetch(userId));
+  }, [dispatch, userId]);
+  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'ORIGINAL'));
+  const user = useSelector((state: RootState) => AccountsSlice.select(state, userId));
   if (user === undefined) return <Spin />;
   const name = `${user.firstName} ${user.lastName}`.trim();
   return (
@@ -77,9 +76,9 @@ function ProfileSection({ account, hasChatButton }: ProfileSectionProps): ReactE
         </List.Item>
       )}
       <List.Item>
-        <ContactButton userId={account.userId} />
-        {hasChatButton && <ChatButton userId={account.userId} />}
-        <BlockButton userId={account.userId} />
+        <ContactButton userId={userId} />
+        {hasChatButton && <ChatButton userId={userId} />}
+        <BlockButton userId={userId} />
       </List.Item>
     </List>
   );

@@ -18,10 +18,15 @@ export interface InviteSectionProps {
 }
 
 export default function InviteSection({ chatId }: InviteSectionProps): ReactElement {
-  const [isVisible, setVisible] = useState(false);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const publicity = useSelector((state: RootState) => ChatsSlice.selectPublicity(state, chatId));
-  if (publicity === undefined) return <Spin />;
-  if (publicity === 'NOT_INVITABLE') return <></>;
+  const participants = useSelector((state: RootState) => ChatsSlice.selectParticipants(state, chatId));
+  const [isVisible, setVisible] = useState(false);
+  if (publicity === undefined || participants === undefined) return <Spin />;
+  if (!participants.includes(Storage.readUserId()!) || publicity === 'NOT_INVITABLE') return <></>;
   return (
     <>
       <Divider />

@@ -28,12 +28,12 @@ export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps):
     await operateRemoveGroupChatUsers(chatId, userId);
   };
   const cards = participants
-    .filter((participant) => participant.userId !== userId)
+    .filter((participant) => participant !== userId)
     .map((participant) => (
       <ActionableUserCard
         extraRenderer={(userId) => (adminIdList.includes(userId) ? <AdminIndicator /> : <NonAdminIndicator />)}
-        key={participant.userId}
-        account={participant}
+        key={participant}
+        userId={participant}
         popconfirmation={{ title: 'Remove user', onConfirm }}
       />
     ));
