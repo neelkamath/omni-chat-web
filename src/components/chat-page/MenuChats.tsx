@@ -106,12 +106,13 @@ function LastChatMessage({ chatId }: LastChatMessageTextProps): ReactElement {
   useEffect(() => {
     dispatch(ChatsSlice.fetchChat(chatId));
   }, [dispatch, chatId]);
+  const isLoading = !useSelector(ChatsSlice.selectIsLoaded);
   const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
   useEffect(() => {
-    if (lastMessage?.sender.userId !== undefined) dispatch(AccountsSlice.fetch(lastMessage?.sender.userId));
+    if (lastMessage?.sender.userId !== undefined) dispatch(AccountsSlice.fetch(lastMessage.sender.userId));
   }, [dispatch, lastMessage]);
   const username = useSelector((state: RootState) => AccountsSlice.select(state, lastMessage?.sender.userId))?.username;
-  if (username === undefined) return <Spin />;
+  if (isLoading || (lastMessage !== undefined && username === undefined)) return <Spin />;
   if (lastMessage === undefined) return <></>;
   return (
     <Typography.Text ellipsis style={{ width: 300 }}>
