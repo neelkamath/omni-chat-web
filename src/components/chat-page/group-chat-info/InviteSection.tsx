@@ -11,6 +11,7 @@ import { httpApiConfig, operateGraphQlApi } from '../../../api';
 import { Storage } from '../../../Storage';
 import { ContactsSlice } from '../../../store/slices/ContactsSlice';
 import PrivateChatPic from '../PrivateChatPic';
+import operateCreatePrivateChat from '../../../operateCreatePrivateChat';
 
 export interface InviteSectionProps {
   readonly chatId: number;
@@ -171,53 +172,6 @@ async function createGroupChatInviteMessage(
             }
           `,
           variables: { chatId, invitedChatId },
-        },
-        Storage.readAccessToken()!,
-      ),
-  );
-}
-
-// TODO: If you use the following, abstract it from <ProfileModal> where it was copied from.
-
-async function operateCreatePrivateChat(userId: number): Promise<number | undefined> {
-  const response = await createPrivateChat(userId);
-  if (response?.createPrivateChat.__typename === 'InvalidUserId') {
-    message.warning('The user just deleted their account.', 5);
-    return undefined;
-  }
-  return response?.createPrivateChat.chatId;
-}
-
-interface InvalidUserId {
-  readonly __typename: 'InvalidUserId';
-}
-
-interface CreatedChatId {
-  readonly __typename: 'CreatedChatId';
-  readonly chatId: number;
-}
-
-interface CreatePrivateChatResult {
-  readonly createPrivateChat: InvalidUserId | CreatedChatId;
-}
-
-async function createPrivateChat(userId: number): Promise<CreatePrivateChatResult | undefined> {
-  return await operateGraphQlApi(
-    async () =>
-      await queryOrMutate(
-        httpApiConfig,
-        {
-          query: `
-            mutation CreatePrivateChat($userId: Int!) {
-              createPrivateChat(userId: $userId) {
-                __typename
-                ... on CreatedChatId {
-                  chatId
-                }
-              }
-            }
-          `,
-          variables: { userId },
         },
         Storage.readAccessToken()!,
       ),

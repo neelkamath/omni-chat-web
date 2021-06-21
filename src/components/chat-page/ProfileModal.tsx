@@ -12,6 +12,7 @@ import { queryOrMutate } from '@neelkamath/omni-chat';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
 import { RootState } from '../../store/store';
+import operateCreatePrivateChat from '../../operateCreatePrivateChat';
 
 export interface ProfileModalProps {
   readonly account: ChatsSlice.UserAccount;
@@ -102,51 +103,6 @@ function ChatButton({ userId }: ChatButtonProps): ReactElement {
     <Button loading={isLoading} onClick={onClick}>
       Chat
     </Button>
-  );
-}
-
-async function operateCreatePrivateChat(userId: number): Promise<number | undefined> {
-  const response = await createPrivateChat(userId);
-  if (response?.createPrivateChat.__typename === 'InvalidUserId') {
-    message.warning('The user just deleted their account.', 5);
-    return undefined;
-  }
-  return response?.createPrivateChat.chatId;
-}
-
-interface InvalidUserId {
-  readonly __typename: 'InvalidUserId';
-}
-
-interface CreatedChatId {
-  readonly __typename: 'CreatedChatId';
-  readonly chatId: number;
-}
-
-interface CreatePrivateChatResult {
-  readonly createPrivateChat: InvalidUserId | CreatedChatId;
-}
-
-async function createPrivateChat(userId: number): Promise<CreatePrivateChatResult | undefined> {
-  return await operateGraphQlApi(
-    async () =>
-      await queryOrMutate(
-        httpApiConfig,
-        {
-          query: `
-            mutation CreatePrivateChat($userId: Int!) {
-              createPrivateChat(userId: $userId) {
-                __typename
-                ... on CreatedChatId {
-                  chatId
-                }
-              }
-            }
-          `,
-          variables: { userId },
-        },
-        Storage.readAccessToken()!,
-      ),
   );
 }
 
@@ -294,6 +250,10 @@ async function operateBlockUser(id: number): Promise<void> {
 
 interface BlockUserResult {
   readonly blockUser: InvalidUserId | null;
+}
+
+interface InvalidUserId {
+  readonly __typename: 'InvalidUserId';
 }
 
 async function blockUser(id: number): Promise<BlockUserResult | undefined> {
