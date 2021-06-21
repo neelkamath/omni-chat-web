@@ -1,17 +1,12 @@
 import { GraphQlResponse, GroupChatDescription, GroupChatTitle, subscribe } from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../../api';
-import store from '../store';
-import { ChatsSlice } from '../slices/ChatsSlice';
+import store from '../../store/store';
+import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { Storage } from '../../Storage';
-import { ChatPageLayoutSlice } from '../slices/ChatPageLayoutSlice';
+import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { message } from 'antd';
-import { PicsSlice } from '../slices/PicsSlice';
-import {
-  onSubscriptionError,
-  PromiseResolver,
-  subscriptionClosers,
-  verifySubscriptionCreation,
-} from '../subscriptionManager';
+import { PicsSlice } from '../../store/slices/PicsSlice';
+import { onSubscriptionError, PromiseResolver, subscriptionClosers, verifySubscriptionCreation } from '../manager';
 
 interface SubscribeToChatsResult {
   readonly subscribeToChats:

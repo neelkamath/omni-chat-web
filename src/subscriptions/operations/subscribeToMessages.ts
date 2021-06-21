@@ -1,15 +1,10 @@
 import { DateTime, GraphQlResponse, MessageText, subscribe, Uuid } from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../../api';
-import store from '../store';
-import { ChatsSlice } from '../slices/ChatsSlice';
-import { PicMessagesSlice } from '../slices/PicMessagesSlice';
+import store from '../../store/store';
+import { ChatsSlice } from '../../store/slices/ChatsSlice';
+import { PicMessagesSlice } from '../../store/slices/PicMessagesSlice';
 import { Storage } from '../../Storage';
-import {
-  onSubscriptionError,
-  PromiseResolver,
-  subscriptionClosers,
-  verifySubscriptionCreation,
-} from '../subscriptionManager';
+import { onSubscriptionError, PromiseResolver, subscriptionClosers, verifySubscriptionCreation } from '../manager';
 
 interface SubscribeToMessagesResult {
   readonly subscribeToMessages:

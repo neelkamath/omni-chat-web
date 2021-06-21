@@ -1,20 +1,15 @@
 import { Bio, GraphQlResponse, Name, subscribe, Username } from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../../api';
 import { Storage } from '../../Storage';
-import store from '../store';
-import { AccountsSlice } from '../slices/AccountsSlice';
-import { PicsSlice } from '../slices/PicsSlice';
-import { BlockedUsersSlice } from '../slices/BlockedUsersSlice';
-import { ContactsSlice } from '../slices/ContactsSlice';
-import { ChatsSlice } from '../slices/ChatsSlice';
-import { OnlineStatusesSlice } from '../slices/OnlineStatusesSlice';
-import { TypingStatusesSlice } from '../slices/TypingStatusesSlice';
-import {
-  onSubscriptionError,
-  PromiseResolver,
-  subscriptionClosers,
-  verifySubscriptionCreation,
-} from '../subscriptionManager';
+import store from '../../store/store';
+import { AccountsSlice } from '../../store/slices/AccountsSlice';
+import { PicsSlice } from '../../store/slices/PicsSlice';
+import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
+import { ContactsSlice } from '../../store/slices/ContactsSlice';
+import { ChatsSlice } from '../../store/slices/ChatsSlice';
+import { OnlineStatusesSlice } from '../../store/slices/OnlineStatusesSlice';
+import { TypingStatusesSlice } from '../../store/slices/TypingStatusesSlice';
+import { onSubscriptionError, PromiseResolver, subscriptionClosers, verifySubscriptionCreation } from '../manager';
 
 interface SubscribeToAccountsResult {
   readonly subscribeToAccounts:

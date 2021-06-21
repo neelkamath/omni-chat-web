@@ -1,14 +1,9 @@
 import { DateTime, GraphQlResponse, subscribe } from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../../api';
-import store from '../store';
-import { OnlineStatusesSlice } from '../slices/OnlineStatusesSlice';
+import store from '../../store/store';
+import { OnlineStatusesSlice } from '../../store/slices/OnlineStatusesSlice';
 import { Storage } from '../../Storage';
-import {
-  onSubscriptionError,
-  PromiseResolver,
-  subscriptionClosers,
-  verifySubscriptionCreation,
-} from '../subscriptionManager';
+import { onSubscriptionError, PromiseResolver, subscriptionClosers, verifySubscriptionCreation } from '../manager';
 
 interface SubscribeToOnlineStatuses {
   readonly subscribeToOnlineStatuses: CreatedSubscription | OnlineStatus;

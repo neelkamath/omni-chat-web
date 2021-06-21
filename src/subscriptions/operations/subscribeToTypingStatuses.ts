@@ -1,14 +1,9 @@
 import { GraphQlResponse, subscribe } from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../../api';
-import store from '../store';
-import { TypingStatusesSlice } from '../slices/TypingStatusesSlice';
+import store from '../../store/store';
+import { TypingStatusesSlice } from '../../store/slices/TypingStatusesSlice';
 import { Storage } from '../../Storage';
-import {
-  onSubscriptionError,
-  PromiseResolver,
-  subscriptionClosers,
-  verifySubscriptionCreation,
-} from '../subscriptionManager';
+import { onSubscriptionError, PromiseResolver, subscriptionClosers, verifySubscriptionCreation } from '../manager';
 
 interface SubscribeToTypingStatusesResult {
   readonly subscribeToTypingStatuses: CreatedSubscription | TypingStatus;
