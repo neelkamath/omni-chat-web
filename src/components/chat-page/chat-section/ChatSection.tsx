@@ -62,7 +62,7 @@ interface MessageCreatorSectionProps {
 function MessageCreatorSection({ chat }: MessageCreatorSectionProps): ReactElement {
   switch (chat.__typename) {
     case 'PrivateChat':
-      return <MessageCreator chatId={chat.chatId} />;
+      return <MessageCreator key={chat.chatId} chatId={chat.chatId} />;
     case 'GroupChat': {
       const isParticipant =
         (chat as ChatsSlice.GroupChat).users.edges.find(({ node }) => node.userId === Storage.readUserId()) !==
@@ -70,7 +70,7 @@ function MessageCreatorSection({ chat }: MessageCreatorSectionProps): ReactEleme
       const isAdmin = (chat as ChatsSlice.GroupChat).adminIdList.includes(Storage.readUserId()!);
       if (!isParticipant) return <>You must be a participant to send messages.</>;
       else if ((chat as ChatsSlice.GroupChat).isBroadcast && !isAdmin) return <>Only admins can send messages.</>;
-      else return <MessageCreator chatId={chat.chatId} />;
+      else return <MessageCreator key={chat.chatId} chatId={chat.chatId} />;
     }
   }
 }

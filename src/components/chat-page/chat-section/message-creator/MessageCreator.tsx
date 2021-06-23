@@ -9,7 +9,6 @@ export interface MessageCreatorProps {
   readonly chatId: number;
 }
 
-// FIXME: Doesn't re-render when <chatId> changes.
 export default function MessageCreator({ chatId }: MessageCreatorProps): ReactElement {
   const [creator, setCreator] = useState(<TextMessageCreator chatId={chatId} />);
   const menu = (
