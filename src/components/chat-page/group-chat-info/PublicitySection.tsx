@@ -20,14 +20,13 @@ export default function PublicitySection({ chatId }: PublicitySectionProps): Rea
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   const publicity = useSelector((state: RootState) => ChatsSlice.selectPublicity(state, chatId));
   if (publicity === undefined) return <Spin size='small' />;
-  // FIXME: Doesn't re-render when <chatId> changes.
   return (
     <Form name='updatePublicity' layout='inline' initialValues={{ publicity }}>
       <PublicityRadioGroup
         isInvitableDisabled={!isAdmin || publicity === 'PUBLIC'}
         isNotInvitableDisabled={!isAdmin || publicity === 'PUBLIC'}
         isPublicDisabled
-        onChange={({ target }) => operateSetPublicity(chatId, target.value)}
+        onChange={({ target }) => operateSetPublicity(chatId, target.value === 'INVITABLE')}
       />
     </Form>
   );
