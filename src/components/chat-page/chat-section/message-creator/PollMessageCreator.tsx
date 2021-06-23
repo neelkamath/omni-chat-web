@@ -5,7 +5,6 @@ import GfmFormItem from '../../GfmFormItem';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
 import { Storage } from '../../../../Storage';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import useForm from 'antd/lib/form/hooks/useForm';
 
 export interface PollMessageCreatorProps {
   readonly chatId: number;
@@ -20,17 +19,16 @@ interface Option {
   readonly option: string;
 }
 
+// TODO: Clear the form once the message has been successfully sent.
 export default function PollMessageCreator({ chatId }: PollMessageCreatorProps): ReactElement {
-  const [form] = useForm();
   const [isLoading, setLoading] = useState(false);
   const onFinish = async (data: CreatePollMessageFormData) => {
     setLoading(true);
-    const isCreated = await operateCreatePollMessage(chatId, data);
-    if (isCreated) form.resetFields(); // FIXME
+    await operateCreatePollMessage(chatId, data);
     setLoading(false);
   };
   return (
-    <Form form={form} name='createPollMessage' onFinish={onFinish}>
+    <Form name='createPollMessage' onFinish={onFinish}>
       <GfmFormItem
         rules={[{ required: true, message: 'Enter the question.' }]}
         minLength={1}
@@ -74,14 +72,13 @@ export default function PollMessageCreator({ chatId }: PollMessageCreatorProps):
   );
 }
 
-/** Returns whether the poll message was created. */
 async function operateCreatePollMessage(
   chatId: number,
   { question, options }: CreatePollMessageFormData,
-): Promise<boolean> {
+): Promise<void> {
   if (options === undefined || options.length < 2) {
     message.error('Enter at least two options.', 5);
-    return false;
+    return;
   }
   const poll = { question: question.trim(), options: options.map(({ option }) => option.trim()) };
   if (poll.question.length === 0) message.error('Enter a question.', 3);
@@ -90,11 +87,9 @@ async function operateCreatePollMessage(
   else if (new Set(poll.options).size < poll.options.length) message.error('Each option must be unique.', 5);
   else {
     const response = await createPollMessage(chatId, poll);
-    if (response?.createTextMessage === null) return true;
     if (response?.createTextMessage?.__typename === 'MustBeAdmin')
       message.error("You must be the chat's admin to create a message.", 5);
   }
-  return false;
 }
 
 interface CreatePollMessageResult {
