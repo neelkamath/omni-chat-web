@@ -20,7 +20,13 @@ export default function DescriptionSection({ chatId }: DescriptionSectionProps):
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   const description = useSelector((state: RootState) => ChatsSlice.selectGroupChatDescription(state, chatId));
   if (isAdmin === undefined || description === undefined) return <Spin />;
-  if (isAdmin) return <UpdateDescriptionForm chatId={chatId} />;
+  if (isAdmin)
+    return (
+      <>
+        <Divider />
+        <UpdateDescriptionForm chatId={chatId} />
+      </>
+    );
   if (description.length === 0) return <></>;
   return (
     <>
