@@ -6,18 +6,22 @@ import { ChatPageLayoutSlice } from '../../../../store/slices/ChatPageLayoutSlic
 import store from '../../../../store/store';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
 import { Storage } from '../../../../Storage';
+import useForm from 'antd/lib/form/hooks/useForm';
 
 export interface TextMessageCreatorProps {
   readonly chatId: number;
 }
 
 export default function TextMessageCreator({ chatId }: TextMessageCreatorProps): ReactElement {
+  const [form] = useForm();
   const onPressEnter = async (text: string) => {
-    if (isValidMessageTextScalar(text)) await operateCreateTextMessage(chatId, text);
-    else message.error('Messages must contain characters other than spaces.', 5);
+    if (isValidMessageTextScalar(text)) {
+      await operateCreateTextMessage(chatId, text);
+      form.resetFields();
+    } else message.error('Messages must contain characters other than spaces.', 5);
   };
   return (
-    <Form name='createTextMessage'>
+    <Form name='createTextMessage' form={form}>
       <GfmFormItem minLength={1} maxLength={10_000} name='text' onPressEnter={onPressEnter} />
     </Form>
   );

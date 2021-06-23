@@ -15,14 +15,27 @@ export interface GfmFormItemProps {
   readonly maxLength?: number;
   readonly label?: string;
   /**
-   * If `undefined`, then pressing "return" creates a line break. Otherwise, pressing "return" triggers this function,
-   * and the field is cleared, In this case, a line break can only be created by pressing "shift+return".
+   * If `undefined`, then pressing "return" creates a line break.
+   *
+   * Otherwise, pressing "return" triggers this function, and the field is cleared. In this case, a line break can only
+   * be created by pressing "shift+return". Since this is a form item, the field must also be cleared at the form level
+   * as shown below:
+   *
+   * ```typescript
+   * function MyForm(): ReactElement {
+   *   const [form] = useForm();
+   *   return (
+   *     <Form form={form} name='message'>
+   *       <GfmFormItem onPressEnter={form.resetFields} />
+   *     </Form>
+   *   );
+   * }
+   * ```
    */
   readonly onPressEnter?: (value: string) => void;
   readonly rules?: Rule[];
 }
 
-// FIXME: Pressing enter doesn't clear the field.
 export default function GfmFormItem({
   placeholder,
   maxLength,
@@ -58,6 +71,10 @@ export default function GfmFormItem({
             onPressEnter={() => {
               if (onPressEnter !== undefined && !isShiftDown) {
                 onPressEnter(value);
+                /*
+                We must reset the value at both the field level (i.e., <setValue('')>) and the form level (i.e., the
+                parent component's <form.resetFields()>).
+                 */
                 setValue('');
               }
             }}
