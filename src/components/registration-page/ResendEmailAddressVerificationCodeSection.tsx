@@ -79,7 +79,7 @@ async function emailEmailAddressVerification(
       await queryOrMutate(httpApiConfig, {
         query: `
           mutation EmailEmailAddressVerification($emailAddress: String!) {
-            emailEmailAddressVerification(emailAddress: $emailEmailAddressVerification) {
+            emailEmailAddressVerification(emailAddress: $emailAddress) {
               __typename
             }
           }
