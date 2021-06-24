@@ -44,6 +44,7 @@ interface RefreshTokenSetResult {
 }
 
 async function refreshTokenSet(): Promise<RefreshTokenSetResult | undefined> {
+  const logOutOnUnauthorizedError = false;
   return await operateGraphQlApi(
     async () =>
       await queryOrMutate(httpApiConfig, {
@@ -55,8 +56,9 @@ async function refreshTokenSet(): Promise<RefreshTokenSetResult | undefined> {
             }
           }
         `,
-        variables: { refreshToken: Storage.readRefreshToken()! },
+        variables: { refreshToken: Storage.readRefreshToken() },
       }),
+    logOutOnUnauthorizedError,
   );
 }
 

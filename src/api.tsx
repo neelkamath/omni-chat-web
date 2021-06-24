@@ -20,26 +20,50 @@ export const httpApiConfig: HttpApiConfig = {
 
 export const wsApiConfig: WsApiConfig = { apiUrl: process.env.API_URL!, protocol: process.env.WS as WebSocketProtocol };
 
-export async function operateGraphQlApi<T>(operation: () => Promise<GraphQlResponse<T>>): Promise<T | undefined> {
-  const response = await operateHttpApi(operation);
+/**
+ * If `true`, the user will be logged out if the operation failed because of an invalid access/refresh token.
+ *
+ * An example use case of setting this to `false` is when refreshing the token set. The following example demonstrates
+ * what would happen in such as case had this been set to `true`:
+ * 1. The token set is attempted to be refreshed using `Query.refreshTokenSet`.
+ * 1. The refresh token turns out to be invalid which causes the operation to fail with an unauthorized error.
+ * 1. The user is attempted to be logged out.
+ * 1. The log out operation fails with an unauthorized error because the access token is invalid.
+ * 1. Since the log out operation failed with an unauthorized error, an infinite loop of attempted log outs gets
+ * created.
+ */
+export type LogOutOnUnauthorizedError = boolean;
+
+export async function operateGraphQlApi<T>(
+  operation: () => Promise<GraphQlResponse<T>>,
+  logOutOnUnauthorizedError: LogOutOnUnauthorizedError = true,
+): Promise<T | undefined> {
+  const response = await operateHttpApi(operation, logOutOnUnauthorizedError);
   if (response === undefined) return undefined;
   if (response.errors !== undefined) await displayBugReporter(response.errors);
   return response.data;
 }
 
-export async function operateRestApi<T>(operation: () => Promise<T>): Promise<T | undefined> {
-  return await operateHttpApi(operation);
+export async function operateRestApi<T>(
+  operation: () => Promise<T>,
+  logOutOnUnauthorizedError: LogOutOnUnauthorizedError = true,
+): Promise<T | undefined> {
+  return await operateHttpApi(operation, logOutOnUnauthorizedError);
 }
 
-async function operateHttpApi<T>(operation: () => Promise<T>): Promise<T | undefined> {
+async function operateHttpApi<T>(
+  operation: () => Promise<T>,
+  logOutOnUnauthorizedError: LogOutOnUnauthorizedError = true,
+): Promise<T | undefined> {
   try {
     return await operation();
   } catch (error) {
-    if (error instanceof UnauthorizedError) await logOut();
-    else if (error instanceof ConnectionError) message.error('The server is currently unreachable.');
+    console.error(error);
+    if (error instanceof UnauthorizedError) {
+      if (logOutOnUnauthorizedError) await logOut();
+    } else if (error instanceof ConnectionError) message.error('The server is currently unreachable.');
     else if (error instanceof InternalServerError) await displayBugReporter(error);
     else throw error;
-    console.error(error);
     return undefined;
   }
 }
