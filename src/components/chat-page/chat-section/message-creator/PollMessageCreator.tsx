@@ -1,5 +1,5 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, Divider, Form, message, Space } from 'antd';
+import { Button, Divider, Form, message, Space, Tooltip } from 'antd';
 import { MessageText, queryOrMutate } from '@neelkamath/omni-chat';
 import GfmFormItem from '../../GfmFormItem';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
@@ -52,7 +52,9 @@ export default function PollMessageCreator({ chatId }: PollMessageCreatorProps):
                   minLength={1}
                   maxLength={10_000}
                 />
-                <MinusCircleOutlined onClick={() => remove(name)} />
+                <Tooltip title='Delete' placement='right'>
+                  <Button danger icon={<MinusCircleOutlined />} onClick={() => remove(name)} />
+                </Tooltip>
               </Space>
             ))}
             <Form.Item>

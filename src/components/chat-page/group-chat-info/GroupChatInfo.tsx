@@ -52,6 +52,7 @@ interface UsersAccordionProps {
   readonly chatId: number;
 }
 
+// TODO: Paginate the sections.
 function UsersAccordion({ chatId }: UsersAccordionProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {

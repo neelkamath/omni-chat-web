@@ -20,6 +20,7 @@ export interface ChatMessageProps {
   readonly chatId: number;
 }
 
+// TODO: Continue testing the app from here.
 export default function ChatMessage({ message, chatId }: ChatMessageProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {

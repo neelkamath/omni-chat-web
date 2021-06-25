@@ -40,7 +40,7 @@ async function operateCreateTextMessage(chatId: number, text: MessageText): Prom
       message.error('The context message has just been deleted.', 5);
       break;
     case 'MustBeAdmin':
-      message.error("You must be the chat's admin to create a messge.", 5);
+      message.error("You must be the chat's admin to create a message.", 5);
   }
   return false;
 }

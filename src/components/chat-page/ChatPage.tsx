@@ -103,7 +103,7 @@ function LayoutContent(): ReactElement {
     case 'DEVELOPERS_SECTION':
       return <DevelopersSection />;
     case 'CHAT_SECTION':
-      return <ChatSection chatId={chatId!} />; // TODO: Test.
+      return <ChatSection chatId={chatId!} />;
     case 'CREATE_GROUP_CHAT':
       return <CreateGroupChatSection />;
     case 'SEARCH_PUBLIC_CHATS':

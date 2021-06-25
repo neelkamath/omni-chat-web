@@ -38,7 +38,9 @@ function PollOption({ pollOption, messageId }: PollOptionProps): ReactElement {
           onChange={({ target }) => setPollVote(messageId, pollOption.option, target.checked)}
         />
       </Typography.Paragraph>
-      <Typography.Paragraph>{pollOption.votes.length} votes:</Typography.Paragraph>
+      <Typography.Paragraph>
+        {pollOption.votes.length} {pollOption.votes.length === 1 ? 'vote' : 'votes'}:
+      </Typography.Paragraph>
       <Typography.Paragraph>
         <ReactMarkdown plugins={[gfm]}>{pollOption.option}</ReactMarkdown>
       </Typography.Paragraph>
