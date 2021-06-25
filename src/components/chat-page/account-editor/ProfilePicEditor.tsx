@@ -36,7 +36,10 @@ function ProfilePic(): ReactElement {
   }, [dispatch, userId]);
   const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'ORIGINAL'));
   const error = useSelector((state: RootState) => PicsSlice.selectError(state, 'PROFILE_PIC', userId));
-  if (error instanceof NonexistentUserIdError) logOut();
+  if (error instanceof NonexistentUserIdError) {
+    const setOnlineStatus = false;
+    logOut(setOnlineStatus);
+  }
   if (url === undefined) return <Spin size='small' />;
   else if (url === null) return <Typography.Text>No profile picture set.</Typography.Text>;
   else return <OriginalPic type='PROFILE_PIC' url={url} />;

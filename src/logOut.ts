@@ -2,8 +2,9 @@ import { Storage } from './Storage';
 import { shutDownSubscriptions } from './subscriptions/manager';
 import setOnline from './setOnline';
 
-export default async function logOut(): Promise<void> {
-  await setOnline(false);
+/** You may want to `setOnlineStatus` to `false` if the access token is invalid because then an error would occur. */
+export default async function logOut(setOnlineStatus = true): Promise<void> {
+  if (setOnlineStatus) await setOnline(false);
   shutDownSubscriptions();
   Storage.deleteTokenSet();
   location.href = '/sign-in';

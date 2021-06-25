@@ -11,6 +11,7 @@ export interface SearchUsersSectionProps {
   readonly extraRenderer?: CardExtra;
 }
 
+// TODO: Display a spinner while the initial state is getting fetched.
 export default function SearchUsersSection({
   type,
   popconfirmation,

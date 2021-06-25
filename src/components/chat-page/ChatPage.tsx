@@ -16,13 +16,15 @@ import setOnline from '../../setOnline';
 import CreateGroupChatSection from './CreateGroupChatSection';
 import SearchPublicChatsSection from './SearchPublicChatsSection';
 import GroupChatInfo from './group-chat-info/GroupChatInfo';
+import logOut from '../../logOut';
 
 export default function ChatPage(): ReactElement {
   const [page, setPage] = useState(<LoadingPage />);
   useEffect(() => {
     refreshTokenSet().then(async (response) => {
       if (response === undefined) {
-        location.href = '/sign-in';
+        const setOnlineStatus = false;
+        await logOut(setOnlineStatus);
         return;
       }
       Storage.saveTokenSet(response.refreshTokenSet);
@@ -83,6 +85,7 @@ function ChatPageLayout(): ReactElement {
   );
 }
 
+// TODO: Continue testing the app from here.
 function LayoutContent(): ReactElement {
   const { type, chatId } = useSelector(ChatPageLayoutSlice.select);
   switch (type) {

@@ -4,6 +4,7 @@ import App from './components/App';
 import setOnline from './setOnline';
 
 // FIXME: Viewing a public chat the user isn't in doesn't yield updates.
+// FIXME: Online statuses don't get correctly updated.
 
 ReactDOM.render(<App />, document.querySelector('#root'));
 /*

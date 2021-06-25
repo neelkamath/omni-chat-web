@@ -126,7 +126,10 @@ async function operateUpdateAccount(currentEmailAddress: string, update: Account
   const response = await updateAccount(update);
   if (response?.updateAccount === null) {
     message.success('Account updated.', 3);
-    if (isUpdatedAddress) await logOut();
+    if (isUpdatedAddress) {
+      const setOnlineStatus = false;
+      await logOut(setOnlineStatus);
+    }
   } else if (response?.updateAccount?.__typename === 'UsernameTaken')
     message.error('That username has already been taken.', 5);
   else if (response?.updateAccount?.__typename === 'EmailAddressTaken')
