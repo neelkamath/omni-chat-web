@@ -5,6 +5,8 @@ import { subscribeToMessages } from './operations/subscribeToMessages';
 import { subscribeToChats } from './operations/subscribeToChats';
 import { subscribeToAccounts } from './operations/subscribeToAccounts';
 
+// TODO: Test this directory.
+
 export type PromiseResolver = (value: void | PromiseLike<void>) => void;
 
 /** `undefined` if no subscription is running. */

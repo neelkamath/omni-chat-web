@@ -13,6 +13,8 @@ import {
 } from '@neelkamath/omni-chat';
 import logOut from './logOut';
 
+// TODO: Test this file.
+
 export const httpApiConfig: HttpApiConfig = {
   apiUrl: process.env.API_URL!,
   protocol: process.env.HTTP as HttpProtocol,
@@ -61,14 +63,15 @@ async function operateHttpApi<T>(
     console.error(error);
     if (error instanceof UnauthorizedError) {
       if (logOutOnUnauthorizedError) await logOut();
-    } else if (error instanceof ConnectionError) message.error('The server is currently unreachable.');
+    } else if (error instanceof ConnectionError)
+      message.error('The server is currently unreachable. Please try again.');
     else if (error instanceof InternalServerError) await displayBugReporter(error);
     else throw error;
     return undefined;
   }
 }
 
-// TODO: Automatically send back the error report instead, and show a ConnectionError instead.
+// TODO: Automatically send back the error report instead, and show a <ConnectionError> instead.
 export async function displayBugReporter(error: Error | GraphQlResponseValue[]): Promise<void> {
   console.error(error);
   notification.error({

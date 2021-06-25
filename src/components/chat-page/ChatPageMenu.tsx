@@ -32,7 +32,6 @@ export default function ChatPageMenu(): ReactElement {
         <SearchUsersCol />
         <CreateGroupChatCol />
         <SearchPublicChatsCol />
-        <LogOutCol />
         <MoreCol />
       </Row>
       <MenuChats />
@@ -128,16 +127,6 @@ function SearchPublicChatsCol(): ReactElement {
   );
 }
 
-function LogOutCol(): ReactElement {
-  return (
-    <Col>
-      <Tooltip title='Log out'>
-        <Button icon={<LogoutOutlined />} onClick={() => logOut()} />
-      </Tooltip>
-    </Col>
-  );
-}
-
 function SupportItem(): ReactElement {
   const dispatch = useDispatch();
   return (
@@ -162,6 +151,14 @@ function DevelopersItem(): ReactElement {
   );
 }
 
+function LogOutItem(): ReactElement {
+  return (
+    <Button icon={<LogoutOutlined />} onClick={() => logOut()}>
+      Log out
+    </Button>
+  );
+}
+
 function MoreCol(): ReactElement {
   const menu = (
     <Menu>
@@ -173,6 +170,9 @@ function MoreCol(): ReactElement {
       </Menu.Item>
       <Menu.Item key={2}>
         <DevelopersItem />
+      </Menu.Item>
+      <Menu.Item key={3}>
+        <LogOutItem />
       </Menu.Item>
     </Menu>
   );

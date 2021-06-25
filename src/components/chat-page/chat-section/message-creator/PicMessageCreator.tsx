@@ -22,7 +22,7 @@ export default function PicMessageCreator({ chatId }: PicMessageCreatorProps): R
   };
   return (
     <Upload showUploadList={showUploadList} customRequest={customRequest} multiple accept='image/png,image/jpeg'>
-      <Button icon={<UploadOutlined />}>Upload any number of images</Button>
+      <Button icon={<UploadOutlined />}>Upload any number of images by either clicking or dragging-and-dropping</Button>
     </Upload>
   );
 }

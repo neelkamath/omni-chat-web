@@ -11,6 +11,8 @@ import { PicMessagesSlice } from './slices/PicMessagesSlice';
 import { SearchedPublicChatsSlice } from './slices/SearchedPublicChatsSlice';
 import { AccountsSlice } from './slices/AccountsSlice';
 
+// TODO: Test this directory.
+
 /**
  * - `'IDLE'` indicates that either the entities have never been fetched or an error occurred during the last fetch.
  * - `'LOADING'` indicates that the entities are being fetched.

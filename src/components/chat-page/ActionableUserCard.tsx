@@ -12,7 +12,7 @@ import { RootState } from '../../store/store';
  * If `undefined`, then a {@link ProfileModal} will be displayed when the {@link ActionableUserCard} is clicked.
  * Otherwise, a {@link Popconfirm} will be displayed.
  */
-export type CardPopconfirmation = PopconfirmationProps;
+export type CardPopconfirmation = PopconfirmationProps | undefined;
 
 /** Content to display on the top-right of the specified user's {@link ActionableUserCard}. */
 export type CardExtra = (userId: number) => ReactNode;

@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect } from 'react';
 import { Divider, message, Space, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { NonexistentChatError } from '@neelkamath/omni-chat';
-import DeletePicButton from './DeleteProfilePicButton';
+import DeletePicButton from './DeletePicButton';
 import NewPicButton from './NewPicButton';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import { RootState } from '../../../../store/store';
