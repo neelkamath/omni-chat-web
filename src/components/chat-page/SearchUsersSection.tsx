@@ -70,7 +70,7 @@ interface LoadMoreUsersButtonProps {
 function LoadMoreUsersButton({ type }: LoadMoreUsersButtonProps): ReactElement {
   const hasNextPage = useSelector(SearchedUsersSlice.selectHasNextPage);
   const dispatch = useDispatch();
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false); // TODO: This should only stop loading once the users have been fetched.
   const onClick = async () => {
     setLoading(true);
     dispatch(SearchedUsersSlice.fetchAdditional(type));

@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect } from 'react';
-import { message, Space, Spin, Typography } from 'antd';
+import { Divider, message, Space, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { NonexistentChatError } from '@neelkamath/omni-chat';
 import DeletePicButton from './DeleteProfilePicButton';
@@ -16,13 +16,23 @@ interface PicSectionProps {
 }
 
 export default function PicSection({ chatId }: PicSectionProps): ReactElement {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(ChatsSlice.fetchChat(chatId));
+  }, [dispatch, chatId]);
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
+  const picUrl = useSelector((state: RootState) => PicsSlice.selectPic(state, 'GROUP_CHAT_PIC', chatId, 'ORIGINAL'));
+  if (isAdmin === undefined || picUrl === undefined) return <Spin />;
+  if (picUrl === null && !isAdmin) return <></>;
   return (
-    <Space direction='vertical'>
-      <ChatPic chatId={chatId} />
-      {isAdmin && <NewPicButton chatId={chatId} />}
-      {isAdmin && <DeletePicButton chatId={chatId} />}
-    </Space>
+    <>
+      <Divider />
+      <Space direction='vertical'>
+        <ChatPic chatId={chatId} />
+        {isAdmin && <NewPicButton chatId={chatId} />}
+        {isAdmin && <DeletePicButton chatId={chatId} />}
+      </Space>
+    </>
   );
 }
 

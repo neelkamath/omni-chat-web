@@ -85,7 +85,6 @@ function ChatPageLayout(): ReactElement {
   );
 }
 
-// TODO: Continue testing the app from here.
 function LayoutContent(): ReactElement {
   const { type, chatId } = useSelector(ChatPageLayoutSlice.select);
   switch (type) {
@@ -104,7 +103,7 @@ function LayoutContent(): ReactElement {
     case 'DEVELOPERS_SECTION':
       return <DevelopersSection />;
     case 'CHAT_SECTION':
-      return <ChatSection chatId={chatId!} />;
+      return <ChatSection chatId={chatId!} />; // TODO: Test.
     case 'CREATE_GROUP_CHAT':
       return <CreateGroupChatSection />;
     case 'SEARCH_PUBLIC_CHATS':

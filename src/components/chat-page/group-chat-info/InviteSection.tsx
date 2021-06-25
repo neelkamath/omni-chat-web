@@ -44,6 +44,7 @@ interface ChatsProps {
   readonly invitedChatId: number;
 }
 
+// TODO: Paginate.
 function Chats({ invitedChatId }: ChatsProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
