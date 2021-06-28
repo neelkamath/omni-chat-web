@@ -1,11 +1,4 @@
-import {
-  createAsyncThunk,
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  EntityAdapter,
-  EntityId,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, EntityAdapter } from '@reduxjs/toolkit';
 import { FetchStatus, RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
@@ -99,6 +92,7 @@ export namespace ContactsSlice {
 
   export const { removeOne, upsertOne } = slice.actions;
 
+  /** This is only accurate if {@link selectIsLoaded} returns `true`. */
   export const selectIsContact = createSelector(
     (state: RootState) => state.contacts.ids,
     (_: RootState, userId: number) => userId,
@@ -107,12 +101,12 @@ export namespace ContactsSlice {
 
   /** Whether all the contacts have been fetched. */
   export const selectIsLoaded = createSelector(
-    (state: RootState) => state.contacts.status,
-    (status: FetchStatus) => status === 'LOADED',
+    (state: RootState) => state.contacts.status === 'LOADED',
+    (isLoaded: boolean) => isLoaded,
   );
 
   export const selectAll = createSelector(
-    (state: RootState) => state.contacts.ids,
-    (idList: EntityId[]) => idList.map((id) => parseInt(id.toString())),
+    (state: RootState) => state.contacts.ids.map((id) => parseInt(id.toString())),
+    (idList: number[]) => idList,
   );
 }

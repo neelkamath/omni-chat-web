@@ -122,7 +122,7 @@ export namespace SearchedPublicChatsSlice {
   );
 
   export const selectHasNextPage = createSelector(
-    (state: RootState) => state.searchedPublicChats.hasNextPage,
-    (hasNextPage: boolean | undefined) => (hasNextPage === undefined ? false : hasNextPage),
+    ({ searchedPublicChats }: RootState) => searchedPublicChats.hasNextPage ?? false,
+    (hasNextPage: boolean | undefined) => hasNextPage,
   );
 }

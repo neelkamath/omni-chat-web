@@ -112,7 +112,7 @@ async function onMessage(
       resolve();
       break;
     case 'UpdatedAccount':
-      if (event.userId === Storage.readUserId()!) store.dispatch(AccountsSlice.update(event));
+      store.dispatch(AccountsSlice.update(event));
       break;
     case 'UpdatedProfilePic':
       store.dispatch(PicsSlice.fetch({ id: event.userId, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
@@ -130,6 +130,7 @@ async function onMessage(
       store.dispatch(BlockedUsersSlice.removeOne(event.userId));
       break;
     case 'DeletedAccount':
+      store.dispatch(AccountsSlice.removeOne(event.userId));
       store.dispatch(BlockedUsersSlice.removeOne(event.userId));
       store.dispatch(ChatsSlice.removePrivateChat(event.userId));
       store.dispatch(OnlineStatusesSlice.removeOne(event.userId));

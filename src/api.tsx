@@ -13,8 +13,6 @@ import {
 } from '@neelkamath/omni-chat';
 import logOut from './logOut';
 
-// TODO: Test this file.
-
 export const httpApiConfig: HttpApiConfig = {
   apiUrl: process.env.API_URL!,
   protocol: process.env.HTTP as HttpProtocol,

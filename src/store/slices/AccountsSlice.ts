@@ -1,4 +1,12 @@
-import { createAsyncThunk, createEntityAdapter, createSelector, createSlice, Dictionary } from '@reduxjs/toolkit';
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+  Dictionary,
+  Draft,
+  PayloadAction,
+} from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
@@ -74,19 +82,23 @@ export namespace AccountsSlice {
     readonly bio: Bio;
   }
 
+  function reduceRemoveOne(state: Draft<State>, { payload }: PayloadAction<number>): State | void {
+    adapter.removeOne(state, payload);
+  }
+
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState({ fetching: [] }) as State,
-    reducers: { update: adapter.upsertOne },
+    reducers: { update: adapter.upsertOne, removeOne: reduceRemoveOne },
     extraReducers: (builder) => {
       builder
         .addCase(fetch.rejected, (state, { meta }) => {
           state.fetching = state.fetching.filter((userId) => userId !== meta.arg);
         })
         .addCase(fetch.fulfilled, (state, { payload, meta }) => {
+          state.fetching = state.fetching.filter((userId) => userId !== meta.arg);
           if (payload === undefined) return;
           adapter.upsertOne(state, payload);
-          state.fetching = state.fetching.filter((userId) => userId !== meta.arg);
         })
         .addCase(fetch.pending, (state, { meta }) => {
           state.fetching.push(meta.arg);
@@ -96,7 +108,7 @@ export namespace AccountsSlice {
 
   export const { reducer } = slice;
 
-  export const { update } = slice.actions;
+  export const { update, removeOne } = slice.actions;
 
   /**
    * Returns the specified user. `undefined` will get returned if either the ID passed was `undefined` or the user

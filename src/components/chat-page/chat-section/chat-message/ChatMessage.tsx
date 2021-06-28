@@ -84,5 +84,6 @@ function PicMessageContent({ messageId }: PicMessageContentProps): ReactElement 
     dispatch(PicMessagesSlice.fetch(messageId));
   }, [dispatch, messageId]);
   const url = useSelector((state: RootState) => PicMessagesSlice.selectPic(state, messageId)).originalUrl;
+  // FIXME: Set the width to be at most 50% instead of 50% because otherwise small images get enlarged excessively.
   return url === undefined ? <Spin size='small' /> : <Image src={url} width='50%' />;
 }

@@ -11,5 +11,5 @@ export interface CustomPicProps {
 
 export default function CustomPic({ icon, url, size }: CustomPicProps): ReactElement {
   if (url === undefined) return <Spin size='small' />;
-  return <Avatar size={size === undefined ? 'large' : size} icon={url === null ? icon : undefined} src={url} />;
+  return <Avatar size={size ?? 'large'} icon={url === null ? icon : undefined} src={url} />;
 }

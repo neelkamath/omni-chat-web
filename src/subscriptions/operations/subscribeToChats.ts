@@ -100,7 +100,7 @@ async function onMessage(
       break;
     case 'UpdatedGroupChat':
       store.dispatch(ChatsSlice.updateGroupChat(event));
-      if (event?.removedUsers?.map(({ userId }) => userId).includes(Storage.readUserId()!)) {
+      if (event.removedUsers?.find(({ userId }) => Storage.readUserId() === userId) !== undefined) {
         store.dispatch(ChatsSlice.removeOne(event.chatId));
         if (ChatPageLayoutSlice.select(store.getState()).chatId === event.chatId) {
           message.info("You're no longer in this chat.", 5);

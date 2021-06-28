@@ -79,7 +79,7 @@ interface OnlineStatusSectionProps {
 function OnlineStatusSection({ userId }: OnlineStatusSectionProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(OnlineStatusesSlice.fetchStatus(userId));
+    dispatch(OnlineStatusesSlice.fetch(userId));
   }, [dispatch, userId]);
   const onlineStatus = useSelector((state: RootState) => OnlineStatusesSlice.select(state, userId));
   if (onlineStatus === undefined) return <></>;
@@ -107,7 +107,7 @@ interface PrivateChatTypingStatusSectionProps {
 function PrivateChatTypingStatusSection({ userId, chatId }: PrivateChatTypingStatusSectionProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(TypingStatusesSlice.fetchStatuses());
+    dispatch(TypingStatusesSlice.fetch());
   }, [dispatch]);
   const isTyping = useSelector((state: RootState) => TypingStatusesSlice.selectIsTyping(state, userId, chatId));
   return <Col flex='auto'>{isTyping ? 'typing...' : ''}</Col>;
@@ -120,7 +120,7 @@ interface GroupChatTypingStatusSectionProps {
 function GroupChatTypingStatusSection({ chatId }: GroupChatTypingStatusSectionProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(TypingStatusesSlice.fetchStatuses());
+    dispatch(TypingStatusesSlice.fetch());
   }, [dispatch]);
   const userIdList = useSelector((state: RootState) => TypingStatusesSlice.selectTyping(state, chatId));
   const userId = userIdList[userIdList.length - 1];

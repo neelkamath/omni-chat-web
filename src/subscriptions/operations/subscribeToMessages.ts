@@ -202,7 +202,7 @@ async function onMessage(
       store.dispatch(PicMessagesSlice.deleteMessage(event.messageId));
       break;
     case 'UserChatMessagesRemoval':
-      store.dispatch(ChatsSlice.removeUserChatMessages(event));
+      store.dispatch(ChatsSlice.removeUserChatMessages(event)); // FIXME: Messages get deleted but infinite spinners take their place.
       break;
     case 'NewActionMessage':
     case 'NewAudioMessage':
@@ -212,8 +212,8 @@ async function onMessage(
     case 'NewPollMessage':
     case 'NewTextMessage':
     case 'NewVideoMessage':
-      store.dispatch(ChatsSlice.addMessage(event)); // Adds the message if the chat is already in the store.
       store.dispatch(ChatsSlice.fetchChat(event.chatId)); // Fetches the chat in case it wasn't in the store.
+      store.dispatch(ChatsSlice.addMessage(event)); // Adds the message if the chat is already in the store.
   }
 }
 

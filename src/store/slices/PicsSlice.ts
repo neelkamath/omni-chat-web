@@ -134,7 +134,7 @@ export namespace PicsSlice {
         .addCase(fetch.fulfilled, adapter.upsertOne)
         .addCase(fetch.pending, (state, { meta }) => {
           const id = generateId(meta.arg.type, meta.arg.id);
-          if (state.entities[id] === undefined) adapter.upsertOne(state, { id, type: meta.arg.type, isLoading: true });
+          adapter.upsertOne(state, { id, type: meta.arg.type, isLoading: true });
         });
     },
   });

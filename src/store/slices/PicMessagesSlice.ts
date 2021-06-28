@@ -73,8 +73,7 @@ export namespace PicMessagesSlice {
         })
         .addCase(fetch.fulfilled, adapter.upsertOne)
         .addCase(fetch.pending, (state, { meta }) => {
-          if (state.entities[meta.arg] === undefined)
-            adapter.upsertOne(state, { messageId: meta.arg, isLoading: true });
+          adapter.upsertOne(state, { messageId: meta.arg, isLoading: true });
         });
     },
   });

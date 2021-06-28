@@ -249,7 +249,7 @@ export namespace SearchedUsersSlice {
           adapter.setAll(state, payload.connection.edges);
         })
         .addCase(fetchInitialState.fulfilled, (state, { payload }) => {
-          if (payload == undefined) return;
+          if (payload === undefined) return;
           state.query = '';
           state.hasNextPage = payload.pageInfo.hasNextPage;
           adapter.setAll(state, payload.edges);
@@ -269,7 +269,7 @@ export namespace SearchedUsersSlice {
   );
 
   export const selectHasNextPage = createSelector(
-    (state: RootState) => state.searchedUsers.hasNextPage,
-    (hasNextPage: boolean | undefined) => (hasNextPage === undefined ? false : hasNextPage),
+    ({ searchedUsers }: RootState) => searchedUsers.hasNextPage ?? false,
+    (hasNextPage: boolean | undefined) => hasNextPage,
   );
 }

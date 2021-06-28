@@ -19,19 +19,21 @@ export default function AddUsersSection({ chatId }: AddUsersSectionProps): React
   useEffect(() => {
     dispatch(ChatsSlice.fetchChat(chatId));
   }, [dispatch, chatId]);
-  const userIdList = useSelector((state: RootState) => ChatsSlice.selectParticipantIdList(state, chatId));
+  const participants = useSelector((state: RootState) => ChatsSlice.selectParticipants(state, chatId));
   useEffect(() => {
     SearchedUsersSlice.clear();
     SearchedUsersSlice.fetchInitialState('CONTACTS');
   }, []);
-  if (userIdList === undefined) return <Spin />;
+  if (participants === undefined) return <Spin />;
   const onConfirm = async (userId: number) => {
-    if (userIdList.includes(userId)) message.info('That user is already a participant.', 5);
+    if (participants.includes(userId)) message.info('That user is already a participant.', 5);
     else await operateAddGroupChatUsers(chatId, userId);
   };
   return (
     <SearchUsersSection
-      extraRenderer={(userId) => (userIdList.includes(userId) ? <ParticipantIndicator /> : <NonparticipantIndicator />)}
+      extraRenderer={(userId) =>
+        participants.includes(userId) ? <ParticipantIndicator /> : <NonparticipantIndicator />
+      }
       popconfirmation={{ title: 'Add user', onConfirm }}
       type='CONTACTS'
     />

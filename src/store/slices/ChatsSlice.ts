@@ -269,7 +269,7 @@ export namespace ChatsSlice {
     /** {@link fetchChats} status. */
     readonly status: FetchStatus;
     /** The IDs of private chats which were deleted because the user being chatted with deleted their account. */
-    readonly deletedPrivateChatIdList: number[];
+    readonly deletedPrivateChatIdList: number[]; // TODO: Maybe don't use this.
     /** The IDs of chats currently being fetched by calls to {@link fetchChat}. */
     readonly fetching: number[];
   }
@@ -465,7 +465,6 @@ export namespace ChatsSlice {
   /** Adds the message to the chat if it's in the store. Use {@link fetchChat} for adding a message to a new chat. */
   function reduceAddMessage(state: Draft<State>, { payload }: PayloadAction<NewMessage>): State | void {
     const node: any = {
-      __typename: '',
       sent: payload.sent,
       sender: payload.sender,
       state: payload.state,
@@ -501,6 +500,7 @@ export namespace ChatsSlice {
       case 'NewVideoMessage':
         node.__typename = 'VideoMessage';
     }
+    // TODO: New messages may not be received in order. So, instead of pushing it directly, place it in sorted order.
     state.entities[payload.chatId]?.messages.edges.push({ node });
   }
 
@@ -520,11 +520,10 @@ export namespace ChatsSlice {
       builder
         .addCase(fetchChats.fulfilled, (state, { payload }) => {
           state.status = 'LOADED';
-          if (payload !== undefined)
-            adapter.upsertMany(
-              state,
-              payload.edges.map(({ node }) => node),
-            );
+          if (payload !== undefined) {
+            const nodes = payload.edges.map(({ node }) => node);
+            adapter.upsertMany(state, nodes);
+          }
         })
         .addCase(fetchChats.rejected, (state) => {
           state.status = 'IDLE';
@@ -614,8 +613,8 @@ export namespace ChatsSlice {
 
   /** Whether the chats have been fetched. */
   export const selectIsLoaded = createSelector(
-    (state: RootState) => state.chats.status,
-    (status: FetchStatus) => status === 'LOADED',
+    (state: RootState) => state.chats.status === 'LOADED',
+    (isLoaded: boolean) => isLoaded,
   );
 
   /**
@@ -626,11 +625,6 @@ export namespace ChatsSlice {
     const edges = chat?.messages.edges;
     return edges === undefined ? undefined : edges[edges.length - 1]?.node;
   });
-
-  /** Returns the IDs of users in the specified group chat, or `undefined` if the chat hasn't been fetched. */
-  export const selectParticipantIdList = createSelector(selectGroupChat, (chat: GroupChat | undefined) =>
-    chat?.users.edges.map(({ node }) => node.userId),
-  );
 
   /** Returns the ID of each participant in the specified group chat, or `undefined` if the chat hasn't been fetched. */
   export const selectParticipants = createSelector(selectGroupChat, (chat: GroupChat | undefined) =>
@@ -653,8 +647,8 @@ export namespace ChatsSlice {
    */
   export const selectPrivateChatUsers = createSelector(
     (state: RootState) =>
-      Object.values(state.chats.entities)
-        .filter((chat) => chat?.__typename === 'PrivateChat')
+      selectAll(state)
+        .filter((chat) => chat.__typename === 'PrivateChat')
         .map((chat) => (chat as PrivateChat).user.userId),
     (userIdList: number[] | undefined) => userIdList,
   );

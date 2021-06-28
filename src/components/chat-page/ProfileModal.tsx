@@ -195,7 +195,7 @@ interface BlockButtonProps {
 function BlockButton({ userId }: BlockButtonProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(BlockedUsersSlice.fetchUsers());
+    dispatch(BlockedUsersSlice.fetch());
   }, [dispatch]);
   const isBlocked = useSelector((state: RootState) => BlockedUsersSlice.selectIsBlocked(state, userId));
   const isButtonLoading = !useSelector(BlockedUsersSlice.selectIsLoaded);

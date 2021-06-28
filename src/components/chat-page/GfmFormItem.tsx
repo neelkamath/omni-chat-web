@@ -47,7 +47,7 @@ export default function GfmFormItem({
   initialValue,
   rules,
 }: GfmFormItemProps): ReactElement {
-  const [value, setValue] = useState(initialValue === undefined ? '' : initialValue);
+  const [value, setValue] = useState(initialValue ?? '');
   const [isShiftDown, setShiftDown] = useState(false);
   return (
     <Tabs
