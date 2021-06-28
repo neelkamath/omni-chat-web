@@ -40,7 +40,10 @@ export async function operateGraphQlApi<T>(
 ): Promise<T | undefined> {
   const response = await operateHttpApi(operation, logOutOnUnauthorizedError);
   if (response === undefined) return undefined;
-  if (response.errors !== undefined) await displayBugReporter(response.errors);
+  if (response.errors !== undefined) {
+    await displayBugReporter(response.errors);
+    return undefined;
+  }
   return response.data;
 }
 

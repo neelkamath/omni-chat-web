@@ -158,6 +158,7 @@ export namespace ChatsSlice {
           node {
             __typename
             sent
+            state
             sender {
               userId
             }
@@ -268,8 +269,6 @@ export namespace ChatsSlice {
   export interface State extends ReturnType<typeof adapter.getInitialState> {
     /** {@link fetchChats} status. */
     readonly status: FetchStatus;
-    /** The IDs of private chats which were deleted because the user being chatted with deleted their account. */
-    readonly deletedPrivateChatIdList: number[]; // TODO: Maybe don't use this.
     /** The IDs of chats currently being fetched by calls to {@link fetchChat}. */
     readonly fetching: number[];
   }
@@ -423,7 +422,6 @@ export namespace ChatsSlice {
       (entity) => entity?.__typename === 'PrivateChat' && (entity as PrivateChat).user.userId === payload,
     );
     if (chat === undefined) return;
-    state.deletedPrivateChatIdList.push(chat.chatId);
     adapter.removeOne(state, chat.chatId);
   }
 
@@ -506,7 +504,7 @@ export namespace ChatsSlice {
 
   const slice = createSlice({
     name: sliceName,
-    initialState: adapter.getInitialState({ status: 'IDLE', fetching: [], deletedPrivateChatIdList: [] }) as State,
+    initialState: adapter.getInitialState({ status: 'IDLE', fetching: [] }) as State,
     reducers: {
       removeOne: adapter.removeOne,
       removePrivateChat: reduceRemovePrivateChat,
@@ -621,10 +619,14 @@ export namespace ChatsSlice {
    * If the specified chat has been fetched, and it has a last message, it'll be selected. Otherwise, `undefined` will
    * be selected.
    */
-  export const selectLastMessage = createSelector([selectChat], (chat: Chat | undefined) => {
-    const edges = chat?.messages.edges;
-    return edges === undefined ? undefined : edges[edges.length - 1]?.node;
-  });
+  export const selectLastMessage = createSelector(
+    (state: RootState) => state.chats.entities,
+    (_: RootState, chatId: number) => chatId,
+    (chats: Dictionary<Chat>, chatId: number) => {
+      const edges = chats[chatId]?.messages.edges;
+      return edges === undefined ? undefined : edges[edges.length - 1]?.node;
+    },
+  );
 
   /** Returns the ID of each participant in the specified group chat, or `undefined` if the chat hasn't been fetched. */
   export const selectParticipants = createSelector(selectGroupChat, (chat: GroupChat | undefined) =>
@@ -633,13 +635,6 @@ export namespace ChatsSlice {
 
   /** Returns the IDs of each admin in the specified group chat, or `undefined` if the chat hasn't been fetched. */
   export const selectAdminIdList = createSelector(selectGroupChat, (chat: GroupChat | undefined) => chat?.adminIdList);
-
-  /** Whether the specified private chat belongs to a user who deleted their account, and therefore deleted the chat. */
-  export const selectIsDeletedPrivateChat = createSelector(
-    (state: RootState) => state.chats.deletedPrivateChatIdList,
-    (_: RootState, chatId: number) => chatId,
-    (chatIdList: number[], chatId: number) => chatIdList.includes(chatId),
-  );
 
   /**
    * Returns the IDs of users in private chats with the signed in user excluding the signed in user, or `undefined` if

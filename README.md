@@ -13,7 +13,7 @@ Official web app for the [Omni Chat API](https://github.com/neelkamath/omni-chat
 
 ## Usage
 
-1. Either run the Omni Chat 0.21.0 API [locally](https://github.com/neelkamath/omni-chat-backend/blob/v0.21.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat-backend/blob/v0.20.0/docs/cloud.md).
+1. Either run the Omni Chat 0.21.0 API [locally](https://github.com/neelkamath/omni-chat-backend/blob/v0.21.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat-backend/blob/v0.21.0/docs/cloud.md).
 1. Serve the website which has been saved to `dist/`.
 
 ## [Contributing](docs/CONTRIBUTING.md)

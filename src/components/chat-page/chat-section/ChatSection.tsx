@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { Divider, Empty, Layout, message, Spin } from 'antd';
+import { Divider, Layout, Spin } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import { RootState } from '../../../store/store';
@@ -18,15 +18,7 @@ export default function ChatSection({ chatId }: ChatSectionProps): ReactElement 
   useEffect(() => {
     dispatch(ChatsSlice.fetchChat(chatId));
   }, [dispatch, chatId]);
-  const isDeletedPrivateChat = useSelector((state: RootState) => ChatsSlice.selectIsDeletedPrivateChat(state, chatId));
   const chat = useSelector((state: RootState) => ChatsSlice.selectChat(state, chatId));
-  const onDeletedChat = () => {
-    message.warning('This chat has just been deleted.', 5);
-    setSection(<Empty />);
-  };
-  useEffect(() => {
-    if (isDeletedPrivateChat) onDeletedChat();
-  }, [isDeletedPrivateChat]);
   useEffect(() => {
     if (chat?.__typename === 'PrivateChat') setSection(<ChatSegment chat={chat} />);
     else if (chat?.__typename === 'GroupChat') setSection(<ChatSegment chat={chat} />);

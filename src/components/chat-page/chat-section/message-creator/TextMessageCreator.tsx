@@ -12,6 +12,7 @@ export interface TextMessageCreatorProps {
   readonly chatId: number;
 }
 
+// FIXME: After sending a text message, the focus on the text field gets lost.
 export default function TextMessageCreator({ chatId }: TextMessageCreatorProps): ReactElement {
   const [form] = useForm();
   const onPressEnter = async (text: string) => {

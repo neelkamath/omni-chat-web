@@ -202,7 +202,11 @@ async function onMessage(
       store.dispatch(PicMessagesSlice.deleteMessage(event.messageId));
       break;
     case 'UserChatMessagesRemoval':
-      store.dispatch(ChatsSlice.removeUserChatMessages(event)); // FIXME: Messages get deleted but infinite spinners take their place.
+      /*
+      FIXME: Messages get deleted but infinite spinners take their place. This might get fixed in Omni Chat Backend
+       0.22.0 because I think it's due to the user not actually getting deleted.
+       */
+      store.dispatch(ChatsSlice.removeUserChatMessages(event));
       break;
     case 'NewActionMessage':
     case 'NewAudioMessage':

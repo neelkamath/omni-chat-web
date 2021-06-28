@@ -114,7 +114,7 @@ async function onMessage(
     case 'DeletedPrivateChat':
       ChatsSlice.removeOne(event.chatId);
       if (ChatPageLayoutSlice.select(store.getState()).chatId === event.chatId) {
-        message.info('The other user just deleted their account.', 5);
+        message.info('This chat has just been deleted.', 5);
         store.dispatch(ChatPageLayoutSlice.update({ type: 'EMPTY' }));
       }
   }
