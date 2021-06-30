@@ -50,11 +50,8 @@ export namespace ChatsSlice {
       | 'VideoMessage';
     readonly sent: DateTime;
     readonly sender: SenderAccount;
-    readonly state: MessageState;
     readonly messageId: number;
   }
-
-  export type MessageState = 'SENT' | 'DELIVERED' | 'READ';
 
   export interface TextMessage extends Message {
     readonly __typename: 'TextMessage';
@@ -158,7 +155,6 @@ export namespace ChatsSlice {
           node {
             __typename
             sent
-            state
             sender {
               userId
             }
@@ -312,7 +308,6 @@ export namespace ChatsSlice {
     readonly messageId: number;
     readonly sent: DateTime;
     readonly sender: NewMessageSender;
-    readonly state: MessageState;
   }
 
   export interface NewMessageSender {
@@ -389,9 +384,7 @@ export namespace ChatsSlice {
   interface UpdatedPollMessage {
     readonly chatId: number;
     readonly messageId: number;
-    readonly userId: number;
-    readonly option: MessageText;
-    readonly vote: boolean;
+    readonly poll: Poll;
   }
 
   interface UpdatedGroupChatAccount {
@@ -425,22 +418,12 @@ export namespace ChatsSlice {
     adapter.removeOne(state, chat.chatId);
   }
 
+  // TODO: Test.
   function reduceUpdatePoll(state: Draft<State>, { payload }: PayloadAction<UpdatedPollMessage>): State | void {
     const messages = state.entities[payload.chatId]?.messages;
     if (messages === undefined) return;
     messages.edges = messages.edges.map((edge) => {
-      if (edge.node.messageId === payload.messageId) {
-        const poll = (edge.node as Draft<PollMessage>).poll;
-        poll.options = poll.options.map((option) => {
-          if (option.option === payload.option) {
-            if (payload.vote) {
-              const vote = { userId: payload.userId };
-              if (!option.votes.includes(vote)) option.votes.push(vote);
-            } else option.votes = option.votes.filter(({ userId }) => userId !== payload.userId);
-          }
-          return option;
-        });
-      }
+      if (edge.node.__typename === 'PollMessage') (edge.node as Draft<PollMessage>).poll = payload.poll;
       return edge;
     });
   }
@@ -465,7 +448,6 @@ export namespace ChatsSlice {
     const node: any = {
       sent: payload.sent,
       sender: payload.sender,
-      state: payload.state,
       messageId: payload.messageId,
     };
     switch (payload.__typename) {

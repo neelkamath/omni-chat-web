@@ -7,7 +7,6 @@ import ProfileModal from '../ProfileModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { OnlineStatusesSlice } from '../../../store/slices/OnlineStatusesSlice';
-import TimeAgo from 'timeago-react';
 import { TypingStatusesSlice } from '../../../store/slices/TypingStatusesSlice';
 import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
 import GroupChatTags from './GroupChatTags';
@@ -83,18 +82,9 @@ function OnlineStatusSection({ userId }: OnlineStatusSectionProps): ReactElement
   }, [dispatch, userId]);
   const onlineStatus = useSelector((state: RootState) => OnlineStatusesSlice.select(state, userId));
   if (onlineStatus === undefined) return <></>;
-  let status: ReactNode;
-  if (onlineStatus.isOnline) status = 'online';
-  else if (onlineStatus.lastOnline === null) status = 'offline';
-  else
-    status = (
-      <>
-        last online <TimeAgo datetime={onlineStatus.lastOnline} opts={{ minInterval: 60 }} />
-      </>
-    );
   return (
     <Col>
-      <Typography.Text style={{ color: 'white' }}>{status}</Typography.Text>
+      <Typography.Text style={{ color: 'white' }}>{onlineStatus.isOnline ? 'online' : 'offline'}</Typography.Text>
     </Col>
   );
 }

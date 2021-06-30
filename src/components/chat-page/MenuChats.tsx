@@ -1,18 +1,10 @@
 import React, { ReactElement, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
-import { Card, Col, Row, Space, Spin, Tooltip, Typography } from 'antd';
+import { Card, Col, Row, Space, Spin, Typography } from 'antd';
 import ChatPic from './ChatPic';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
-import {
-  AudioOutlined,
-  CheckCircleTwoTone,
-  ClockCircleTwoTone,
-  FileImageOutlined,
-  FileOutlined,
-  GroupOutlined,
-  VideoCameraOutlined,
-} from '@ant-design/icons';
+import { AudioOutlined, FileImageOutlined, FileOutlined, GroupOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import gfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
 import TimeAgo from 'timeago-react';
@@ -71,13 +63,8 @@ function ChatMetadata({ chat }: ChatMetadataProps): ReactElement {
           <LastMessageTimeAgo chatId={chat.chatId} />
         </Col>
       </Row>
-      <Row gutter={16} justify='space-between'>
-        <Col>
-          <LastChatMessage chatId={chat.chatId} />
-        </Col>
-        <Col>
-          <LastMessageStatus chatId={chat.chatId} />
-        </Col>
+      <Row gutter={16}>
+        <LastChatMessage chatId={chat.chatId} />
       </Row>
     </>
   );
@@ -152,35 +139,5 @@ function LastChatMessageContent({ message }: LastChatMessageContentProps): React
       return <GroupOutlined />;
     case 'VideoMessage':
       return <VideoCameraOutlined />;
-  }
-}
-
-interface LastMessageStatusProps {
-  readonly chatId: number;
-}
-
-function LastMessageStatus({ chatId }: LastMessageStatusProps): ReactElement {
-  const state = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId))?.state;
-  switch (state) {
-    case undefined:
-      return <></>;
-    case 'SENT':
-      return (
-        <Tooltip title='Sent'>
-          <ClockCircleTwoTone twoToneColor='#53C51A' />
-        </Tooltip>
-      );
-    case 'DELIVERED':
-      return (
-        <Tooltip title='Delivered'>
-          <CheckCircleTwoTone twoToneColor='#41A8FE' />
-        </Tooltip>
-      );
-    case 'READ':
-      return (
-        <Tooltip title='Read'>
-          <CheckCircleTwoTone twoToneColor='#53C51A' />
-        </Tooltip>
-      );
   }
 }

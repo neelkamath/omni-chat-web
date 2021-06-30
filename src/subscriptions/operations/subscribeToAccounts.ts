@@ -10,6 +10,7 @@ import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { OnlineStatusesSlice } from '../../store/slices/OnlineStatusesSlice';
 import { TypingStatusesSlice } from '../../store/slices/TypingStatusesSlice';
 import { onSubscriptionError, PromiseResolver, subscriptionClosers, verifySubscriptionCreation } from '../manager';
+import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
 
 interface SubscribeToAccountsResult {
   readonly subscribeToAccounts:
@@ -112,7 +113,7 @@ async function onMessage(
       resolve();
       break;
     case 'UpdatedAccount':
-      store.dispatch(AccountsSlice.update(event));
+      store.dispatch(AccountsSlice.update({ ...event, __typename: 'Account' }));
       break;
     case 'UpdatedProfilePic':
       store.dispatch(PicsSlice.fetch({ id: event.userId, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
@@ -136,6 +137,7 @@ async function onMessage(
       store.dispatch(OnlineStatusesSlice.removeOne(event.userId));
       store.dispatch(PicsSlice.removeAccount(event.userId));
       store.dispatch(TypingStatusesSlice.removeUser(event.userId));
+      store.dispatch(SearchedUsersSlice.removeOne(event.userId));
   }
 }
 

@@ -8,21 +8,13 @@ import { Storage } from '../../Storage';
 /**
  * The results of a search for blocked users, contacts, or users registered on the Omni Chat instance being used.
  *
- * We don't remove users who have been unblocked, are no longer a contact, or deleted their account after they've
- * appeared in the search results for the following reasons:
- * - The UI would glitch. For example, if the user is viewing a search result, and then it gets removed from the state,
- * then the displayed user would suddenly disappear.
- * - The user may have accidentally unblocked a user, or deleted a contact. In this case, the specified user should
- * still be displayed so that they can blocked or added as a contact again.
- * - If the user has updated the users they've blocked outside this page (e.g., on another device they're using Omni
- * Chat on at the same time), then they'll refresh the page if they really want to see the updated search results
- * immediately. This is a rare and harmless case since this page will only be viewed for short periods of time.
+ * We don't remove users who have either been unblocked or are no longer a contact after they've appeared in the search
+ * results because the user may have accidentally unblocked a user, or deleted a contact. In such a case, the specified
+ * user should still be displayed so that they can blocked or added as a contact again.
  */
 export namespace SearchedUsersSlice {
   const sliceName = 'searchedUsers';
-
   const pagination: ForwardPagination = { first: 10 };
-
   const adapter = createEntityAdapter<AccountEdge>({ selectId: ({ node }) => node.userId });
 
   export interface AccountEdge {
@@ -234,7 +226,7 @@ export namespace SearchedUsersSlice {
   const slice = createSlice({
     name: sliceName,
     initialState: adapter.getInitialState() as State,
-    reducers: { clear: reduceClear },
+    reducers: { clear: reduceClear, removeOne: adapter.removeOne },
     extraReducers: (builder) => {
       builder
         .addCase(fetchAdditional.fulfilled, (state, { payload }) => {
@@ -259,7 +251,7 @@ export namespace SearchedUsersSlice {
 
   export const { reducer } = slice;
 
-  export const { clear } = slice.actions;
+  export const { clear, removeOne } = slice.actions;
 
   export const { selectAll } = adapter.getSelectors((state: RootState) => state.searchedUsers);
 

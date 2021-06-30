@@ -7,9 +7,7 @@ import { Storage } from '../../Storage';
 
 export namespace SearchedPublicChatsSlice {
   const sliceName = 'searchedPublicChats';
-
   const pagination: ForwardPagination = { first: 10 };
-
   const adapter = createEntityAdapter<GroupChatEdge>({ selectId: ({ node }) => node.chatId });
 
   interface SearchPublicChatsResult {

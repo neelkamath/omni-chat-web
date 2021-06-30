@@ -3,17 +3,14 @@ import { GroupChatDescription, GroupChatTitle, queryOrMutate, Uuid } from '@neel
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
 import { Storage } from '../../../../Storage';
 import { Card, Space, Spin } from 'antd';
-import GroupChatPic from '../../GroupChatPic';
 import GroupChatTags from '../GroupChatTags';
 
 export interface GroupChatInviteMessageContentProps {
   readonly inviteCode: Uuid | null;
-  readonly chatId: number;
 }
 
 export default function GroupChatInviteMessageContent({
   inviteCode,
-  chatId,
 }: GroupChatInviteMessageContentProps): ReactElement {
   const [section, setSection] = useState(inviteCode === null ? <InvalidGroupChatInvite /> : <Spin />);
   useEffect(() => {
@@ -21,13 +18,13 @@ export default function GroupChatInviteMessageContent({
       readGroupChat(inviteCode).then((response) => {
         switch (response?.readGroupChat.__typename) {
           case 'GroupChatInfo':
-            setSection(<GroupChatInvitation chatId={chatId} info={response.readGroupChat} />);
+            setSection(<GroupChatInvitation info={response.readGroupChat} />);
             break;
           case 'InvalidInviteCode':
             setSection(<InvalidGroupChatInvite />);
         }
       });
-  }, [chatId, inviteCode]);
+  }, [inviteCode]);
   return <>{section}</>;
 }
 
@@ -41,11 +38,10 @@ function InvalidGroupChatInvite(): ReactElement {
 
 interface GroupChatInvitationProps {
   readonly info: GroupChatInfo;
-  readonly chatId: number;
 }
 
-// TODO: Once Omni Chat 0.22.0 releases (to fix group chat invites), style the card as much as antd allows for it, and add a "Join" button.
-function GroupChatInvitation({ info, chatId }: GroupChatInvitationProps): ReactElement {
+// TODO: Style the card as much as antd allows for it, and add a "Join" button.
+function GroupChatInvitation({ info }: GroupChatInvitationProps): ReactElement {
   return (
     <Card
       size='small'
@@ -53,7 +49,7 @@ function GroupChatInvitation({ info, chatId }: GroupChatInvitationProps): ReactE
       extra={<GroupChatTags isBroadcast={info.isBroadcast} publicity={info.publicity} />}
     >
       <Space>
-        <GroupChatPic chatId={chatId} />
+        {/* TODO: Once Omni ChatBackend 0.23.0 releases, pass the invited chat's ID: <GroupChatPic chatId={chatId} /> */}
         {info.description}
       </Space>
     </Card>

@@ -1,4 +1,4 @@
-import { DateTime, GraphQlResponse, subscribe } from '@neelkamath/omni-chat';
+import { GraphQlResponse, subscribe } from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../../api';
 import store from '../../store/store';
 import { OnlineStatusesSlice } from '../../store/slices/OnlineStatusesSlice';
@@ -17,7 +17,6 @@ interface OnlineStatus {
   readonly __typename: 'OnlineStatus';
   readonly userId: number;
   readonly isOnline: boolean;
-  readonly lastOnline: DateTime;
 }
 
 const query = `
@@ -27,7 +26,6 @@ const query = `
       ... on OnlineStatus {
         userId
         isOnline
-        lastOnline
       }
     }
   }

@@ -8,11 +8,10 @@ import {
 } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
-import { DateTime, queryOrMutate } from '@neelkamath/omni-chat';
+import { queryOrMutate } from '@neelkamath/omni-chat';
 
 export namespace OnlineStatusesSlice {
   const adapter: EntityAdapter<OnlineStatus> = createEntityAdapter({ selectId: ({ userId }) => userId });
-
   const sliceName = 'onlineStatuses';
 
   export interface State extends ReturnType<typeof adapter.getInitialState> {
@@ -33,7 +32,6 @@ export namespace OnlineStatusesSlice {
     readonly __typename: 'OnlineStatus';
     readonly userId: number;
     readonly isOnline: boolean;
-    readonly lastOnline: DateTime;
   }
 
   interface InvalidUserId {
@@ -51,7 +49,6 @@ export namespace OnlineStatusesSlice {
                 ... on OnlineStatus {
                   userId
                   isOnline
-                  lastOnline
                 }
               }
             }

@@ -40,10 +40,7 @@ interface NewMessage {
   readonly messageId: number;
   readonly sent: DateTime;
   readonly sender: Sender;
-  readonly state: MessageState;
 }
-
-export type MessageState = 'SENT' | 'DELIVERED' | 'READ';
 
 interface Sender {
   readonly userId: number;
@@ -121,9 +118,7 @@ interface UpdatedPollMessage {
   readonly __typename: 'UpdatedPollMessage';
   readonly chatId: number;
   readonly messageId: number;
-  readonly userId: number;
-  readonly option: MessageText;
-  readonly vote: boolean;
+  readonly poll: Poll;
 }
 
 const query = `
@@ -133,9 +128,15 @@ const query = `
       ... on UpdatedPollMessage {
         chatId
         messageId
-        userId
-        option
-        vote
+        poll {
+          question
+          options {
+            option
+            votes {
+              userId
+            }
+          }
+        }
       }
       ... on DeletedMessage {
         chatId
@@ -148,7 +149,6 @@ const query = `
         sender {
           userId
         }
-        state
       }
       ... on NewTextMessage {
         textMessage

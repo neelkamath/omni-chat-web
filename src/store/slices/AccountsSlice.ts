@@ -25,7 +25,7 @@ export namespace AccountsSlice {
     `${sliceName}/fetch`,
     async (userId: number) => {
       const response = await readAccount(userId);
-      return response?.readAccount;
+      return response?.readAccount.__typename === 'Account' ? response?.readAccount : undefined;
     },
     {
       condition: (userId, { getState }) => {
@@ -36,6 +36,7 @@ export namespace AccountsSlice {
   );
 
   export interface Account {
+    readonly __typename: 'Account';
     readonly userId: number;
     readonly username: Username;
     readonly emailAddress: string;
@@ -44,8 +45,12 @@ export namespace AccountsSlice {
     readonly bio: Bio;
   }
 
+  interface InvalidUserId {
+    readonly __typename: 'InvalidUserId';
+  }
+
   interface ReadAccountResult {
-    readonly readAccount: Account;
+    readonly readAccount: Account | InvalidUserId;
   }
 
   async function readAccount(userId: number): Promise<ReadAccountResult | undefined> {
@@ -57,12 +62,15 @@ export namespace AccountsSlice {
             query: `
               query ReadAccount($userId: Int!) {
                 readAccount(userId: $userId) {
-                  userId
-                  username
-                  emailAddress
-                  firstName
-                  lastName
-                  bio
+                  __typename
+                  ... on Account {
+                    userId
+                    username
+                    emailAddress
+                    firstName
+                    lastName
+                    bio
+                  }
                 }
               }
             `,

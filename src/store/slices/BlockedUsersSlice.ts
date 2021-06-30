@@ -6,7 +6,6 @@ import { queryOrMutate } from '@neelkamath/omni-chat';
 
 export namespace BlockedUsersSlice {
   const adapter = createEntityAdapter<Account>({ selectId: ({ userId }) => userId });
-
   const sliceName = 'blockedUsers';
 
   export interface State extends ReturnType<typeof adapter.getInitialState> {
