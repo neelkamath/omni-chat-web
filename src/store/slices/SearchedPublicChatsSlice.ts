@@ -32,7 +32,11 @@ export namespace SearchedPublicChatsSlice {
     readonly chatId: number;
     readonly title: GroupChatTitle;
     readonly description: GroupChatDescription;
+    readonly isBroadcast: boolean;
+    readonly publicity: GroupChatPublicity;
   }
+
+  export type GroupChatPublicity = 'NOT_INVITABLE' | 'INVITABLE' | 'PUBLIC';
 
   async function searchPublicChats(
     query: string,
@@ -55,6 +59,8 @@ export namespace SearchedPublicChatsSlice {
                       chatId
                       title
                       description
+                      isBroadcast
+                      publicity
                     }
                   }
                 }

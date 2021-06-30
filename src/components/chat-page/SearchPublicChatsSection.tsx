@@ -1,11 +1,8 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, Card, Divider, Input, Space, Typography } from 'antd';
+import { Button, Input, Space, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchedPublicChatsSlice } from '../../store/slices/SearchedPublicChatsSlice';
-import GroupChatPic from './GroupChatPic';
-import ReactMarkdown from 'react-markdown';
-import gfm from 'remark-gfm';
-import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
+import GroupChatInvitation from './GroupChatInvitation';
 
 export default function SearchPublicChatsSection(): ReactElement {
   const query = useSelector(SearchedPublicChatsSlice.selectQuery);
@@ -23,31 +20,8 @@ export default function SearchPublicChatsSection(): ReactElement {
 
 function Chats(): ReactElement {
   const chats = useSelector(SearchedPublicChatsSlice.selectAll);
-  const cards = chats.map(({ node }) => <ChatCard key={node.chatId} chat={node} />);
+  const cards = chats.map(({ node }) => <GroupChatInvitation key={node.chatId} data={node.chatId} {...node} />);
   return <Space direction='vertical'>{cards}</Space>;
-}
-
-interface ChatCardProps {
-  readonly chat: SearchedPublicChatsSlice.GroupChat;
-}
-
-function ChatCard({ chat }: ChatCardProps): ReactElement {
-  const dispatch = useDispatch();
-  const onClick = () => dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_SECTION', chatId: chat.chatId }));
-  return (
-    <Card hoverable onClick={onClick}>
-      <Space>
-        <GroupChatPic chatId={chat.chatId} />
-        <Typography.Text strong>{chat.title}</Typography.Text>
-      </Space>
-      {chat.description.length > 0 && (
-        <>
-          <Divider />
-          <ReactMarkdown plugins={[gfm]}>{chat.description}</ReactMarkdown>
-        </>
-      )}
-    </Card>
-  );
 }
 
 function LoadMoreChatsButton(): ReactElement {

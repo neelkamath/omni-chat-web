@@ -34,6 +34,7 @@ export default function ChatMessage({ message }: ChatMessageProps): ReactElement
   if (username === undefined) return <Spin />;
   let actions: ReactNode[] | undefined;
   if (message.sender.userId === Storage.readUserId()) actions = [<DeleteAction key={1} message={message} />];
+  // TODO: Make the <datetime> human-readable.
   return (
     <Comment
       actions={actions}
