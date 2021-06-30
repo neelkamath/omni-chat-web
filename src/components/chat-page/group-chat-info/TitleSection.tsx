@@ -34,6 +34,7 @@ interface UpdateTitleFormProps {
   readonly chatId: number;
 }
 
+// TODO: Set to parent element's width.
 function UpdateTitleForm({ chatId }: UpdateTitleFormProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {

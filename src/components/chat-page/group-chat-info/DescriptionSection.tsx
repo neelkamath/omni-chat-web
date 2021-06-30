@@ -44,6 +44,7 @@ interface UpdateGroupChatDescriptionFormData {
   readonly description: string;
 }
 
+// TODO: Set to parent element's width.
 function UpdateDescriptionForm({ chatId }: UpdateDescriptionFormProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
