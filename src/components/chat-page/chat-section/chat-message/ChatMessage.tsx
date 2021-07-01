@@ -14,7 +14,7 @@ import PollMessageContent from './PollMessageContent';
 import GroupChatInviteMessageContent from './GroupChatInviteMessageContent';
 import { AccountsSlice } from '../../../../store/slices/AccountsSlice';
 import Options from './Options';
-import { Username } from '@neelkamath/omni-chat';
+import { DateTime, Username } from '@neelkamath/omni-chat';
 
 export interface ChatMessageProps {
   readonly chatId: number;
@@ -34,18 +34,28 @@ export default function ChatMessage({ chatId, message }: ChatMessageProps): Reac
   );
   const username = useSelector((state: RootState) => AccountsSlice.select(state, message.sender.userId))?.username;
   if (username === undefined) return <Spin />;
-  // TODO: Make the <datetime> human-readable.
   return (
     <Row justify='space-between' align='middle'>
       <Comment
         avatar={<CustomPic icon={<UserOutlined />} url={url} />}
         author={<Author username={username} isForwarded={message.isForwarded} />}
         content={<MessageContent message={message} />}
-        datetime={message.sent}
+        datetime={getDateTime(message.sent)}
       />
       <Options chatId={chatId} message={message} />
     </Row>
   );
+}
+
+function getDateTime(dateTime: DateTime): string {
+  const locale = undefined; // Set the locale to <undefined> to use the user's default locale.
+  return new Date(dateTime).toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  });
 }
 
 interface AuthorProps {
