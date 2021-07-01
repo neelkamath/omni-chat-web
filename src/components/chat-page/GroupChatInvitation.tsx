@@ -42,7 +42,7 @@ export default function GroupChatInvitation({
       {/* TODO: Once Omni ChatBackend 0.23.0 releases, pass the invited chat's ID to <Card.Meta>: avatar={<GroupChatPic chatId={chatId} />} */}
       <Card.Meta
         title={
-          <Row justify='space-between'>
+          <Row gutter={16} justify='space-between'>
             <Col>{title}</Col>
             <Col>
               <GroupChatTags isBroadcast={isBroadcast} publicity={publicity} />
