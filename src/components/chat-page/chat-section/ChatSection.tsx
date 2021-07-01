@@ -38,7 +38,7 @@ function ChatSegment({ chat }: ChatSegmentProps): ReactElement {
       </Layout.Header>
       <Layout.Content style={{ padding: 16 }}>
         {chat.messages.edges.map(({ node }) => (
-          <ChatMessage key={node.messageId} message={node} />
+          <ChatMessage chatId={chat.chatId} key={node.messageId} message={node} />
         ))}
         {chat.messages.edges.length > 0 && <Divider />}
         <MessageCreatorSection chat={chat} />

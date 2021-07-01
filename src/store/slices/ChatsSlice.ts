@@ -48,6 +48,7 @@ export namespace ChatsSlice {
       | 'DocMessage'
       | 'GroupChatInviteMessage'
       | 'VideoMessage';
+    readonly isForwarded: boolean;
     readonly sent: DateTime;
     readonly sender: SenderAccount;
     readonly messageId: number;
@@ -155,6 +156,7 @@ export namespace ChatsSlice {
           node {
             __typename
             sent
+            isForwarded
             sender {
               userId
             }
@@ -305,6 +307,7 @@ export namespace ChatsSlice {
       | 'NewTextMessage'
       | 'NewVideoMessage';
     readonly chatId: number;
+    readonly isForwarded: boolean;
     readonly messageId: number;
     readonly sent: DateTime;
     readonly sender: NewMessageSender;
@@ -449,6 +452,7 @@ export namespace ChatsSlice {
       sent: payload.sent,
       sender: payload.sender,
       messageId: payload.messageId,
+      isForwarded: payload.isForwarded,
     };
     switch (payload.__typename) {
       case 'NewTextMessage':

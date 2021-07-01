@@ -64,7 +64,9 @@ function ChatMetadata({ chat }: ChatMetadataProps): ReactElement {
         </Col>
       </Row>
       <Row gutter={16}>
-        <LastChatMessage chatId={chat.chatId} />
+        <Col>
+          <LastChatMessage chatId={chat.chatId} />
+        </Col>
       </Row>
     </>
   );
@@ -102,7 +104,7 @@ function LastChatMessage({ chatId }: LastChatMessageTextProps): ReactElement {
   if (isLoading || (lastMessage !== undefined && username === undefined)) return <Spin />;
   if (lastMessage === undefined) return <></>;
   return (
-    <Typography.Text ellipsis style={{ width: 300 }}>
+    <Typography.Text ellipsis style={{ width: 333 }}>
       <Space>
         <Typography.Paragraph>{username}:</Typography.Paragraph>
         <Typography.Paragraph style={{ height: 22 }}>

@@ -38,6 +38,7 @@ interface NewMessage {
     | 'NewVideoMessage';
   readonly chatId: number;
   readonly messageId: number;
+  readonly isForwarded: boolean;
   readonly sent: DateTime;
   readonly sender: Sender;
 }
@@ -145,6 +146,7 @@ const query = `
       ... on NewMessage {
         chatId
         messageId
+        isForwarded
         sent
         sender {
           userId

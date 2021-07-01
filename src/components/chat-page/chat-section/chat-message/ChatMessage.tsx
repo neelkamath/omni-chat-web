@@ -1,8 +1,7 @@
-import React, { ReactElement, ReactNode, useEffect } from 'react';
-import { Comment, Image, Spin } from 'antd';
+import React, { ReactElement, useEffect } from 'react';
+import { Comment, Image, Row, Space, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserOutlined } from '@ant-design/icons';
-import DeleteAction from './DeleteAction';
 import { RootState } from '../../../../store/store';
 import { PicsSlice } from '../../../../store/slices/PicsSlice';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
@@ -14,12 +13,15 @@ import { PicMessagesSlice } from '../../../../store/slices/PicMessagesSlice';
 import PollMessageContent from './PollMessageContent';
 import GroupChatInviteMessageContent from './GroupChatInviteMessageContent';
 import { AccountsSlice } from '../../../../store/slices/AccountsSlice';
+import Options from './Options';
+import { Username } from '@neelkamath/omni-chat';
 
 export interface ChatMessageProps {
+  readonly chatId: number;
   readonly message: ChatsSlice.Message;
 }
 
-export default function ChatMessage({ message }: ChatMessageProps): ReactElement {
+export default function ChatMessage({ chatId, message }: ChatMessageProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(AccountsSlice.fetch(Storage.readUserId()!));
@@ -32,17 +34,31 @@ export default function ChatMessage({ message }: ChatMessageProps): ReactElement
   );
   const username = useSelector((state: RootState) => AccountsSlice.select(state, message.sender.userId))?.username;
   if (username === undefined) return <Spin />;
-  let actions: ReactNode[] | undefined;
-  if (message.sender.userId === Storage.readUserId()) actions = [<DeleteAction key={1} message={message} />];
   // TODO: Make the <datetime> human-readable.
   return (
-    <Comment
-      actions={actions}
-      avatar={<CustomPic icon={<UserOutlined />} url={url} />}
-      author={username}
-      content={<MessageContent message={message} />}
-      datetime={message.sent}
-    />
+    <Row justify='space-between' align='middle'>
+      <Comment
+        avatar={<CustomPic icon={<UserOutlined />} url={url} />}
+        author={<Author username={username} isForwarded={message.isForwarded} />}
+        content={<MessageContent message={message} />}
+        datetime={message.sent}
+      />
+      <Options chatId={chatId} message={message} />
+    </Row>
+  );
+}
+
+interface AuthorProps {
+  readonly username: Username;
+  readonly isForwarded: boolean;
+}
+
+function Author({ username, isForwarded }: AuthorProps): ReactElement {
+  return (
+    <Space>
+      {username}
+      {isForwarded && <Typography.Text italic>(forwarded)</Typography.Text>}
+    </Space>
   );
 }
 
