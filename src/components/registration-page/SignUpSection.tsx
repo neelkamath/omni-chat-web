@@ -1,5 +1,5 @@
-import React, { ReactElement, useState } from 'react';
-import { Button, Col, Form, Image, Input, message, Row, Space, Typography } from 'antd';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { Button, Col, Form, Image, Input, message, Row, Space, Spin, Typography } from 'antd';
 import completingImage from '../../images/completing.svg';
 import {
   Bio,
@@ -19,6 +19,7 @@ export default function SignUpSection(): ReactElement {
         <Typography.Title level={2}>Sign Up</Typography.Title>
         <Space direction='vertical'>
           You can edit your username, profile picture, etc. once you&apos;ve signed in.
+          <AllowedDomains />
           <SignUpForm />
         </Space>
       </Col>
@@ -27,6 +28,23 @@ export default function SignUpSection(): ReactElement {
       </Col>
     </Row>
   );
+}
+
+function AllowedDomains(): ReactElement {
+  const [section, setSection] = useState(<Spin size='small' />);
+  useEffect(() => {
+    readAllowedEmailAddressDomains().then((response) => {
+      console.log(response);
+      if (response === undefined || response.readAllowedEmailAddressDomains.length === 0) return;
+      setSection(
+        <>
+          This Omni Chat server only allows registering with the following email address domains:{' '}
+          <Typography.Text strong>{response.readAllowedEmailAddressDomains.join(', ')}</Typography.Text>
+        </>,
+      );
+    });
+  }, []);
+  return section;
 }
 
 interface SignUpFormData {
@@ -108,11 +126,7 @@ async function operateCreateAccount(account: AccountInput): Promise<void> {
       message.error('That email address has already been registered.', 5);
       break;
     case 'InvalidDomain':
-      message.error(
-        "This Omni Chat server disallows the provided email address's domain. For example, " +
-          '"john.doe@private.company.com" may be allowed but not "john.doe@gmail.com".',
-        10,
-      );
+      message.error("This Omni Chat server disallows the provided email address's domain.", 7.5);
       break;
     case 'UsernameTaken':
       message.error('That username has already been taken.', 5);
@@ -147,6 +161,23 @@ async function createAccount(account: AccountInput): Promise<CreateAccountResult
           }
         `,
         variables: { account },
+      }),
+  );
+}
+
+interface ReadAllowedEmailAddressDomainsResult {
+  readonly readAllowedEmailAddressDomains: string[];
+}
+
+async function readAllowedEmailAddressDomains(): Promise<ReadAllowedEmailAddressDomainsResult | undefined> {
+  return await operateGraphQlApi(
+    async () =>
+      await queryOrMutate(httpApiConfig, {
+        query: `
+          query ReadAllowedEmailAddressDomains {
+            readAllowedEmailAddressDomains
+          }
+        `,
       }),
   );
 }
