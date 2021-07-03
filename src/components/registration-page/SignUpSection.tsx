@@ -34,7 +34,6 @@ function AllowedDomains(): ReactElement {
   const [section, setSection] = useState(<Spin size='small' />);
   useEffect(() => {
     readAllowedEmailAddressDomains().then((response) => {
-      console.log(response);
       if (response === undefined || response.readAllowedEmailAddressDomains.length === 0) return;
       setSection(
         <>
