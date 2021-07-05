@@ -156,7 +156,7 @@ function PowerfulMessagesRow(): ReactElement {
           <List.Item>Search messages.</List.Item>
           <List.Item>See when the message was sent, delivered, and read by each user.</List.Item>
           <List.Item>Delete messages.</List.Item>
-          <List.Item>Star important messages to easily view them later.</List.Item>
+          <List.Item>Bookmark important messages to easily view them later.</List.Item>
           <List.Item>
             Format messages using Markdown (e.g., &quot;**Hello**&quot; displays as &quot;
             <Typography.Text strong>Hello</Typography.Text>

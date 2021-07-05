@@ -1,12 +1,11 @@
 import React, { ReactElement } from 'react';
 import { Tag } from 'antd';
+import { GroupChatPublicity } from '@neelkamath/omni-chat';
 
 export interface GroupChatTagsProps {
   readonly isBroadcast: boolean;
   readonly publicity: GroupChatPublicity;
 }
-
-export type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
 
 export default function GroupChatTags({ isBroadcast, publicity }: GroupChatTagsProps): ReactElement {
   /*

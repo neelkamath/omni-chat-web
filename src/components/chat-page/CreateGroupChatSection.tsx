@@ -1,6 +1,6 @@
 import React, { ReactElement, useState } from 'react';
 import { Button, Form, Input, message, Space } from 'antd';
-import { GroupChatDescription, GroupChatTitle, queryOrMutate } from '@neelkamath/omni-chat';
+import { GroupChatDescription, GroupChatPublicity, GroupChatTitle, queryOrMutate } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { Storage } from '../../Storage';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
@@ -20,8 +20,6 @@ interface CreateGroupChatFormData {
   readonly title: string;
   readonly publicity: GroupChatPublicity;
 }
-
-export type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
 
 function CreateGroupChatForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);

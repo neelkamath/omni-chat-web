@@ -14,6 +14,7 @@ import { httpApiConfig, operateGraphQlApi } from '../../api';
 import {
   DateTime,
   GroupChatDescription,
+  GroupChatPublicity,
   GroupChatTitle,
   MessageText,
   queryOrMutate,
@@ -88,8 +89,6 @@ export namespace ChatsSlice {
   export interface SenderAccount {
     readonly userId: number;
   }
-
-  export type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
 
   export interface PrivateChat extends Chat {
     readonly __typename: 'PrivateChat';

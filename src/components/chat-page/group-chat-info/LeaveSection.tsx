@@ -15,8 +15,8 @@ export default function LeaveSection({ chatId }: LeaveSectionProps): ReactElemen
     <Space direction='vertical'>
       <Typography.Text strong>Leave Chat</Typography.Text>
       <Typography.Paragraph>
-        Your messages and votes on polls will remain if you leave the chat. Messages you&apos;ve starred in the chat
-        will get unstarred for you.
+        Your messages and votes on polls will remain if you leave the chat. Messages you&apos;ve bookmarked in the chat
+        will get unbookmarked for you.
       </Typography.Paragraph>
       <Typography.Paragraph>
         You can&apos;t leave if the chat has other participants, and you&apos;re the last admin. In such a case,

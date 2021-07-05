@@ -1,4 +1,10 @@
-import { GraphQlResponse, GroupChatDescription, GroupChatTitle, subscribe } from '@neelkamath/omni-chat';
+import {
+  GraphQlResponse,
+  GroupChatDescription,
+  GroupChatPublicity,
+  GroupChatTitle,
+  subscribe,
+} from '@neelkamath/omni-chat';
 import { displayBugReporter, wsApiConfig } from '../../api';
 import store from '../../store/store';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
@@ -51,8 +57,6 @@ interface UpdatedGroupChat {
 interface UpdatedGroupChatAccount {
   readonly userId: number;
 }
-
-export type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
 
 const query = `
   subscription SubscribeToChats {

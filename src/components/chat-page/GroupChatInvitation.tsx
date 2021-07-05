@@ -1,4 +1,4 @@
-import { GroupChatDescription, GroupChatTitle, queryOrMutate, Uuid } from '@neelkamath/omni-chat';
+import { GroupChatDescription, GroupChatPublicity, GroupChatTitle, queryOrMutate, Uuid } from '@neelkamath/omni-chat';
 import React, { ReactElement, useState } from 'react';
 import { Button, Card, Col, message, Row, Space } from 'antd';
 import GroupChatTags from './chat-section/GroupChatTags';
@@ -20,8 +20,6 @@ export interface GroupChatInvitationProps {
   readonly isBroadcast: boolean;
   readonly publicity: GroupChatPublicity;
 }
-
-export type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
 
 // TODO: Once Omni Chat Backend 0.23.0 releases, disable the join button if the user is already in the chat.
 export default function GroupChatInvitation({

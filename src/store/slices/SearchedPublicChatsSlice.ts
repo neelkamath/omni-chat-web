@@ -1,6 +1,6 @@
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-import { Cursor, GroupChatDescription, GroupChatTitle, queryOrMutate } from '@neelkamath/omni-chat';
+import { Cursor, GroupChatDescription, GroupChatPublicity, GroupChatTitle, queryOrMutate } from '@neelkamath/omni-chat';
 import { ForwardPagination } from '../../pagination';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { Storage } from '../../Storage';
@@ -35,8 +35,6 @@ export namespace SearchedPublicChatsSlice {
     readonly isBroadcast: boolean;
     readonly publicity: GroupChatPublicity;
   }
-
-  export type GroupChatPublicity = 'NOT_INVITABLE' | 'INVITABLE' | 'PUBLIC';
 
   async function searchPublicChats(
     query: string,

@@ -15,9 +15,9 @@ export default function PicMessageCreator({ chatId }: PicMessageCreatorProps): R
   const [showUploadList, setShowUploadList] = useState<ShowUploadListInterface | boolean>({ showRemoveIcon: false });
   const customRequest = async (option: UploadRequestOption) => {
     const file = option.file as File;
-    if (file.size > 5 * 1024 * 1024)
-      message.error(`${file.name} couldn't upload because it was bigger than 5 MB.`, 7.5);
-    else await postPicMessage(httpApiConfig, Storage.readAccessToken()!, file, chatId);
+    if (file.size > 3 * 1_024 * 1_024)
+      message.error(`${file.name} couldn't upload because it was bigger than 3 MB.`, 7.5);
+    else await postPicMessage(httpApiConfig, Storage.readAccessToken()!, file, chatId); // TODO: Handle errors.
     setShowUploadList(false);
   };
   return (

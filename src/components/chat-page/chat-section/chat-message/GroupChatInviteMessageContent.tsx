@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { GroupChatDescription, GroupChatTitle, queryOrMutate, Uuid } from '@neelkamath/omni-chat';
+import { GroupChatDescription, GroupChatPublicity, GroupChatTitle, queryOrMutate, Uuid } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
 import { Storage } from '../../../../Storage';
 import GroupChatInvitation from '../../GroupChatInvitation';
@@ -42,13 +42,12 @@ interface ReadGroupChatResult {
 
 interface GroupChatInfo {
   readonly __typename: 'GroupChatInfo';
+  readonly chatId: number;
   readonly title: GroupChatTitle;
   readonly description: GroupChatDescription;
   readonly isBroadcast: boolean;
   readonly publicity: GroupChatPublicity;
 }
-
-type GroupChatPublicity = 'INVITABLE' | 'NOT_INVITABLE' | 'PUBLIC';
 
 interface InvalidInviteCode {
   readonly __typename: 'InvalidInviteCode';
@@ -65,6 +64,7 @@ async function readGroupChat(inviteCode: Uuid): Promise<ReadGroupChatResult | un
               readGroupChat(inviteCode: $inviteCode) {
                 __typename
                 ... on GroupChatInfo {
+                  chatId
                   title
                   description
                   isBroadcast
