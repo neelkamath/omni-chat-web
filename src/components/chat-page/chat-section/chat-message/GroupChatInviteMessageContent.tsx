@@ -18,7 +18,13 @@ export default function GroupChatInviteMessageContent({
       readGroupChat(inviteCode).then((response) => {
         switch (response?.readGroupChat.__typename) {
           case 'GroupChatInfo':
-            setSection(<GroupChatInvitation data={inviteCode} {...response.readGroupChat} />);
+            setSection(
+              <GroupChatInvitation
+                invitedChatId={response.readGroupChat.chatId}
+                data={inviteCode}
+                {...response.readGroupChat}
+              />,
+            );
             break;
           case 'InvalidInviteCode':
             setSection(<InvalidGroupChatInvite />);

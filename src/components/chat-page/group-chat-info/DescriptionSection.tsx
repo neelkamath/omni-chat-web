@@ -44,7 +44,6 @@ interface UpdateGroupChatDescriptionFormData {
   readonly description: string;
 }
 
-// TODO: Set to parent element's width.
 function UpdateDescriptionForm({ chatId }: UpdateDescriptionFormProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -59,7 +58,7 @@ function UpdateDescriptionForm({ chatId }: UpdateDescriptionFormProps): ReactEle
     setLoading(false);
   };
   return (
-    <Form onFinish={onFinish} layout='vertical' name='updateGroupChatDescription'>
+    <Form style={{ width: '100%' }} onFinish={onFinish} layout='vertical' name='updateGroupChatDescription'>
       <GfmFormItem maxLength={1_000} name='description' label='Description' initialValue={description} />
       <Form.Item>
         <Button type='primary' htmlType='submit' loading={isLoading}>

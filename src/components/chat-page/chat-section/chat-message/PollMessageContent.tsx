@@ -1,11 +1,12 @@
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
 import React, { ReactElement } from 'react';
-import { Checkbox, Space, Typography } from 'antd';
+import { Card, Checkbox, Space, Typography } from 'antd';
 import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
 import { MessageText, queryOrMutate } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
 import { Storage } from '../../../../Storage';
+import { UpCircleTwoTone } from '@ant-design/icons';
 
 export interface PollMessageContentProps {
   readonly message: ChatsSlice.PollMessage;
@@ -13,14 +14,15 @@ export interface PollMessageContentProps {
 
 export default function PollMessageContent({ message }: PollMessageContentProps): ReactElement {
   return (
-    <Space direction='vertical'>
-      <ReactMarkdown plugins={[gfm]}>{message.poll.question}</ReactMarkdown>
-      {[...message.poll.options]
-        .sort((a, b) => b.votes.length - a.votes.length)
-        .map((pollOption) => (
-          <PollOption messageId={message.messageId} key={pollOption.option} pollOption={pollOption} />
-        ))}
-    </Space>
+    <Card size='small' title={<ReactMarkdown plugins={[gfm]}>{message.poll.question}</ReactMarkdown>}>
+      <Space direction='vertical'>
+        {[...message.poll.options]
+          .sort((a, b) => b.votes.length - a.votes.length)
+          .map((pollOption) => (
+            <PollOption messageId={message.messageId} key={pollOption.option} pollOption={pollOption} />
+          ))}
+      </Space>
+    </Card>
   );
 }
 
@@ -38,8 +40,8 @@ function PollOption({ pollOption, messageId }: PollOptionProps): ReactElement {
           onChange={({ target }) => setPollVote(messageId, pollOption.option, target.checked)}
         />
       </Typography.Paragraph>
-      <Typography.Paragraph>
-        {pollOption.votes.length} {pollOption.votes.length === 1 ? 'vote' : 'votes'}:
+      <Typography.Paragraph style={{ color: '#177DDC' }}>
+        {pollOption.votes.length} × <UpCircleTwoTone />
       </Typography.Paragraph>
       <Typography.Paragraph>
         <ReactMarkdown plugins={[gfm]}>{pollOption.option}</ReactMarkdown>

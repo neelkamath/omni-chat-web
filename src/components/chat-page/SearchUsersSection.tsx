@@ -1,5 +1,5 @@
-import React, { ReactElement, useState } from 'react';
-import { Button, Input, Space, Typography } from 'antd';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { Button, Input, Space, Spin, Typography } from 'antd';
 import { Storage } from '../../Storage';
 import ActionableUserCard, { CardExtra, CardPopconfirmation } from './ActionableUserCard';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,15 +11,25 @@ export interface SearchUsersSectionProps {
   readonly extraRenderer?: CardExtra;
 }
 
-// TODO: Display a spinner while the initial state is getting fetched.
 export default function SearchUsersSection({
   type,
   popconfirmation,
   extraRenderer,
 }: SearchUsersSectionProps): ReactElement {
-  const query = useSelector(SearchedUsersSlice.selectQuery);
   const dispatch = useDispatch();
+  const query = useSelector(SearchedUsersSlice.selectQuery);
   if (query === undefined) dispatch(SearchedUsersSlice.fetchInitialState(type));
+  const isLoading = useSelector(SearchedUsersSlice.selectIsFetchingInitialState);
+  const [section, setSection] = useState(<Spin />);
+  useEffect(() => {
+    if (!isLoading)
+      setSection(
+        <>
+          <Users popconfirmation={popconfirmation} extraRenderer={extraRenderer} />
+          {query !== undefined && <LoadMoreUsersButton type={type} />}
+        </>,
+      );
+  }, [popconfirmation, extraRenderer, query, type, isLoading]);
   let text: string;
   switch (type) {
     case 'CONTACTS':
@@ -36,8 +46,7 @@ export default function SearchUsersSection({
       <Typography.Text>Search {text} by their name, username, or email address.</Typography.Text>
       <Space direction='vertical'>
         <SearchUsersForm type={type} />
-        <Users popconfirmation={popconfirmation} extraRenderer={extraRenderer} />
-        {query !== undefined && <LoadMoreUsersButton type={type} />}
+        {section}
       </Space>
     </Space>
   );
@@ -70,14 +79,13 @@ interface LoadMoreUsersButtonProps {
 function LoadMoreUsersButton({ type }: LoadMoreUsersButtonProps): ReactElement {
   const hasNextPage = useSelector(SearchedUsersSlice.selectHasNextPage);
   const dispatch = useDispatch();
-  const [isLoading, setLoading] = useState(false); // FIXME: This should only stop loading once the users have been fetched.
-  const onClick = async () => {
-    setLoading(true);
-    dispatch(SearchedUsersSlice.fetchAdditional(type));
-    setLoading(false);
-  };
+  const isLoading = useSelector(SearchedUsersSlice.selectIsFetchingAdditional);
   return (
-    <Button loading={isLoading} disabled={!hasNextPage} onClick={onClick}>
+    <Button
+      loading={isLoading}
+      disabled={!hasNextPage}
+      onClick={() => dispatch(SearchedUsersSlice.fetchAdditional(type))}
+    >
       {hasNextPage ? 'Load' : 'No'} more users
     </Button>
   );

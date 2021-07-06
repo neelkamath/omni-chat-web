@@ -37,6 +37,7 @@ export default function ChatMessage({ chatId, message }: ChatMessageProps): Reac
   return (
     <Row justify='space-between' align='middle'>
       <Comment
+        style={{ maxWidth: 925 } /* <Options> displays on a new line for pic messages if we don't set the <width>. */}
         avatar={<CustomPic icon={<UserOutlined />} url={url} />}
         author={<Author username={username} isForwarded={message.isForwarded} />}
         content={<MessageContent message={message} />}
@@ -104,6 +105,6 @@ function PicMessageContent({ messageId }: PicMessageContentProps): ReactElement 
     dispatch(PicMessagesSlice.fetch(messageId));
   }, [dispatch, messageId]);
   const url = useSelector((state: RootState) => PicMessagesSlice.selectPic(state, messageId)).originalUrl;
-  // FIXME: Set the width to be at most 50% instead of 50% because otherwise small images get enlarged excessively.
+  // FIXME: Set the width to be at most 50% instead of 50% because otherwise small images get enlarged excessively. Check what happens if you put a thin but tall image.
   return url === undefined ? <Spin size='small' /> : <Image src={url} width='25%' />;
 }

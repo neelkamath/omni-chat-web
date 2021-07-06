@@ -43,6 +43,8 @@ export namespace SearchedUsersSlice {
     readonly query?: string;
     /** Pagination (i.e., {@link PageInfo} parameter). `undefined` if no users have been searched for yet. */
     readonly hasNextPage?: boolean;
+    readonly isFetchingInitialState: boolean;
+    readonly isFetchingAdditional: boolean;
   }
 
   interface AccountsConnection {
@@ -97,7 +99,7 @@ export namespace SearchedUsersSlice {
    */
   export const fetchInitialState = createAsyncThunk(`${sliceName}/fetchInitialState`, async (type: SearchUsersType) => {
     const query = '';
-    let connection: AccountsConnection | undefined;
+    let connection: AccountsConnection | undefined = undefined;
     switch (type) {
       case 'BLOCKED_USERS': {
         const response = await searchBlockedUsers(query, pagination);
@@ -225,14 +227,21 @@ export namespace SearchedUsersSlice {
 
   const slice = createSlice({
     name: sliceName,
-    initialState: adapter.getInitialState() as State,
+    initialState: adapter.getInitialState({ isFetchingInitialState: false, isFetchingAdditional: false }) as State,
     reducers: { clear: reduceClear, removeOne: adapter.removeOne },
     extraReducers: (builder) => {
       builder
+        .addCase(fetchAdditional.pending, (state) => {
+          state.isFetchingAdditional = true;
+        })
         .addCase(fetchAdditional.fulfilled, (state, { payload }) => {
+          state.isFetchingAdditional = false;
           if (payload === undefined) return;
           state.hasNextPage = payload.pageInfo.hasNextPage;
           adapter.addMany(state, payload.edges);
+        })
+        .addCase(fetchAdditional.rejected, (state) => {
+          state.isFetchingAdditional = false;
         })
         .addCase(fetchReplacement.fulfilled, (state, { payload }) => {
           if (payload?.connection === undefined) return;
@@ -240,11 +249,18 @@ export namespace SearchedUsersSlice {
           state.hasNextPage = payload.connection.pageInfo.hasNextPage;
           adapter.setAll(state, payload.connection.edges);
         })
+        .addCase(fetchInitialState.pending, (state) => {
+          state.isFetchingInitialState = true;
+        })
         .addCase(fetchInitialState.fulfilled, (state, { payload }) => {
-          if (payload === undefined) return;
+          state.isFetchingInitialState = false;
           state.query = '';
+          if (payload === undefined) return;
           state.hasNextPage = payload.pageInfo.hasNextPage;
           adapter.setAll(state, payload.edges);
+        })
+        .addCase(fetchInitialState.rejected, (state) => {
+          state.isFetchingInitialState = false;
         });
     },
   });
@@ -262,6 +278,16 @@ export namespace SearchedUsersSlice {
 
   export const selectHasNextPage = createSelector(
     ({ searchedUsers }: RootState) => searchedUsers.hasNextPage ?? false,
-    (hasNextPage: boolean | undefined) => hasNextPage,
+    (hasNextPage: boolean) => hasNextPage,
+  );
+
+  export const selectIsFetchingInitialState = createSelector(
+    ({ searchedUsers }: RootState) => searchedUsers,
+    ({ isFetchingInitialState }: State) => isFetchingInitialState,
+  );
+
+  export const selectIsFetchingAdditional = createSelector(
+    ({ searchedUsers }: RootState) => searchedUsers,
+    ({ isFetchingAdditional }: State) => isFetchingAdditional,
   );
 }

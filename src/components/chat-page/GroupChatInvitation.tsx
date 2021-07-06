@@ -6,8 +6,9 @@ import ReactMarkdown from 'react-markdown';
 import gfm from 'remark-gfm';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { Storage } from '../../Storage';
-import store from '../../store/store';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
+import { useDispatch } from 'react-redux';
+import GroupChatPic from './GroupChatPic';
 
 export interface GroupChatInvitationProps {
   /**
@@ -15,30 +16,33 @@ export interface GroupChatInvitationProps {
    * code of a group chat.
    */
   readonly data: number | Uuid;
+  readonly invitedChatId: number;
   readonly title: GroupChatTitle;
   readonly description: GroupChatDescription;
   readonly isBroadcast: boolean;
   readonly publicity: GroupChatPublicity;
 }
 
-// TODO: Once Omni Chat Backend 0.23.0 releases, disable the join button if the user is already in the chat.
 export default function GroupChatInvitation({
   data,
+  invitedChatId,
   description,
   publicity,
   title,
   isBroadcast,
 }: GroupChatInvitationProps): ReactElement {
+  const dispatch = useDispatch();
   const [isLoading, setLoading] = useState(false);
   const onClick = async () => {
     setLoading(true);
-    typeof data === 'number' ? await operateJoinPublicChat(data) : await operateJoinGroupChat(data);
+    const hasJoined = typeof data === 'number' ? await operateJoinPublicChat(data) : await operateJoinGroupChat(data);
     setLoading(false);
+    if (hasJoined) dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_SECTION', chatId: invitedChatId }));
   };
   return (
     <Card>
-      {/* TODO: Once Omni ChatBackend 0.23.0 releases, pass the invited chat's ID to <Card.Meta>: avatar={<GroupChatPic chatId={chatId} />} */}
       <Card.Meta
+        avatar={<GroupChatPic chatId={invitedChatId} />}
         title={
           <Row gutter={16} justify='space-between'>
             <Col>{title}</Col>
@@ -60,21 +64,25 @@ export default function GroupChatInvitation({
   );
 }
 
-async function operateJoinPublicChat(chatId: number): Promise<void> {
+/** @returns boolean Whether the `chatId` was joined. */
+async function operateJoinPublicChat(chatId: number): Promise<boolean> {
   const result = await joinPublicChat(chatId);
   if (result?.joinPublicChat === null) {
     message.success("You've joined the chat.", 5);
-    store.dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_SECTION', chatId })); // FIXME: Doesn't open the chat.
+    return true;
   } else if (result?.joinPublicChat.__typename === 'InvalidChatId') message.error('The chat no longer exists.', 5);
+  return false;
 }
 
-async function operateJoinGroupChat(inviteCode: Uuid): Promise<void> {
+/** @returns boolean Whether the `chatId` was joined. */
+async function operateJoinGroupChat(inviteCode: Uuid): Promise<boolean> {
   const result = await joinGroupChat(inviteCode);
   if (result?.joinGroupChat === null) {
     message.success("You've joined the chat.", 5);
-    // TODO: Once Omni Chat Backend 0.23.0 releases, open the chat upon joining: store.dispatch(ChatPageLayoutSlice.update({ type: 'CHAT_SECTION', chatId }));
+    return true;
   } else if (result?.joinGroupChat.__typename === 'InvalidInviteCode')
     message.error('The chat is no longer accepting invitations.', 5);
+  return false;
 }
 
 interface JoinGroupChatResult {

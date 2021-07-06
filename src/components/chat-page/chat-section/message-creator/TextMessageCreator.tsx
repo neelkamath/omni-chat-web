@@ -12,7 +12,6 @@ export interface TextMessageCreatorProps {
   readonly chatId: number;
 }
 
-// FIXME: After sending a text message, the focus on the text field gets lost.
 export default function TextMessageCreator({ chatId }: TextMessageCreatorProps): ReactElement {
   const [form] = useForm();
   const onPressEnter = async (text: string) => {
@@ -23,7 +22,7 @@ export default function TextMessageCreator({ chatId }: TextMessageCreatorProps):
   };
   return (
     <Form name='createTextMessage' form={form}>
-      <GfmFormItem minLength={1} maxLength={10_000} name='text' onPressEnter={onPressEnter} />
+      <GfmFormItem autoFocus minLength={1} maxLength={10_000} name='text' onPressEnter={onPressEnter} />
     </Form>
   );
 }

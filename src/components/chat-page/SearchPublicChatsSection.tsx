@@ -20,7 +20,9 @@ export default function SearchPublicChatsSection(): ReactElement {
 
 function Chats(): ReactElement {
   const chats = useSelector(SearchedPublicChatsSlice.selectAll);
-  const cards = chats.map(({ node }) => <GroupChatInvitation key={node.chatId} data={node.chatId} {...node} />);
+  const cards = chats.map(({ node }) => (
+    <GroupChatInvitation invitedChatId={node.chatId} key={node.chatId} data={node.chatId} {...node} />
+  ));
   return <Space direction='vertical'>{cards}</Space>;
 }
 

@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { Button, Form, Input, message, Spin, Typography } from 'antd';
+import { Button, Col, Form, Input, message, Row, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { GroupChatTitle, queryOrMutate } from '@neelkamath/omni-chat';
 import { RootState } from '../../../store/store';
@@ -34,7 +34,6 @@ interface UpdateTitleFormProps {
   readonly chatId: number;
 }
 
-// TODO: Set to parent element's width.
 function UpdateTitleForm({ chatId }: UpdateTitleFormProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -49,15 +48,21 @@ function UpdateTitleForm({ chatId }: UpdateTitleFormProps): ReactElement {
     setLoading(false);
   };
   return (
-    <Form onFinish={onFinish} name='updateGroupChatTitle' layout='inline'>
-      <Form.Item name='title' label='Title' initialValue={title}>
-        <Input maxLength={70} minLength={1} />
-      </Form.Item>
-      <Form.Item>
-        <Button type='primary' htmlType='submit' loading={isLoading}>
-          Update
-        </Button>
-      </Form.Item>
+    <Form onFinish={onFinish} name='updateGroupChatTitle' style={{ width: '100%' }}>
+      <Row gutter={16}>
+        <Col span={21}>
+          <Form.Item name='title' label='Title' initialValue={title}>
+            <Input maxLength={70} minLength={1} />
+          </Form.Item>
+        </Col>
+        <Col span={3}>
+          <Form.Item>
+            <Button type='primary' htmlType='submit' loading={isLoading}>
+              Update
+            </Button>
+          </Form.Item>
+        </Col>
+      </Row>
     </Form>
   );
 }

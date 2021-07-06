@@ -9,6 +9,8 @@ import { NamePath } from 'antd/lib/form/interface';
 export interface GfmFormItemProps {
   readonly name?: NamePath;
   readonly fieldKey?: React.Key | React.Key[];
+  /** `false` if `undefined`. */
+  readonly autoFocus?: boolean;
   readonly initialValue?: string;
   readonly placeholder?: string;
   readonly minLength?: number;
@@ -39,6 +41,7 @@ export interface GfmFormItemProps {
 export default function GfmFormItem({
   placeholder,
   maxLength,
+  autoFocus = false,
   minLength,
   name,
   label,
@@ -58,6 +61,7 @@ export default function GfmFormItem({
       <Tabs.TabPane tab={<EditTab />} key={1}>
         <Form.Item fieldKey={fieldKey} name={name} label={label} initialValue={value} rules={rules}>
           <Input.TextArea
+            autoFocus={autoFocus}
             showCount
             placeholder={placeholder}
             maxLength={maxLength}

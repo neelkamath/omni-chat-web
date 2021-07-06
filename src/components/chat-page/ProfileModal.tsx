@@ -12,6 +12,8 @@ import { queryOrMutate } from '@neelkamath/omni-chat';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
 import { RootState } from '../../store/store';
 import operateCreatePrivateChat from '../../operateCreatePrivateChat';
+import gfm from 'remark-gfm';
+import ReactMarkdown from 'react-markdown';
 
 export interface ProfileModalProps {
   readonly userId: number;
@@ -72,7 +74,7 @@ function ProfileSection({ userId, hasChatButton }: ProfileSectionProps): ReactEl
       </List.Item>
       {user.bio.length > 0 && (
         <List.Item>
-          <Typography.Text strong>Bio</Typography.Text>: {user.bio}
+          <Typography.Text strong>Bio</Typography.Text>: <ReactMarkdown plugins={[gfm]}>{user.bio}</ReactMarkdown>
         </List.Item>
       )}
       <List.Item>

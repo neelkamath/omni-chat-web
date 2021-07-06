@@ -12,7 +12,6 @@ export interface PublicitySectionProps {
   readonly chatId: number;
 }
 
-// FIXME: The publicity's value doesn't get updated for non-admins because we use <initialValues> on the form.
 export default function PublicitySection({ chatId }: PublicitySectionProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {

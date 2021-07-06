@@ -420,12 +420,11 @@ export namespace ChatsSlice {
     adapter.removeOne(state, chat.chatId);
   }
 
-  // TODO: Test.
   function reduceUpdatePoll(state: Draft<State>, { payload }: PayloadAction<UpdatedPollMessage>): State | void {
     const messages = state.entities[payload.chatId]?.messages;
     if (messages === undefined) return;
     messages.edges = messages.edges.map((edge) => {
-      if (edge.node.__typename === 'PollMessage') (edge.node as Draft<PollMessage>).poll = payload.poll;
+      if (edge.node.messageId === payload.messageId) (edge.node as Draft<PollMessage>).poll = payload.poll;
       return edge;
     });
   }
@@ -483,8 +482,11 @@ export namespace ChatsSlice {
       case 'NewVideoMessage':
         node.__typename = 'VideoMessage';
     }
-    // TODO: New messages may not be received in order. So, instead of pushing it directly, place it in sorted order.
-    state.entities[payload.chatId]?.messages.edges.push({ node });
+    const messages = state.entities[payload.chatId]?.messages;
+    if (messages === undefined) return;
+    let index = 0;
+    while (index < messages.edges.length && node.messageId > messages.edges[index]!.node.messageId) index++;
+    messages.edges.splice(index, 0, { node });
   }
 
   const slice = createSlice({

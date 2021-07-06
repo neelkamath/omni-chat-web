@@ -32,8 +32,8 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
   );
   return (
     <Row gutter={16}>
-      <Col>{creator}</Col>
-      <Col>
+      <Col span={23}>{creator}</Col>
+      <Col span={1}>
         <Dropdown overlay={menu}>
           <MessageOutlined style={{ fontSize: 24 }} />
         </Dropdown>
