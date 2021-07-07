@@ -1,9 +1,9 @@
 import React, { ReactElement, useState } from 'react';
 import { Col, Dropdown, Menu, Row, Space } from 'antd';
-import { EditOutlined, MessageOutlined, PictureOutlined, TableOutlined } from '@ant-design/icons';
-import PicMessageCreator from './PicMessageCreator';
+import { EditOutlined, FileOutlined, MessageOutlined, PictureOutlined, TableOutlined } from '@ant-design/icons';
 import TextMessageCreator from './TextMessageCreator';
 import PollMessageCreator from './PollMessageCreator';
+import MediaMessageCreator from './MediaMessageCreator';
 
 export interface MessageCreatorProps {
   readonly chatId: number;
@@ -14,19 +14,16 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
   const menu = (
     <Menu>
       <Menu.Item key={1} onClick={() => setCreator(<TextMessageCreator chatId={chatId} />)}>
-        <Space>
-          <EditOutlined /> Text
-        </Space>
+        <TextItem />
       </Menu.Item>
-      <Menu.Item key={2} onClick={() => setCreator(<PicMessageCreator chatId={chatId} />)}>
-        <Space>
-          <PictureOutlined /> Picture
-        </Space>
+      <Menu.Item key={2} onClick={() => setCreator(<MediaMessageCreator type='IMAGE' chatId={chatId} />)}>
+        <ImagesItem />
       </Menu.Item>
-      <Menu.Item key={3} onClick={() => setCreator(<PollMessageCreator chatId={chatId} />)}>
-        <Space>
-          <TableOutlined /> Poll
-        </Space>
+      <Menu.Item key={3} onClick={() => setCreator(<MediaMessageCreator type='DOC' chatId={chatId} />)}>
+        <DocumentsItem />
+      </Menu.Item>
+      <Menu.Item key={4} onClick={() => setCreator(<PollMessageCreator chatId={chatId} />)}>
+        <PollItem />
       </Menu.Item>
     </Menu>
   );
@@ -39,5 +36,37 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
         </Dropdown>
       </Col>
     </Row>
+  );
+}
+
+function TextItem(): ReactElement {
+  return (
+    <Space>
+      <EditOutlined /> Text
+    </Space>
+  );
+}
+
+function ImagesItem(): ReactElement {
+  return (
+    <Space>
+      <PictureOutlined /> Images
+    </Space>
+  );
+}
+
+function DocumentsItem(): ReactElement {
+  return (
+    <Space>
+      <FileOutlined /> Documents
+    </Space>
+  );
+}
+
+function PollItem(): ReactElement {
+  return (
+    <Space>
+      <TableOutlined /> Poll
+    </Space>
   );
 }

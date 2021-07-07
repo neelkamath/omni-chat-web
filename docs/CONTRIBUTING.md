@@ -38,7 +38,6 @@ Here's how to test the production build:
 ## Design
 
 - The theme color is `#177DDC`.
-- Only use Ant Design components (i.e., don't use components from other design systems, or vanilla HTML components such as `<span>`).
 - Only use icons from [Ant Design](https://ant.design/components/icon/).
 - Only use illustrations from [unDraw](https://undraw.co/). The illustration's theme color must match that of the app's. Save the image to [`src/images/`](../src/images) with the name being the same as the caption given on unDraw.
 - Padding from the edges of the screen, and between elements is `16px`.

@@ -10,47 +10,36 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { httpApiConfig, operateRestApi } from '../../api';
-import { getPicMessage } from '@neelkamath/omni-chat';
+import { getDocMessage } from '@neelkamath/omni-chat';
 import { Storage } from '../../Storage';
 import { RootState } from '../store';
 
-/** The URLs of picture messages. */
-export namespace PicMessagesSlice {
-  const sliceName = 'picMessages';
+/** The URLs of doc messages. */
+export namespace DocMessagesSlice {
+  const sliceName = 'docMessages';
   const adapter: EntityAdapter<Entity> = createEntityAdapter({ selectId: ({ messageId }) => messageId });
 
-  export interface Entity extends Pic {
+  export interface Entity {
     readonly messageId: number;
+    readonly url?: string;
     readonly isLoading: boolean;
-  }
-
-  export interface Pic {
-    readonly thumbnailUrl?: string;
-    readonly originalUrl?: string;
   }
 
   export const fetch = createAsyncThunk(
     `${sliceName}/fetch`,
     async (messageId: number) => {
-      const thumbnail = await operateRestApi(() =>
-        getPicMessage(httpApiConfig, Storage.readAccessToken(), messageId, 'THUMBNAIL'),
-      );
-      const original = await operateRestApi(() =>
-        getPicMessage(httpApiConfig, Storage.readAccessToken(), messageId, 'ORIGINAL'),
-      );
+      const doc = await operateRestApi(() => getDocMessage(httpApiConfig, Storage.readAccessToken(), messageId));
       return {
         messageId,
-        thumbnailUrl: thumbnail === undefined ? undefined : URL.createObjectURL(thumbnail),
-        originalUrl: original === undefined ? undefined : URL.createObjectURL(original),
+        url: doc === undefined ? undefined : URL.createObjectURL(doc),
         isLoading: false,
       };
     },
     {
       condition: (messageId, { getState }) => {
-        const { picMessages } = getState() as { picMessages: EntityState<Entity> };
-        const pic = picMessages.entities[messageId];
-        if (pic === undefined) return true;
-        return (pic.originalUrl === undefined || pic.thumbnailUrl === undefined) && !pic.isLoading;
+        const { docMessages } = getState() as { docMessages: EntityState<Entity> };
+        const doc = docMessages.entities[messageId];
+        return doc === undefined || !doc.isLoading;
       },
     },
   );
@@ -71,10 +60,10 @@ export namespace PicMessagesSlice {
         .addCase(fetch.rejected, ({ entities }, { meta }) => {
           entities[meta.arg]!.isLoading = false;
         })
-        .addCase(fetch.fulfilled, adapter.upsertOne)
         .addCase(fetch.pending, (state, { meta }) => {
           adapter.upsertOne(state, { messageId: meta.arg, isLoading: true });
-        });
+        })
+        .addCase(fetch.fulfilled, adapter.upsertOne);
     },
   });
 
@@ -82,23 +71,20 @@ export namespace PicMessagesSlice {
 
   export const { deleteMessage } = slice.actions;
 
-  /** Returns `true` if either the pic hasn't been fetched or is being fetched, and `false` if it has been fetched. */
+  /** Returns `true` if either the doc hasn't been fetched or is being fetched, and `false` if it has been fetched. */
   export const selectIsLoading = createSelector(
-    (state: RootState) => state.picMessages.entities,
+    (state: RootState) => state.docMessages.entities,
     (_: RootState, messageId: number) => messageId,
     (entities: Dictionary<Entity>, messageId: number) => entities[messageId]?.isLoading !== false,
   );
 
   /**
-   * Returns the specified message's pic whose URLs may be `undefined` if they haven't been fetched yet.
+   * Returns the specified message's doc whose URLs may be `undefined` if they haven't been fetched yet.
    * @see selectIsLoading
    */
-  export const selectPic = createSelector(
-    (state: RootState) => state.picMessages.entities,
+  export const selectDoc = createSelector(
+    (state: RootState) => state.docMessages.entities,
     (_: RootState, messageId: number) => messageId,
-    (entities: Dictionary<Entity>, messageId: number) => {
-      const entity = entities[messageId];
-      return { thumbnailUrl: entity?.thumbnailUrl, originalUrl: entity?.originalUrl };
-    },
+    (entities: Dictionary<Entity>, messageId: number) => entities[messageId]?.url,
   );
 }

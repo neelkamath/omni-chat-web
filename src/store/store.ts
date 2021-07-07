@@ -10,6 +10,7 @@ import { ChatPageLayoutSlice } from './slices/ChatPageLayoutSlice';
 import { PicMessagesSlice } from './slices/PicMessagesSlice';
 import { SearchedPublicChatsSlice } from './slices/SearchedPublicChatsSlice';
 import { AccountsSlice } from './slices/AccountsSlice';
+import { DocMessagesSlice } from './slices/DocMessagesSlice';
 
 /**
  * - `'IDLE'` indicates that either the entities have never been fetched or an error occurred during the last fetch.
@@ -30,6 +31,7 @@ const store = configureStore({
     typingStatuses: TypingStatusesSlice.reducer,
     chatPageLayout: ChatPageLayoutSlice.reducer,
     picMessages: PicMessagesSlice.reducer,
+    docMessages: DocMessagesSlice.reducer,
     searchedPublicChats: SearchedPublicChatsSlice.reducer,
   },
 });

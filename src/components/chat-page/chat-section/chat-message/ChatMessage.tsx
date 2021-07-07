@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect } from 'react';
-import { Comment, Image, Row, Space, Spin, Typography } from 'antd';
+import { Button, Comment, Image, Row, Space, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { UserOutlined } from '@ant-design/icons';
+import { DownloadOutlined, UserOutlined } from '@ant-design/icons';
 import { RootState } from '../../../../store/store';
 import { PicsSlice } from '../../../../store/slices/PicsSlice';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
@@ -15,6 +15,7 @@ import GroupChatInviteMessageContent from './GroupChatInviteMessageContent';
 import { AccountsSlice } from '../../../../store/slices/AccountsSlice';
 import Options from './Options';
 import { DateTime, Username } from '@neelkamath/omni-chat';
+import { DocMessagesSlice } from '../../../../store/slices/DocMessagesSlice';
 
 export interface ChatMessageProps {
   readonly chatId: number;
@@ -87,9 +88,10 @@ function MessageContent({ message }: MessageContentProps): ReactElement {
       return <PollMessageContent message={message as ChatsSlice.PollMessage} />;
     case 'GroupChatInviteMessage':
       return <GroupChatInviteMessageContent inviteCode={(message as ChatsSlice.GroupChatInviteMessage).inviteCode} />;
+    case 'DocMessage':
+      return <DocMessageContent messageId={message.messageId} />;
     case 'ActionMessage':
     case 'AudioMessage':
-    case 'DocMessage':
     case 'VideoMessage':
       return <>Not implemented.</>;
   }
@@ -106,5 +108,27 @@ function PicMessageContent({ messageId }: PicMessageContentProps): ReactElement 
   }, [dispatch, messageId]);
   const url = useSelector((state: RootState) => PicMessagesSlice.selectPic(state, messageId)).originalUrl;
   // FIXME: Set the width to be at most 50% instead of 50% because otherwise small images get enlarged excessively. Check what happens if you put a thin but tall image.
-  return url === undefined ? <Spin size='small' /> : <Image src={url} width='25%' />;
+  return url === undefined ? <Spin size='small' /> : <Image src={url} width='33%' />;
+}
+
+interface DocMessageContentProps {
+  readonly messageId: number;
+}
+
+function DocMessageContent({ messageId }: DocMessageContentProps): ReactElement {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(DocMessagesSlice.fetch(messageId));
+  }, [dispatch, messageId]);
+  const url = useSelector((state: RootState) => DocMessagesSlice.selectDoc(state, messageId));
+  if (url === undefined) return <Spin />;
+  return (
+    <Button>
+      <Typography.Link download href={url}>
+        <Space>
+          <DownloadOutlined /> Download
+        </Space>
+      </Typography.Link>
+    </Button>
+  );
 }
