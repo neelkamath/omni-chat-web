@@ -4,7 +4,7 @@
 
 1. Install the [app](install.md).
 1. Configure the development environment:
-   1. Copy the [`.env`](.env) file to the project's root directory.
+   1. Copy the [`.env.development`](.env.development) file to the project's root directory.
    1. If you're not running the Omni Chat API on `localhost`, change the value of the `API_URL` key (e.g., `localhost:8080`, `example.com/api`).
    1. If the API server has an SSL certificate, change the values of the `HTTP` and `WS` keys to `https` and `wss` respectively.
 
