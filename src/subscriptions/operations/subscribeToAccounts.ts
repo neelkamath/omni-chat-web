@@ -142,7 +142,7 @@ async function onMessage(
 }
 
 /** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToAccounts`. */
-export async function subscribeToAccounts(): Promise<void> {
+export default async function subscribeToAccounts(): Promise<void> {
   verifySubscriptionCreation(subscriptionClosers.onAccountsSubscriptionClose);
   return new Promise((resolve) => {
     subscriptionClosers.onAccountsSubscriptionClose = subscribe(

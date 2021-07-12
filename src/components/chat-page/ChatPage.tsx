@@ -21,9 +21,13 @@ import logOut from '../../logOut';
 export default function ChatPage(): ReactElement {
   const [page, setPage] = useState(<LoadingPage />);
   useEffect(() => {
+    const setOnlineStatus = false;
+    if (Storage.readRefreshToken() === undefined) {
+      logOut();
+      return;
+    }
     refreshTokenSet().then(async (response) => {
       if (response === undefined) {
-        const setOnlineStatus = false;
         await logOut(setOnlineStatus);
         return;
       }

@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { HashRouter, Route, Switch } from 'react-router-dom';
 import HomePage from './home-page/HomePage';
 import RegistrationPage from './registration-page/RegistrationPage';
 import SignInPage from './sign-in-page/SignInPage';
@@ -18,7 +18,7 @@ export default function App(): ReactElement {
 
 function Router(): ReactElement {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Switch>
         <Route exact path='/' component={HomePage} />
         <Route exact path='/register' component={RegistrationPage} />
@@ -26,6 +26,6 @@ function Router(): ReactElement {
         <Route exact path='/chat' component={ChatPage} />
         <Route exact path='/developers' component={DevelopersPage} />
       </Switch>
-    </BrowserRouter>
+    </HashRouter>
   );
 }

@@ -47,7 +47,7 @@ async function onMessage(
 }
 
 /** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToOnlineStatuses`. */
-export async function subscribeToOnlineStatuses(): Promise<void> {
+export default async function subscribeToOnlineStatuses(): Promise<void> {
   verifySubscriptionCreation(subscriptionClosers.onOnlineStatusesSubscriptionClose);
   return new Promise((resolve) => {
     subscriptionClosers.onOnlineStatusesSubscriptionClose = subscribe(

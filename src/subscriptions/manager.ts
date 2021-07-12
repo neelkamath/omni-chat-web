@@ -1,9 +1,9 @@
 import { OnSocketClose } from '@neelkamath/omni-chat';
-import { subscribeToTypingStatuses } from './operations/subscribeToTypingStatuses';
-import { subscribeToOnlineStatuses } from './operations/subscribeToOnlineStatuses';
-import { subscribeToMessages } from './operations/subscribeToMessages';
-import { subscribeToChats } from './operations/subscribeToChats';
-import { subscribeToAccounts } from './operations/subscribeToAccounts';
+import subscribeToTypingStatuses from './operations/subscribeToTypingStatuses';
+import subscribeToOnlineStatuses from './operations/subscribeToOnlineStatuses';
+import subscribeToMessages from './operations/subscribeToMessages';
+import subscribeToChats from './operations/subscribeToChats';
+import subscribeToAccounts from './operations/subscribeToAccounts';
 
 export type PromiseResolver = (value: void | PromiseLike<void>) => void;
 

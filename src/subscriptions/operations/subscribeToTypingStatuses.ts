@@ -49,7 +49,7 @@ async function onMessage(
 }
 
 /** Keeps the {@link store} up-to-date with events from the GraphQL subscription `subscribeToTypingStatuses`. */
-export async function subscribeToTypingStatuses(): Promise<void> {
+export default async function subscribeToTypingStatuses(): Promise<void> {
   verifySubscriptionCreation(subscriptionClosers.onTypingStatusesSubscriptionClose);
   return new Promise((resolve) => {
     subscriptionClosers.onTypingStatusesSubscriptionClose = subscribe(

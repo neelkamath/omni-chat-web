@@ -25,33 +25,29 @@ export default function HomeLayout({ children }: HomeLayoutProps): ReactElement 
 
 function HeaderMenu(): ReactElement {
   return (
-    <Menu theme='dark' mode='horizontal' defaultSelectedKeys={[location.pathname]}>
-      <Menu.Item key='/'>
+    <Menu theme='dark' mode='horizontal' defaultSelectedKeys={[location.hash]}>
+      <Menu.Item key='#/'>
         <Link component={Typography.Link} to='/'>
           <Space>
             <HomeOutlined /> Home
           </Space>
         </Link>
       </Menu.Item>
-      <Menu.Item key='/register'>
+      <Menu.Item key='#/register'>
         <Link component={Typography.Link} to='/register'>
           <Space>
             <UserAddOutlined /> Register
           </Space>
         </Link>
       </Menu.Item>
-      <Menu.Item key='/sign-in'>
-        <Typography.Link
-          onClick={() => {
-            location.href = Storage.readTokenSet() === undefined ? '/sign-in' : '/chat';
-          }}
-        >
+      <Menu.Item key='#/sign-in'>
+        <Link component={Typography.Link} to={Storage.readTokenSet() === undefined ? '/sign-in' : '/chat'}>
           <Space>
             <LoginOutlined /> Sign In
           </Space>
-        </Typography.Link>
+        </Link>
       </Menu.Item>
-      <Menu.Item key='/developers'>
+      <Menu.Item key='#/developers'>
         <Link component={Typography.Link} to='/developers'>
           <Space>
             <CodeOutlined /> Developers

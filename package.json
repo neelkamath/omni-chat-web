@@ -6,6 +6,7 @@
     "lint": "eslint . && prettier -c . && tsc --noEmit",
     "fix": "eslint --fix . && prettier -w . && tsc --noEmit"
   },
+  "homepage": "/#/",
   "devDependencies": {
     "@types/node": "14.14.34",
     "@types/react": "17.0.3",
