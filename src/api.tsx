@@ -14,11 +14,14 @@ import {
 import logOut from './logOut';
 
 export const httpApiConfig: HttpApiConfig = {
-  apiUrl: process.env.API_URL!,
+  apiUrl: process.env.API_AUTHORITY!,
   protocol: process.env.HTTP as HttpProtocol,
 };
 
-export const wsApiConfig: WsApiConfig = { apiUrl: process.env.API_URL!, protocol: process.env.WS as WebSocketProtocol };
+export const wsApiConfig: WsApiConfig = {
+  apiUrl: process.env.API_AUTHORITY!,
+  protocol: process.env.WS as WebSocketProtocol,
+};
 
 /**
  * If `true`, the user will be logged out if the operation failed because of an invalid access/refresh token.

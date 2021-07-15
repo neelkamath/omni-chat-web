@@ -12,3 +12,31 @@ jobs:
           node-version: 14
       - run: npm i
       - run: npm run lint
+  host:
+    if: github.ref == 'refs/heads/main'
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      - run: npm i
+      - name: Set env vars
+        env:
+          API_AUTHORITY: ${{ secrets.API_AUTHORITY }}
+          SUPPORT_EMAIL_ADDRESS: ${{ secrets.SUPPORT_EMAIL_ADDRESS }}
+        run: |
+          cat > .env << EOF
+          API_AUTHORITY=$API_AUTHORITY
+          HTTP=https
+          WS=wss
+          API_VERSION=0.24.0
+          SUPPORT_EMAIL_ADDRESS=$SUPPORT_EMAIL_ADDRESS
+          EOF
+      - run: npm run build
+      - uses: crazy-max/ghaction-github-pages@v2
+        with:
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
