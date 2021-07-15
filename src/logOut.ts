@@ -7,5 +7,6 @@ export default async function logOut(setOnlineStatus = true): Promise<void> {
   if (setOnlineStatus) await setOnline(false);
   shutDownSubscriptions();
   Storage.deleteTokenSet();
-  location.href = '/#/sign-in';
+  console.log(location.href);
+  location.href = 'sign-in';
 }
