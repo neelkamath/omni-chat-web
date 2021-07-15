@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "parcel src/index.html",
-    "build": "parcel build src/index.html --public-url /omni-chat-web/#/",
+    "build": "parcel build src/index.html --public-url /omni-chat-web/",
     "lint": "eslint . && prettier -c . && tsc --noEmit",
     "fix": "eslint --fix . && prettier -w . && tsc --noEmit"
   },
