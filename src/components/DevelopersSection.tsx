@@ -25,7 +25,7 @@ function BotSection(): ReactElement {
           API docs
         </Typography.Link>{' '}
         to see how to build a bot or UI integration (e.g., mobile app). The API base URL is{' '}
-        <Typography.Text code>{process.env.API_URL}</Typography.Text>.
+        <Typography.Text code>{process.env.API_AUTHORITY}</Typography.Text>.
       </Col>
       <Col span={7}>
         <Image preview={false} alt='Chat bot' src={chatBotImage} />

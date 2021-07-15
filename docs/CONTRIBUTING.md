@@ -1,11 +1,20 @@
 # Contributing
 
+## Forking
+
+Create the following [encrypted secrets](https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
+
+|          Name           | Explanation                                                                                                       | Example            |
+| :---------------------: | ----------------------------------------------------------------------------------------------------------------- | ------------------ |
+|     `API_AUTHORITY`     | The URL Omni Chat Backend is running on.                                                                          | `example.com`      |
+| `SUPPORT_EMAIL_ADDRESS` | The email address which will be displayed to users when they require help such as when they want to report a bug. | `john@example.com` |
+
 ## Installation
 
 1. Install the [app](install.md).
 1. Configure the development environment:
    1. Copy the [`.env.development`](.env.development) file to the project's root directory.
-   1. If you're not running the Omni Chat API on `localhost`, change the value of the `API_URL` key (e.g., `localhost:8080`, `example.com/api`).
+   1. If you're not running the Omni Chat API on `localhost`, change the value of the `API_AUTHORITY` key (e.g., `localhost:8080`, `example.com/api`).
    1. If the API server has an SSL certificate, change the values of the `HTTP` and `WS` keys to `https` and `wss` respectively.
 
 ## Development
