@@ -25,8 +25,6 @@ export namespace ImageMessagesSlice {
   }
 
   export interface Image {
-    /** `undefined` only if {@link thumbnailUrl} and {@link originalUrl} are `undefined`. */
-    readonly filename?: string;
     readonly thumbnailUrl?: string;
     readonly originalUrl?: string;
   }
@@ -42,7 +40,6 @@ export namespace ImageMessagesSlice {
       );
       return {
         messageId,
-        filename: thumbnail?.filename ?? original?.filename,
         thumbnailUrl: thumbnail === undefined ? undefined : URL.createObjectURL(thumbnail.blob),
         originalUrl: original === undefined ? undefined : URL.createObjectURL(original.blob),
         isLoading: false,

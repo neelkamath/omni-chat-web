@@ -32,8 +32,6 @@ export namespace ImagesSlice {
   export interface Entity {
     readonly id: string; // Generated using <generateId()>.
     readonly type: EntityType;
-    /** `undefined` only if {@link thumbnailUrl} and {@link originalUrl} are `undefined`. */
-    readonly filename?: string;
     readonly thumbnailUrl?: ImageUrl;
     readonly originalUrl?: ImageUrl;
     /** Whether this entity is currently being fetched. */
@@ -95,7 +93,6 @@ export namespace ImagesSlice {
       return {
         id: generateId(type, id),
         type,
-        filename: thumbnail?.filename ?? original?.filename,
         thumbnailUrl: generateUrl(thumbnail),
         originalUrl: generateUrl(original),
         isLoading: false,
