@@ -19,9 +19,14 @@ export namespace DocMessagesSlice {
   const sliceName = 'docMessages';
   const adapter: EntityAdapter<Entity> = createEntityAdapter({ selectId: ({ messageId }) => messageId });
 
-  export interface Entity {
-    readonly messageId: number;
+  export interface DocFile {
+    /** `undefined` only if {@link url} is `undefined`. */
+    readonly filename?: string;
     readonly url?: string;
+  }
+
+  export interface Entity extends DocFile {
+    readonly messageId: number;
     readonly isLoading: boolean;
   }
 
@@ -31,7 +36,8 @@ export namespace DocMessagesSlice {
       const doc = await operateRestApi(() => getDocMessage(httpApiConfig, Storage.readAccessToken(), messageId));
       return {
         messageId,
-        url: doc === undefined ? undefined : URL.createObjectURL(doc),
+        filename: doc?.filename,
+        url: doc === undefined ? undefined : URL.createObjectURL(doc.blob),
         isLoading: false,
       };
     },
@@ -82,9 +88,12 @@ export namespace DocMessagesSlice {
    * Returns the specified message's doc whose URLs may be `undefined` if they haven't been fetched yet.
    * @see selectIsLoading
    */
-  export const selectDoc = createSelector(
+  export const selectFile = createSelector(
     (state: RootState) => state.docMessages.entities,
     (_: RootState, messageId: number) => messageId,
-    (entities: Dictionary<Entity>, messageId: number) => entities[messageId]?.url,
+    (entities: Dictionary<Entity>, messageId: number): DocFile => {
+      const entity = entities[messageId];
+      return { filename: entity?.filename, url: entity?.url };
+    },
   );
 }

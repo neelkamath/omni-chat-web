@@ -1,7 +1,7 @@
 import { ChatsSlice } from '../../../store/slices/ChatsSlice';
 import React, { MouseEventHandler, ReactElement, ReactNode, useEffect, useState } from 'react';
 import { Button, Col, Row, Tag, Typography } from 'antd';
-import ChatPic from '../ChatPic';
+import ChatImage from '../ChatImage';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import ProfileModal from '../ProfileModal';
 import { useDispatch, useSelector } from 'react-redux';
@@ -44,7 +44,7 @@ export default function Header({ chat }: HeaderProps): ReactElement {
   return (
     <Row gutter={16}>
       <Col>
-        <ChatPic chat={chat} />
+        <ChatImage chat={chat} />
       </Col>
       <Col>
         <Typography.Text style={{ color: 'white' }} strong>

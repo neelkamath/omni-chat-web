@@ -43,7 +43,7 @@ export namespace ChatsSlice {
     readonly __typename:
       | 'TextMessage'
       | 'ActionMessage'
-      | 'PicMessage'
+      | 'ImageMessage'
       | 'PollMessage'
       | 'AudioMessage'
       | 'DocMessage'
@@ -74,7 +74,7 @@ export namespace ChatsSlice {
     readonly text: MessageText;
   }
 
-  export interface PicMessage extends Message {
+  export interface ImageMessage extends Message {
     readonly caption: MessageText;
   }
 
@@ -168,7 +168,7 @@ export namespace ChatsSlice {
                 text
               }
             }
-            ... on PicMessage {
+            ... on ImageMessage {
               caption
             }
             ... on GroupChatInviteMessage {
@@ -301,7 +301,7 @@ export namespace ChatsSlice {
       | 'NewAudioMessage'
       | 'NewDocMessage'
       | 'NewGroupChatInviteMessage'
-      | 'NewPicMessage'
+      | 'NewImageMessage'
       | 'NewPollMessage'
       | 'NewTextMessage'
       | 'NewVideoMessage';
@@ -331,8 +331,8 @@ export namespace ChatsSlice {
     readonly actions: MessageText[];
   }
 
-  export interface NewPicMessage extends NewMessage {
-    readonly __typename: 'NewPicMessage';
+  export interface NewImageMessage extends NewMessage {
+    readonly __typename: 'NewImageMessage';
     readonly caption: MessageText;
   }
 
@@ -461,9 +461,9 @@ export namespace ChatsSlice {
         node.__typename = 'ActionMessage';
         node.actionableMessage = (payload as NewActionMessage).actionableMessage;
         break;
-      case 'NewPicMessage':
-        node.__typename = 'PicMessage';
-        node.caption = (payload as NewPicMessage).caption;
+      case 'NewImageMessage':
+        node.__typename = 'ImageMessage';
+        node.caption = (payload as NewImageMessage).caption;
         break;
       case 'NewPollMessage':
         node.__typename = 'PollMessage';

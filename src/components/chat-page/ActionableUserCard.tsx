@@ -3,8 +3,8 @@ import { UserOutlined } from '@ant-design/icons';
 import { Card, Col, Popconfirm, Row, Spin, Typography } from 'antd';
 import ProfileModal from './ProfileModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { PicsSlice } from '../../store/slices/PicsSlice';
-import CustomPic from './CustomPic';
+import { ImagesSlice } from '../../store/slices/ImagesSlice';
+import CustomImage from './CustomImage';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
 import { RootState } from '../../store/store';
 
@@ -66,7 +66,7 @@ function UserCard({ userId, onClick, extraRenderer }: UserCardProps): ReactEleme
     <Card extra={extraRenderer === undefined ? undefined : extraRenderer(userId)} hoverable onClick={onClick}>
       <Row gutter={16} align='middle'>
         <Col>
-          <ProfilePic userId={userId} />
+          <ProfileImage userId={userId} />
         </Col>
         <Col>{name}</Col>
       </Row>
@@ -74,20 +74,20 @@ function UserCard({ userId, onClick, extraRenderer }: UserCardProps): ReactEleme
   );
 }
 
-interface ProfilePicProps {
+interface ProfileImageProps {
   readonly userId: number;
 }
 
-function ProfilePic({ userId }: ProfilePicProps): ReactElement {
+function ProfileImage({ userId }: ProfileImageProps): ReactElement {
   const dispatch = useDispatch();
   /*
   A <NonexistentUserIdError> will occur if a user who was to be displayed in the search results deleted their account in
-  between being searched, and having the profile pic displayed. Since this rarely ever happens, and no harm comes from
+  between being searched, and having the profile image displayed. Since this rarely ever happens, and no harm comes from
   leaving the search result up, we ignore this possibility.
    */
-  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'THUMBNAIL'));
+  const url = useSelector((state: RootState) => ImagesSlice.selectImage(state, 'PROFILE_IMAGE', userId, 'THUMBNAIL'));
   useEffect(() => {
-    dispatch(PicsSlice.fetch({ id: userId, type: 'PROFILE_PIC' }));
+    dispatch(ImagesSlice.fetch({ id: userId, type: 'PROFILE_IMAGE' }));
   }, [dispatch, userId]);
-  return <CustomPic icon={<UserOutlined />} url={url} />;
+  return <CustomImage icon={<UserOutlined />} url={url} />;
 }

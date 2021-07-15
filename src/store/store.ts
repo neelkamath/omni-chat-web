@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { PicsSlice } from './slices/PicsSlice';
+import { ImagesSlice } from './slices/ImagesSlice';
 import { SearchedUsersSlice } from './slices/SearchedUsersSlice';
 import { BlockedUsersSlice } from './slices/BlockedUsersSlice';
 import { ChatsSlice } from './slices/ChatsSlice';
@@ -7,7 +7,7 @@ import { OnlineStatusesSlice } from './slices/OnlineStatusesSlice';
 import { TypingStatusesSlice } from './slices/TypingStatusesSlice';
 import { ContactsSlice } from './slices/ContactsSlice';
 import { ChatPageLayoutSlice } from './slices/ChatPageLayoutSlice';
-import { PicMessagesSlice } from './slices/PicMessagesSlice';
+import { ImageMessagesSlice } from './slices/ImageMessagesSlice';
 import { SearchedPublicChatsSlice } from './slices/SearchedPublicChatsSlice';
 import { AccountsSlice } from './slices/AccountsSlice';
 import { DocMessagesSlice } from './slices/DocMessagesSlice';
@@ -26,11 +26,11 @@ const store = configureStore({
     chats: ChatsSlice.reducer,
     contacts: ContactsSlice.reducer,
     onlineStatuses: OnlineStatusesSlice.reducer,
-    pics: PicsSlice.reducer,
+    images: ImagesSlice.reducer,
     searchedUsers: SearchedUsersSlice.reducer,
     typingStatuses: TypingStatusesSlice.reducer,
     chatPageLayout: ChatPageLayoutSlice.reducer,
-    picMessages: PicMessagesSlice.reducer,
+    imageMessages: ImageMessagesSlice.reducer,
     docMessages: DocMessagesSlice.reducer,
     searchedPublicChats: SearchedPublicChatsSlice.reducer,
   },

@@ -10,21 +10,21 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { httpApiConfig, operateRestApi } from '../../api';
-import { getPicMessage } from '@neelkamath/omni-chat';
+import { getImageMessage } from '@neelkamath/omni-chat';
 import { Storage } from '../../Storage';
 import { RootState } from '../store';
 
-/** The URLs of picture messages. */
-export namespace PicMessagesSlice {
-  const sliceName = 'picMessages';
+/** The URLs of image messages. */
+export namespace ImageMessagesSlice {
+  const sliceName = 'imageMessages';
   const adapter: EntityAdapter<Entity> = createEntityAdapter({ selectId: ({ messageId }) => messageId });
 
-  export interface Entity extends Pic {
+  export interface Entity extends Image {
     readonly messageId: number;
     readonly isLoading: boolean;
   }
 
-  export interface Pic {
+  export interface Image {
     readonly thumbnailUrl?: string;
     readonly originalUrl?: string;
   }
@@ -33,24 +33,24 @@ export namespace PicMessagesSlice {
     `${sliceName}/fetch`,
     async (messageId: number) => {
       const thumbnail = await operateRestApi(() =>
-        getPicMessage(httpApiConfig, Storage.readAccessToken(), messageId, 'THUMBNAIL'),
+        getImageMessage(httpApiConfig, Storage.readAccessToken(), messageId, 'THUMBNAIL'),
       );
       const original = await operateRestApi(() =>
-        getPicMessage(httpApiConfig, Storage.readAccessToken(), messageId, 'ORIGINAL'),
+        getImageMessage(httpApiConfig, Storage.readAccessToken(), messageId, 'ORIGINAL'),
       );
       return {
         messageId,
-        thumbnailUrl: thumbnail === undefined ? undefined : URL.createObjectURL(thumbnail),
-        originalUrl: original === undefined ? undefined : URL.createObjectURL(original),
+        thumbnailUrl: thumbnail === undefined ? undefined : URL.createObjectURL(thumbnail.blob),
+        originalUrl: original === undefined ? undefined : URL.createObjectURL(original.blob),
         isLoading: false,
       };
     },
     {
       condition: (messageId, { getState }) => {
-        const { picMessages } = getState() as { picMessages: EntityState<Entity> };
-        const pic = picMessages.entities[messageId];
-        if (pic === undefined) return true;
-        return (pic.originalUrl === undefined || pic.thumbnailUrl === undefined) && !pic.isLoading;
+        const { imageMessages } = getState() as { imageMessages: EntityState<Entity> };
+        const image = imageMessages.entities[messageId];
+        if (image === undefined) return true;
+        return (image.originalUrl === undefined || image.thumbnailUrl === undefined) && !image.isLoading;
       },
     },
   );
@@ -82,19 +82,19 @@ export namespace PicMessagesSlice {
 
   export const { deleteMessage } = slice.actions;
 
-  /** Returns `true` if either the pic hasn't been fetched or is being fetched, and `false` if it has been fetched. */
+  /** Returns `true` if either the image hasn't been fetched or is being fetched, and `false` if it has been fetched. */
   export const selectIsLoading = createSelector(
-    (state: RootState) => state.picMessages.entities,
+    (state: RootState) => state.imageMessages.entities,
     (_: RootState, messageId: number) => messageId,
     (entities: Dictionary<Entity>, messageId: number) => entities[messageId]?.isLoading !== false,
   );
 
   /**
-   * Returns the specified message's pic whose URLs may be `undefined` if they haven't been fetched yet.
+   * Returns the specified message's image whose URLs may be `undefined` if they haven't been fetched yet.
    * @see selectIsLoading
    */
-  export const selectPic = createSelector(
-    (state: RootState) => state.picMessages.entities,
+  export const selectImage = createSelector(
+    (state: RootState) => state.imageMessages.entities,
     (_: RootState, messageId: number) => messageId,
     (entities: Dictionary<Entity>, messageId: number) => {
       const entity = entities[messageId];

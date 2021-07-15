@@ -3,7 +3,7 @@ import { displayBugReporter, wsApiConfig } from '../../api';
 import { Storage } from '../../Storage';
 import store from '../../store/store';
 import { AccountsSlice } from '../../store/slices/AccountsSlice';
-import { PicsSlice } from '../../store/slices/PicsSlice';
+import { ImagesSlice } from '../../store/slices/ImagesSlice';
 import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
 import { ContactsSlice } from '../../store/slices/ContactsSlice';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
@@ -17,7 +17,7 @@ interface SubscribeToAccountsResult {
     | CreatedSubscription
     | NewContact
     | UpdatedAccount
-    | UpdatedProfilePic
+    | UpdatedProfileImage
     | DeletedContact
     | BlockedAccount
     | UnblockedAccount
@@ -44,8 +44,8 @@ interface BlockedAccount {
   readonly userId: number;
 }
 
-interface UpdatedProfilePic {
-  readonly __typename: 'UpdatedProfilePic';
+interface UpdatedProfileImage {
+  readonly __typename: 'UpdatedProfileImage';
   readonly userId: number;
 }
 
@@ -80,7 +80,7 @@ const query = `
         lastName
         bio
       }
-      ... on UpdatedProfilePic {
+      ... on UpdatedProfileImage {
         userId
       }
       ... on BlockedAccount {
@@ -115,8 +115,8 @@ async function onMessage(
     case 'UpdatedAccount':
       store.dispatch(AccountsSlice.update({ ...event, __typename: 'Account' }));
       break;
-    case 'UpdatedProfilePic':
-      store.dispatch(PicsSlice.fetch({ id: event.userId, type: 'PROFILE_PIC', shouldUpdateOnly: true }));
+    case 'UpdatedProfileImage':
+      store.dispatch(ImagesSlice.fetch({ id: event.userId, type: 'PROFILE_IMAGE', shouldUpdateOnly: true }));
       break;
     case 'BlockedAccount':
       store.dispatch(BlockedUsersSlice.upsertOne(event));
@@ -135,7 +135,7 @@ async function onMessage(
       store.dispatch(BlockedUsersSlice.removeOne(event.userId));
       store.dispatch(ChatsSlice.removePrivateChat(event.userId));
       store.dispatch(OnlineStatusesSlice.removeOne(event.userId));
-      store.dispatch(PicsSlice.removeAccount(event.userId));
+      store.dispatch(ImagesSlice.removeAccount(event.userId));
       store.dispatch(TypingStatusesSlice.removeUser(event.userId));
       store.dispatch(SearchedUsersSlice.removeOne(event.userId));
   }

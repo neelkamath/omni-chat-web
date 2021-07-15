@@ -3,8 +3,8 @@ import { Button, List, message, Modal, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { ContactsSlice } from '../../store/slices/ContactsSlice';
 import { BlockedUsersSlice } from '../../store/slices/BlockedUsersSlice';
-import { PicsSlice } from '../../store/slices/PicsSlice';
-import OriginalPic from './OriginalPic';
+import { ImagesSlice } from '../../store/slices/ImagesSlice';
+import OriginalImage from './OriginalImage';
 import { Storage } from '../../Storage';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
@@ -42,10 +42,10 @@ interface ProfileSectionProps {
 function ProfileSection({ userId, hasChatButton }: ProfileSectionProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(PicsSlice.fetch({ id: userId, type: 'PROFILE_PIC' }));
+    dispatch(ImagesSlice.fetch({ id: userId, type: 'PROFILE_IMAGE' }));
     dispatch(AccountsSlice.fetch(userId));
   }, [dispatch, userId]);
-  const url = useSelector((state: RootState) => PicsSlice.selectPic(state, 'PROFILE_PIC', userId, 'ORIGINAL'));
+  const url = useSelector((state: RootState) => ImagesSlice.selectImage(state, 'PROFILE_IMAGE', userId, 'ORIGINAL'));
   const user = useSelector((state: RootState) => AccountsSlice.select(state, userId));
   if (user === undefined) return <Spin />;
   const name = `${user.firstName} ${user.lastName}`.trim();
@@ -58,7 +58,7 @@ function ProfileSection({ userId, hasChatButton }: ProfileSectionProps): ReactEl
       )}
       {url !== undefined && url !== null && (
         <List.Item>
-          <OriginalPic type='PROFILE_PIC' url={url} />
+          <OriginalImage type='PROFILE_IMAGE' url={url} />
         </List.Item>
       )}
       <List.Item>

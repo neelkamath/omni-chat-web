@@ -3,12 +3,12 @@ import { Divider, Row } from 'antd';
 import UpdateAccountSection from './UpdateAccountSection';
 import UpdatePasswordForm from './UpdatePasswordForm';
 import DeleteAccountSection from './DeleteAccountSection';
-import ProfilePicEditor from './ProfilePicEditor';
+import ProfileImageEditor from './ProfileImageEditor';
 
 export default function AccountEditor(): ReactElement {
   return (
     <Row style={{ padding: 16 }}>
-      <ProfilePicEditor />
+      <ProfileImageEditor />
       <Divider />
       <UpdateAccountSection />
       <Divider />

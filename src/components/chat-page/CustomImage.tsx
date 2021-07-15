@@ -1,15 +1,15 @@
 import React, { ReactElement } from 'react';
 import { Avatar, Spin } from 'antd';
-import { PicsSlice } from '../../store/slices/PicsSlice';
+import { ImagesSlice } from '../../store/slices/ImagesSlice';
 import { AvatarSize } from 'antd/lib/avatar/SizeContext';
 
-export interface CustomPicProps {
+export interface CustomImageProps {
   readonly icon: ReactElement;
-  readonly url: PicsSlice.PicUrl;
+  readonly url: ImagesSlice.ImageUrl;
   readonly size?: AvatarSize;
 }
 
-export default function CustomPic({ icon, url, size }: CustomPicProps): ReactElement {
+export default function CustomImage({ icon, url, size }: CustomImageProps): ReactElement {
   if (url === undefined) return <Spin size='small' />;
   return <Avatar size={size ?? 'large'} icon={url === null ? icon : undefined} src={url} />;
 }

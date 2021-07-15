@@ -8,7 +8,7 @@ import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { Storage } from '../../Storage';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { useDispatch } from 'react-redux';
-import GroupChatPic from './GroupChatPic';
+import GroupChatImage from './GroupChatImage';
 
 export interface GroupChatInvitationProps {
   /**
@@ -42,7 +42,7 @@ export default function GroupChatInvitation({
   return (
     <Card>
       <Card.Meta
-        avatar={<GroupChatPic chatId={invitedChatId} />}
+        avatar={<GroupChatImage chatId={invitedChatId} />}
         title={
           <Row gutter={16} justify='space-between'>
             <Col>{title}</Col>

@@ -3,13 +3,13 @@ import { Button, Comment, Image, Row, Space, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { DownloadOutlined, UserOutlined } from '@ant-design/icons';
 import { RootState } from '../../../../store/store';
-import { PicsSlice } from '../../../../store/slices/PicsSlice';
+import { ImagesSlice } from '../../../../store/slices/ImagesSlice';
 import { ChatsSlice } from '../../../../store/slices/ChatsSlice';
-import CustomPic from '../../CustomPic';
+import CustomImage from '../../CustomImage';
 import { Storage } from '../../../../Storage';
 import gfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
-import { PicMessagesSlice } from '../../../../store/slices/PicMessagesSlice';
+import { ImageMessagesSlice } from '../../../../store/slices/ImageMessagesSlice';
 import PollMessageContent from './PollMessageContent';
 import GroupChatInviteMessageContent from './GroupChatInviteMessageContent';
 import { AccountsSlice } from '../../../../store/slices/AccountsSlice';
@@ -28,18 +28,18 @@ export default function ChatMessage({ chatId, message }: ChatMessageProps): Reac
     dispatch(AccountsSlice.fetch(Storage.readUserId()!));
   }, [dispatch]);
   useEffect(() => {
-    dispatch(PicsSlice.fetch({ id: message.sender.userId, type: 'PROFILE_PIC' }));
+    dispatch(ImagesSlice.fetch({ id: message.sender.userId, type: 'PROFILE_IMAGE' }));
   }, [dispatch, message]);
   const url = useSelector((state: RootState) =>
-    PicsSlice.selectPic(state, 'PROFILE_PIC', message.sender.userId, 'THUMBNAIL'),
+    ImagesSlice.selectImage(state, 'PROFILE_IMAGE', message.sender.userId, 'THUMBNAIL'),
   );
   const username = useSelector((state: RootState) => AccountsSlice.select(state, message.sender.userId))?.username;
   if (username === undefined) return <Spin />;
   return (
     <Row justify='space-between' align='middle'>
       <Comment
-        style={{ maxWidth: 925 } /* <Options> displays on a new line for pic messages if we don't set the <width>. */}
-        avatar={<CustomPic icon={<UserOutlined />} url={url} />}
+        style={{ maxWidth: 925 } /* <Options> displays on a new line for image messages if we don't set the <width>. */}
+        avatar={<CustomImage icon={<UserOutlined />} url={url} />}
         author={<Author username={username} isForwarded={message.isForwarded} />}
         content={<MessageContent message={message} />}
         datetime={getDateTime(message.sent)}
@@ -82,8 +82,8 @@ function MessageContent({ message }: MessageContentProps): ReactElement {
   switch (message.__typename) {
     case 'TextMessage':
       return <ReactMarkdown plugins={[gfm]}>{(message as ChatsSlice.TextMessage).textMessage}</ReactMarkdown>;
-    case 'PicMessage':
-      return <PicMessageContent messageId={message.messageId} />;
+    case 'ImageMessage':
+      return <ImageMessageContent messageId={message.messageId} />;
     case 'PollMessage':
       return <PollMessageContent message={message as ChatsSlice.PollMessage} />;
     case 'GroupChatInviteMessage':
@@ -97,16 +97,16 @@ function MessageContent({ message }: MessageContentProps): ReactElement {
   }
 }
 
-interface PicMessageContentProps {
+interface ImageMessageContentProps {
   readonly messageId: number;
 }
 
-function PicMessageContent({ messageId }: PicMessageContentProps): ReactElement {
+function ImageMessageContent({ messageId }: ImageMessageContentProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(PicMessagesSlice.fetch(messageId));
+    dispatch(ImageMessagesSlice.fetch(messageId));
   }, [dispatch, messageId]);
-  const url = useSelector((state: RootState) => PicMessagesSlice.selectPic(state, messageId)).originalUrl;
+  const url = useSelector((state: RootState) => ImageMessagesSlice.selectImage(state, messageId)).originalUrl;
   // FIXME: Set the width to be at most 50% instead of 50% because otherwise small images get enlarged excessively. Check what happens if you put a thin but tall image.
   return url === undefined ? <Spin size='small' /> : <Image src={url} width='33%' />;
 }
@@ -120,13 +120,13 @@ function DocMessageContent({ messageId }: DocMessageContentProps): ReactElement 
   useEffect(() => {
     dispatch(DocMessagesSlice.fetch(messageId));
   }, [dispatch, messageId]);
-  const url = useSelector((state: RootState) => DocMessagesSlice.selectDoc(state, messageId));
-  if (url === undefined) return <Spin />;
+  const file = useSelector((state: RootState) => DocMessagesSlice.selectFile(state, messageId));
+  if (file.url === undefined) return <Spin />;
   return (
     <Button>
-      <Typography.Link download href={url}>
+      <Typography.Link download={file.filename} href={file.url}>
         <Space>
-          <DownloadOutlined /> Download
+          <DownloadOutlined /> Download {file.filename}
         </Space>
       </Typography.Link>
     </Button>

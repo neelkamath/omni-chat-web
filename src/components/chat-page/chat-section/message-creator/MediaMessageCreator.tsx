@@ -3,7 +3,7 @@ import { ShowUploadListInterface } from 'antd/lib/upload/interface';
 import { UploadRequestOption } from 'rc-upload/lib/interface';
 import { message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import { postDocMessage, postPicMessage, UserNotInChatError } from '@neelkamath/omni-chat';
+import { postDocMessage, postImageMessage, UserNotInChatError } from '@neelkamath/omni-chat';
 import { httpApiConfig } from '../../../../api';
 import { Storage } from '../../../../Storage';
 import Dragger from 'antd/lib/upload/Dragger';
@@ -51,7 +51,7 @@ async function createMessage(file: File, type: MediaMessageType, chatId: number)
           await postDocMessage(httpApiConfig, Storage.readAccessToken()!, file, chatId);
           break;
         case 'IMAGE':
-          await postPicMessage(httpApiConfig, Storage.readAccessToken()!, file, chatId);
+          await postImageMessage(httpApiConfig, Storage.readAccessToken()!, file, chatId);
       }
     } catch (error) {
       if (error instanceof UserNotInChatError) message.error("You're no longer in the chat.", 5);

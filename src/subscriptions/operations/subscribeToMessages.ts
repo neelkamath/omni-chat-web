@@ -2,7 +2,7 @@ import { DateTime, GraphQlResponse, MessageText, subscribe, Uuid } from '@neelka
 import { displayBugReporter, wsApiConfig } from '../../api';
 import store from '../../store/store';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
-import { PicMessagesSlice } from '../../store/slices/PicMessagesSlice';
+import { ImageMessagesSlice } from '../../store/slices/ImageMessagesSlice';
 import { Storage } from '../../Storage';
 import { onSubscriptionError, PromiseResolver, subscriptionClosers, verifySubscriptionCreation } from '../manager';
 
@@ -16,7 +16,7 @@ interface SubscribeToMessagesResult {
     | NewAudioMessage
     | NewDocMessage
     | NewGroupChatInviteMessage
-    | NewPicMessage
+    | NewImageMessage
     | NewPollMessage
     | NewTextMessage
     | NewVideoMessage;
@@ -32,7 +32,7 @@ interface NewMessage {
     | 'NewAudioMessage'
     | 'NewDocMessage'
     | 'NewGroupChatInviteMessage'
-    | 'NewPicMessage'
+    | 'NewImageMessage'
     | 'NewPollMessage'
     | 'NewTextMessage'
     | 'NewVideoMessage';
@@ -62,8 +62,8 @@ interface ActionableMessage {
   readonly actions: MessageText[];
 }
 
-interface NewPicMessage extends NewMessage {
-  readonly __typename: 'NewPicMessage';
+interface NewImageMessage extends NewMessage {
+  readonly __typename: 'NewImageMessage';
   readonly caption: MessageText;
 }
 
@@ -161,7 +161,7 @@ const query = `
           actions
         }
       }
-      ... on NewPicMessage {
+      ... on NewImageMessage {
         caption
       }
       ... on NewPollMessage {
@@ -201,7 +201,7 @@ async function onMessage(
       break;
     case 'DeletedMessage':
       store.dispatch(ChatsSlice.deleteMessage(event));
-      store.dispatch(PicMessagesSlice.deleteMessage(event.messageId));
+      store.dispatch(ImageMessagesSlice.deleteMessage(event.messageId));
       break;
     case 'UserChatMessagesRemoval':
       store.dispatch(ChatsSlice.removeUserChatMessages(event));
@@ -210,7 +210,7 @@ async function onMessage(
     case 'NewAudioMessage':
     case 'NewDocMessage':
     case 'NewGroupChatInviteMessage':
-    case 'NewPicMessage':
+    case 'NewImageMessage':
     case 'NewPollMessage':
     case 'NewTextMessage':
     case 'NewVideoMessage':

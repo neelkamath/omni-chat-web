@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { Card, Col, Row, Space, Spin, Typography } from 'antd';
-import ChatPic from './ChatPic';
+import ChatImage from './ChatImage';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { AudioOutlined, FileImageOutlined, FileOutlined, GroupOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import gfm from 'remark-gfm';
@@ -38,7 +38,7 @@ function ChatCard({ chat }: ChatCardProps): ReactElement {
     >
       <Row gutter={16}>
         <Col>
-          <ChatPic chat={chat} />
+          <ChatImage chat={chat} />
         </Col>
         <Col>
           <ChatMetadata chat={chat} />
@@ -127,8 +127,8 @@ function LastChatMessageContent({ message }: LastChatMessageContentProps): React
       return (
         <ReactMarkdown plugins={[gfm]}>{(message as ChatsSlice.ActionMessage).actionableMessage.text}</ReactMarkdown>
       );
-    case 'PicMessage': {
-      const caption = (message as ChatsSlice.PicMessage).caption;
+    case 'ImageMessage': {
+      const caption = (message as ChatsSlice.ImageMessage).caption;
       return caption === null ? <FileImageOutlined /> : <ReactMarkdown plugins={[gfm]}>{caption}</ReactMarkdown>;
     }
     case 'PollMessage':

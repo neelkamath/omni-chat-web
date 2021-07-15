@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect } from 'react';
 import { Button, Collapse, Divider, Row } from 'antd';
-import PicSection from './pic-section/PicSection';
+import ImageSection from './image-section/ImageSection';
 import TitleSection from './TitleSection';
 import DescriptionSection from './DescriptionSection';
 import BroadcastSection from './BroadcastSection';
@@ -32,7 +32,7 @@ export default function GroupChatInfo({ chatId }: GroupChatSectionProps): ReactE
         Chat
       </Button>
       <InviteSection chatId={chatId} />
-      <PicSection chatId={chatId} />
+      <ImageSection chatId={chatId} />
       <Divider />
       <TitleSection chatId={chatId} />
       <DescriptionSection chatId={chatId} />
