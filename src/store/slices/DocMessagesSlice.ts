@@ -21,6 +21,8 @@ export namespace DocMessagesSlice {
 
   export interface Entity {
     readonly messageId: number;
+    /** `undefined` only if {@link url} is `undefined`. */
+    readonly filename?: string;
     readonly url?: string;
     readonly isLoading: boolean;
   }
@@ -31,7 +33,8 @@ export namespace DocMessagesSlice {
       const doc = await operateRestApi(() => getDocMessage(httpApiConfig, Storage.readAccessToken(), messageId));
       return {
         messageId,
-        url: doc === undefined ? undefined : URL.createObjectURL(doc),
+        filename: doc?.filename,
+        url: doc === undefined ? undefined : URL.createObjectURL(doc.blob),
         isLoading: false,
       };
     },

@@ -1,8 +1,8 @@
 import React, { ReactElement } from 'react';
-import GroupChatPic from './GroupChatPic';
-import PrivateChatPic from './PrivateChatPic';
+import GroupChatImage from './GroupChatImage';
+import PrivateChatImage from './PrivateChatImage';
 
-export interface ChatPicProps {
+export interface ChatImageProps {
   readonly chat: Chat;
 }
 
@@ -24,11 +24,11 @@ export interface Account {
   readonly userId: number;
 }
 
-export default function ChatPic({ chat }: ChatPicProps): ReactElement {
+export default function ChatImage({ chat }: ChatImageProps): ReactElement {
   switch (chat.__typename) {
     case 'PrivateChat':
-      return <PrivateChatPic userId={(chat as PrivateChat).user.userId} />;
+      return <PrivateChatImage userId={(chat as PrivateChat).user.userId} />;
     case 'GroupChat':
-      return <GroupChatPic chatId={(chat as GroupChat).chatId} />;
+      return <GroupChatImage chatId={(chat as GroupChat).chatId} />;
   }
 }

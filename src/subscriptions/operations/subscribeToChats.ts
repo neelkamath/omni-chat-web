@@ -11,14 +11,14 @@ import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { Storage } from '../../Storage';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { message } from 'antd';
-import { PicsSlice } from '../../store/slices/PicsSlice';
+import { ImagesSlice } from '../../store/slices/ImagesSlice';
 import { onSubscriptionError, PromiseResolver, subscriptionClosers, verifySubscriptionCreation } from '../manager';
 
 interface SubscribeToChatsResult {
   readonly subscribeToChats:
     | CreatedSubscription
     | GroupChatId
-    | UpdatedGroupChatPic
+    | UpdatedGroupChatImage
     | UpdatedGroupChat
     | DeletedPrivateChat;
 }
@@ -37,8 +37,8 @@ interface GroupChatId {
   readonly chatId: number;
 }
 
-interface UpdatedGroupChatPic {
-  readonly __typename: 'UpdatedGroupChatPic';
+interface UpdatedGroupChatImage {
+  readonly __typename: 'UpdatedGroupChatImage';
   readonly chatId: number;
 }
 
@@ -79,7 +79,7 @@ const query = `
         isBroadcast
         publicity
       }
-      ... on UpdatedGroupChatPic {
+      ... on UpdatedGroupChatImage {
         chatId
       }
       ... on DeletedPrivateChat {
@@ -112,8 +112,8 @@ async function onMessage(
         }
       }
       break;
-    case 'UpdatedGroupChatPic':
-      store.dispatch(PicsSlice.fetch({ id: event.chatId, type: 'GROUP_CHAT_PIC', shouldUpdateOnly: true }));
+    case 'UpdatedGroupChatImage':
+      store.dispatch(ImagesSlice.fetch({ id: event.chatId, type: 'GROUP_CHAT_IMAGE', shouldUpdateOnly: true }));
       break;
     case 'DeletedPrivateChat':
       ChatsSlice.removeOne(event.chatId);

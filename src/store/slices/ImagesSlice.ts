@@ -10,59 +10,61 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import {
-  getGroupChatPic,
-  getProfilePic,
+  getGroupChatImage,
+  getProfileImage,
+  ImageFile,
+  ImageType,
   NonexistentChatError,
   NonexistentUserIdError,
-  PicType,
 } from '@neelkamath/omni-chat';
 import { RootState } from '../store';
-import { Storage } from '../../Storage';
 import { httpApiConfig, operateRestApi } from '../../api';
 
-/** Profile and group chat pics. */
-export namespace PicsSlice {
-  const sliceName = 'pics';
+/** Profile and group chat images. */
+export namespace ImagesSlice {
+  const sliceName = 'images';
 
   /** `undefined` if it hasn't been fetched yet. `null` if the user doesn't have one. */
-  export type PicUrl = string | null | undefined;
+  export type ImageUrl = string | null | undefined;
 
-  export type EntityType = 'GROUP_CHAT_PIC' | 'PROFILE_PIC';
+  export type EntityType = 'GROUP_CHAT_IMAGE' | 'PROFILE_IMAGE';
 
   export interface Entity {
     readonly id: string; // Generated using <generateId()>.
     readonly type: EntityType;
-    readonly thumbnailUrl?: PicUrl;
-    readonly originalUrl?: PicUrl;
+    /** `undefined` only if {@link thumbnailUrl} and {@link originalUrl} are `undefined`. */
+    readonly filename?: string;
+    readonly thumbnailUrl?: ImageUrl;
+    readonly originalUrl?: ImageUrl;
     /** Whether this entity is currently being fetched. */
     readonly isLoading: boolean;
     /** If an error was thrown while fetching this entity, this won't be `undefined`. */
     readonly error?: NonexistentUserIdError | NonexistentChatError;
   }
 
-  export interface FetchPicData {
+  export interface FetchImageData {
     /**
-     * - A user ID if the {@link type} is a `'PROFILE_PIC'`.
-     * - A group chat ID if the {@link type} is a`'GROUP_CHAT_PIC'`.
+     * - A user ID if the {@link type} is a `'PROFILE_IMAGE'`.
+     * - A group chat ID if the {@link type} is a`'GROUP_CHAT_IMAGE'`.
      */
     readonly id: number;
     readonly type: EntityType;
-    /** If `true`, the pic will only be fetched if it has already been fetched. */
+    /** If `true`, the image will only be fetched if it has already been fetched. */
     readonly shouldUpdateOnly?: boolean;
   }
 
   const adapter: EntityAdapter<Entity> = createEntityAdapter();
 
   /**
-   * - A {@link Blob} is indicative of the pic.
-   * - `null` indicates the entity doesn't have an associated pic.
-   * - `undefined` indicates the pic hasn't been fetched; perhaps due to an error.
+   * - A {@link ImageFile} is indicative of the image.
+   * - `null` indicates the entity doesn't have an associated image.
+   * - `undefined` indicates the image hasn't been fetched; perhaps due to an error.
    */
-  type PicData = Blob | null | undefined;
+  type ImageResponse = ImageFile | null | undefined;
 
-  interface Pic {
-    readonly thumbnail: PicData;
-    readonly original: PicData;
+  interface Image {
+    readonly thumbnail: ImageResponse;
+    readonly original: ImageResponse;
   }
 
   /** Generates the {@link Entity.id}. The `id` is the ID of either the user or group chat. */
@@ -70,32 +72,30 @@ export namespace PicsSlice {
     return `${type}_${id}`;
   }
 
-  async function getPic({ id, type }: FetchPicData): Promise<Pic> {
-    let thumbnail: PicData, original: PicData;
+  async function getImage({ id, type }: FetchImageData): Promise<Image> {
+    let thumbnail: ImageResponse, original: ImageResponse;
     switch (type) {
-      case 'GROUP_CHAT_PIC':
-        thumbnail = await operateRestApi(() =>
-          getGroupChatPic(httpApiConfig, Storage.readAccessToken()!, id, 'THUMBNAIL'),
-        );
-        original = await operateRestApi(() =>
-          getGroupChatPic(httpApiConfig, Storage.readAccessToken()!, id, 'ORIGINAL'),
-        );
+      case 'GROUP_CHAT_IMAGE':
+        thumbnail = await operateRestApi(() => getGroupChatImage(httpApiConfig, id, 'THUMBNAIL'));
+        original = await operateRestApi(() => getGroupChatImage(httpApiConfig, id, 'ORIGINAL'));
         break;
-      case 'PROFILE_PIC':
-        thumbnail = await operateRestApi(() => getProfilePic(httpApiConfig, id, 'THUMBNAIL'));
-        original = await operateRestApi(() => getProfilePic(httpApiConfig, id, 'ORIGINAL'));
+      case 'PROFILE_IMAGE':
+        thumbnail = await operateRestApi(() => getProfileImage(httpApiConfig, id, 'THUMBNAIL'));
+        original = await operateRestApi(() => getProfileImage(httpApiConfig, id, 'ORIGINAL'));
     }
     return { thumbnail, original };
   }
 
   export const fetch = createAsyncThunk(
     `${sliceName}/fetch`,
-    async ({ id, type }: FetchPicData) => {
-      const { thumbnail, original } = await getPic({ id, type });
-      const generateUrl = (data: PicData) => (data instanceof Blob ? URL.createObjectURL(data) : data);
+    async ({ id, type }: FetchImageData) => {
+      const { thumbnail, original } = await getImage({ id, type });
+      const generateUrl = (data: ImageResponse) =>
+        data === null || data === undefined ? data : URL.createObjectURL(data.blob);
       return {
         id: generateId(type, id),
         type,
+        filename: thumbnail?.filename ?? original?.filename,
         thumbnailUrl: generateUrl(thumbnail),
         originalUrl: generateUrl(original),
         isLoading: false,
@@ -103,20 +103,20 @@ export namespace PicsSlice {
     },
     {
       condition: ({ id, type, shouldUpdateOnly }, { getState }) => {
-        const { pics } = getState() as { pics: EntityState<Entity> };
-        const pic = pics.entities[generateId(type, id)];
-        if (pic === undefined) return shouldUpdateOnly !== true;
+        const { images } = getState() as { images: EntityState<Entity> };
+        const image = images.entities[generateId(type, id)];
+        if (image === undefined) return shouldUpdateOnly !== true;
         if (shouldUpdateOnly === true) return true;
-        return (pic.originalUrl === undefined || pic.thumbnailUrl === undefined) && !pic.isLoading;
+        return (image.originalUrl === undefined || image.thumbnailUrl === undefined) && !image.isLoading;
       },
     },
   );
 
   type State = ReturnType<typeof adapter.getInitialState>;
 
-  /** Removes the profile pic of the specified user. */
+  /** Removes the profile image of the specified user. */
   function reduceRemoveAccount(state: Draft<State>, { payload }: PayloadAction<number>): State | void {
-    adapter.removeOne(state, generateId('PROFILE_PIC', payload));
+    adapter.removeOne(state, generateId('PROFILE_IMAGE', payload));
   }
 
   const slice = createSlice({
@@ -143,14 +143,14 @@ export namespace PicsSlice {
 
   export const { removeAccount } = slice.actions;
 
-  export const selectPic = createSelector(
-    (state: RootState) => state.pics.entities,
+  export const selectImage = createSelector(
+    (state: RootState) => state.images.entities,
     (_: RootState, type: EntityType) => type,
     (_state: RootState, _type: EntityType, id: number) => id,
-    (_state: RootState, _type: EntityType, _id: number, picType: PicType) => picType,
-    (entities: Dictionary<Entity>, type: EntityType, id: number, picType: PicType) => {
+    (_state: RootState, _type: EntityType, _id: number, imageType: ImageType) => imageType,
+    (entities: Dictionary<Entity>, type: EntityType, id: number, imageType: ImageType) => {
       const entity = entities[generateId(type, id)];
-      switch (picType) {
+      switch (imageType) {
         case 'THUMBNAIL':
           return entity?.thumbnailUrl;
         case 'ORIGINAL':
@@ -160,11 +160,11 @@ export namespace PicsSlice {
   );
 
   /**
-   * Returns `undefined` if either the pic hasn't been fetched yet or no error occurred when the pic was being fetched.
-   * Otherwise, it'll either be a {@link NonexistentUserIdError} or {@link NonexistentChatError}.
+   * Returns `undefined` if either the image hasn't been fetched yet or no error occurred when the image was being
+   * fetched. Otherwise, it'll either be a {@link NonexistentUserIdError} or {@link NonexistentChatError}.
    */
   export const selectError = createSelector(
-    (state: RootState) => state.pics.entities,
+    (state: RootState) => state.images.entities,
     (_: RootState, type: EntityType) => type,
     (_state: RootState, _type: EntityType, id: number) => id,
     (entities: Dictionary<Entity>, type: EntityType, id: number) => entities[generateId(type, id)]?.error,

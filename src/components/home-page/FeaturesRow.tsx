@@ -149,8 +149,8 @@ function PowerfulMessagesRow(): ReactElement {
         </Typography.Title>
         <List>
           <List.Item>
-            Send texts, audio, pictures, videos, polls, documents, group chat invites, and actions (buttons which
-            trigger third-party server-side code such as ordering food via a bot).
+            Send texts, audio, images, videos, polls, documents, group chat invites, and actions (buttons which trigger
+            third-party server-side code such as ordering food via a bot).
           </List.Item>
           <List.Item>Forward messages.</List.Item>
           <List.Item>Search messages.</List.Item>

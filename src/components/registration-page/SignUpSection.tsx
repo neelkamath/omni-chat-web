@@ -18,7 +18,7 @@ export default function SignUpSection(): ReactElement {
       <Col span={11}>
         <Typography.Title level={2}>Sign Up</Typography.Title>
         <Space direction='vertical'>
-          You can edit your username, profile picture, etc. once you&apos;ve signed in.
+          You can edit your username, profile image, etc. once you&apos;ve signed in.
           <AllowedDomains />
           <SignUpForm />
         </Space>

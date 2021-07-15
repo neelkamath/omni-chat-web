@@ -15,9 +15,9 @@ import {
 import logOut from '../../logOut';
 import MenuChats from './MenuChats';
 import { useDispatch, useSelector } from 'react-redux';
-import { PicsSlice } from '../../store/slices/PicsSlice';
+import { ImagesSlice } from '../../store/slices/ImagesSlice';
 import { Storage } from '../../Storage';
-import CustomPic from './CustomPic';
+import CustomImage from './CustomImage';
 import { NonexistentUserIdError } from '@neelkamath/omni-chat';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
@@ -42,18 +42,20 @@ export default function ChatPageMenu(): ReactElement {
 function EditAccountCol(): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(PicsSlice.fetch({ type: 'PROFILE_PIC', id: Storage.readUserId()! }));
+    dispatch(ImagesSlice.fetch({ type: 'PROFILE_IMAGE', id: Storage.readUserId()! }));
   }, [dispatch]);
   const url = useSelector((state: RootState) =>
-    PicsSlice.selectPic(state, 'PROFILE_PIC', Storage.readUserId()!, 'THUMBNAIL'),
+    ImagesSlice.selectImage(state, 'PROFILE_IMAGE', Storage.readUserId()!, 'THUMBNAIL'),
   );
-  const error = useSelector((state: RootState) => PicsSlice.selectError(state, 'PROFILE_PIC', Storage.readUserId()!));
+  const error = useSelector((state: RootState) =>
+    ImagesSlice.selectError(state, 'PROFILE_IMAGE', Storage.readUserId()!),
+  );
   if (error instanceof NonexistentUserIdError) logOut();
   return (
     <Col>
       <Tooltip title='Edit account'>
         <Button
-          icon={<CustomPic icon={<UserOutlined />} url={url} size='small' />}
+          icon={<CustomImage icon={<UserOutlined />} url={url} size='small' />}
           onClick={() => dispatch(ChatPageLayoutSlice.update({ type: 'ACCOUNT_EDITOR' }))}
         />
       </Tooltip>

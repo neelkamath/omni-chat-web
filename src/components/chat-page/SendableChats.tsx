@@ -4,8 +4,8 @@ import { ChatsSlice } from '../../store/slices/ChatsSlice';
 import { ContactsSlice } from '../../store/slices/ContactsSlice';
 import { Card, message, Popconfirm, Space, Spin } from 'antd';
 import operateCreatePrivateChat from '../../operateCreatePrivateChat';
-import PrivateChatPic from './PrivateChatPic';
-import ChatPic from './ChatPic';
+import PrivateChatImage from './PrivateChatImage';
+import ChatImage from './ChatImage';
 import ChatName from './ChatName';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { queryOrMutate } from '@neelkamath/omni-chat';
@@ -124,7 +124,7 @@ function ChatCard({ type, data, id }: ChatCardProps): ReactElement {
     >
       <Card hoverable size='small' onClick={() => setVisible(true)}>
         <Space>
-          {typeof data === 'number' ? <PrivateChatPic userId={data} /> : <ChatPic chat={data} />}
+          {typeof data === 'number' ? <PrivateChatImage userId={data} /> : <ChatImage chat={data} />}
           <ChatName data={data} />
         </Space>
       </Card>
