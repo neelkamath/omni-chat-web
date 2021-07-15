@@ -83,7 +83,7 @@ async function operateRequestTokenSet(login: Login): Promise<void> {
       break;
     case 'TokenSet':
       Storage.saveTokenSet(response.requestTokenSet);
-      location.href = '#/chat';
+      location.href = 'chat';
       break;
     case 'UnverifiedEmailAddress':
       message.error('You must first verify your email address.', 5);
