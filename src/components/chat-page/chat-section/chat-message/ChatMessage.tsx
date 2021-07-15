@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect } from 'react';
-import { Button, Card, Comment, Image, Row, Space, Spin, Typography } from 'antd';
+import { Button, Comment, Image, Row, Space, Spin, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { DownloadOutlined, UserOutlined } from '@ant-design/icons';
 import { RootState } from '../../../../store/store';
@@ -120,17 +120,15 @@ function DocMessageContent({ messageId }: DocMessageContentProps): ReactElement 
   useEffect(() => {
     dispatch(DocMessagesSlice.fetch(messageId));
   }, [dispatch, messageId]);
-  const url = useSelector((state: RootState) => DocMessagesSlice.selectDoc(state, messageId));
-  if (url === undefined) return <Spin />;
+  const file = useSelector((state: RootState) => DocMessagesSlice.selectFile(state, messageId));
+  if (file.url === undefined) return <Spin />;
   return (
-    <Card>
-      <Button>
-        <Typography.Link download href={url}>
-          <Space>
-            <DownloadOutlined /> Download
-          </Space>
-        </Typography.Link>
-      </Button>
-    </Card>
+    <Button>
+      <Typography.Link download={file.filename} href={file.url}>
+        <Space>
+          <DownloadOutlined /> Download {file.filename}
+        </Space>
+      </Typography.Link>
+    </Button>
   );
 }
