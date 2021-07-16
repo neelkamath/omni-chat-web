@@ -16,13 +16,27 @@ let onMessagesSubscriptionClose: OnSubscriptionClose;
 let onOnlineStatusesSubscriptionClose: OnSubscriptionClose;
 let onTypingStatusesSubscriptionClose: OnSubscriptionClose;
 
-export const subscriptionClosers = {
+export const subscriptionClosers: Record<string, OnSubscriptionClose> = {
   onAccountsSubscriptionClose,
   onGroupChatsSubscriptionClose,
   onMessagesSubscriptionClose,
   onOnlineStatusesSubscriptionClose,
   onTypingStatusesSubscriptionClose,
 };
+
+/*
+If the user is signed in on the chat page, then there will be open WebSocket connections. If they then manually change
+the URL to leave the chat page, and sign in again, the application would crash because the previous connections hadn't
+been closed.
+ */
+addEventListener('hashchange', () => {
+  if (location.hash === '#/chat') return;
+  for (const onClose in subscriptionClosers) {
+    if (subscriptionClosers[onClose] === undefined) return;
+    subscriptionClosers[onClose]!();
+    subscriptionClosers[onClose] = undefined;
+  }
+});
 
 export function verifySubscriptionCreation(onSubscriptionClose: OnSubscriptionClose): void {
   // TODO: Automatically send back the error report instead, and show a ConnectionError instead.
