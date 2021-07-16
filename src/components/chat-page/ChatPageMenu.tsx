@@ -105,7 +105,7 @@ function CreateGroupChatCol(): ReactElement {
         <Button
           icon={<UsergroupAddOutlined />}
           onClick={() => {
-            dispatch(ChatPageLayoutSlice.update({ type: 'CREATE_GROUP_CHAT' }));
+            dispatch(ChatPageLayoutSlice.update({ type: 'GROUP_CHAT_CREATOR' }));
           }}
         />
       </Tooltip>

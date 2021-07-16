@@ -13,7 +13,7 @@ import DevelopersSection from '../DevelopersSection';
 import ChatSection from './chat-section/ChatSection';
 import { queryOrMutate } from '@neelkamath/omni-chat';
 import setOnline from '../../setOnline';
-import CreateGroupChatSection from './CreateGroupChatSection';
+import GroupChatCreatorSection from './CreateGroupChatSection';
 import SearchPublicChatsSection from './SearchPublicChatsSection';
 import GroupChatInfo from './group-chat-info/GroupChatInfo';
 import logOut from '../../logOut';
@@ -94,12 +94,12 @@ function LayoutContent(): ReactElement {
   switch (type) {
     case 'EMPTY':
       return <Empty style={{ padding: 24 }} />;
-    case 'BLOCKED_USERS_SECTION':
-      return <SearchUsersSection type='BLOCKED_USERS' />;
     case 'ACCOUNT_EDITOR':
       return <AccountEditor />;
     case 'CONTACTS_SECTION':
       return <SearchUsersSection type='CONTACTS' />;
+    case 'BLOCKED_USERS_SECTION':
+      return <SearchUsersSection type='BLOCKED_USERS' />;
     case 'SEARCH_USERS_SECTION':
       return <SearchUsersSection type='USERS' />;
     case 'SUPPORT_SECTION':
@@ -108,8 +108,8 @@ function LayoutContent(): ReactElement {
       return <DevelopersSection />;
     case 'CHAT_SECTION':
       return <ChatSection chatId={chatId!} />;
-    case 'CREATE_GROUP_CHAT':
-      return <CreateGroupChatSection />;
+    case 'GROUP_CHAT_CREATOR':
+      return <GroupChatCreatorSection />;
     case 'SEARCH_PUBLIC_CHATS':
       return <SearchPublicChatsSection />;
     case 'GROUP_CHAT_INFO':

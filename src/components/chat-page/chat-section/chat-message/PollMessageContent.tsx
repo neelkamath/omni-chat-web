@@ -7,6 +7,7 @@ import { MessageText, queryOrMutate } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../../../api';
 import { Storage } from '../../../../Storage';
 import { UpCircleTwoTone } from '@ant-design/icons';
+import themeColor from '../../../../themeColor';
 
 export interface PollMessageContentProps {
   readonly message: ChatsSlice.PollMessage;
@@ -40,7 +41,7 @@ function PollOption({ pollOption, messageId }: PollOptionProps): ReactElement {
           onChange={({ target }) => setPollVote(messageId, pollOption.option, target.checked)}
         />
       </Typography.Paragraph>
-      <Typography.Paragraph style={{ color: '#177DDC' }}>
+      <Typography.Paragraph style={{ color: themeColor }}>
         {pollOption.votes.length} × <UpCircleTwoTone />
       </Typography.Paragraph>
       <Typography.Paragraph>

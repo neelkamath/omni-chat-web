@@ -17,7 +17,7 @@ export namespace ChatPageLayoutSlice {
     | 'SUPPORT_SECTION'
     | 'DEVELOPERS_SECTION'
     | 'CHAT_SECTION'
-    | 'CREATE_GROUP_CHAT'
+    | 'GROUP_CHAT_CREATOR'
     | 'SEARCH_PUBLIC_CHATS'
     | 'GROUP_CHAT_INFO';
 

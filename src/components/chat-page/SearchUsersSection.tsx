@@ -4,6 +4,7 @@ import { Storage } from '../../Storage';
 import ActionableUserCard, { CardExtra, CardPopconfirmation } from './ActionableUserCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchedUsersSlice } from '../../store/slices/SearchedUsersSlice';
+import { ContactsOutlined, SearchOutlined, StopOutlined } from '@ant-design/icons';
 
 export interface SearchUsersSectionProps {
   readonly type: SearchedUsersSlice.SearchUsersType;
@@ -30,26 +31,56 @@ export default function SearchUsersSection({
         </>,
       );
   }, [popconfirmation, extraRenderer, query, type, isLoading]);
-  let text: string;
-  switch (type) {
-    case 'CONTACTS':
-      text = 'contacts';
-      break;
-    case 'BLOCKED_USERS':
-      text = "users you've blocked";
-      break;
-    case 'USERS':
-      text = 'users';
-  }
   return (
     <Space direction='vertical' style={{ padding: 16 }}>
-      <Typography.Text>Search {text} by their name, username, or email address.</Typography.Text>
+      <Title type={type} />
+      <Typography.Text>Search {getText(type)} by their name, username, or email address.</Typography.Text>
       <Space direction='vertical'>
         <SearchUsersForm type={type} />
         {section}
       </Space>
     </Space>
   );
+}
+
+interface TitleProps {
+  readonly type: SearchedUsersSlice.SearchUsersType;
+}
+
+function Title({ type }: TitleProps): ReactElement {
+  let icon: ReactElement, title: string;
+  switch (type) {
+    case 'CONTACTS':
+      icon = <ContactsOutlined />;
+      title = 'Contacts';
+      break;
+    case 'BLOCKED_USERS':
+      icon = <StopOutlined />;
+      title = 'Blocked Users';
+      break;
+    case 'USERS':
+      icon = <SearchOutlined />;
+      title = 'Users';
+  }
+  return (
+    <Typography.Title level={2}>
+      <Space>
+        {icon}
+        {title}
+      </Space>
+    </Typography.Title>
+  );
+}
+
+function getText(type: SearchedUsersSlice.SearchUsersType): string {
+  switch (type) {
+    case 'CONTACTS':
+      return 'contacts';
+    case 'BLOCKED_USERS':
+      return "users you've blocked";
+    case 'USERS':
+      return 'users';
+  }
 }
 
 interface UsersProps {

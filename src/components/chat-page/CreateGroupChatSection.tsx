@@ -1,18 +1,38 @@
 import React, { ReactElement, useState } from 'react';
-import { Button, Form, Input, message, Space } from 'antd';
+import { Button, Col, Form, Image, Input, message, Row, Space, Typography } from 'antd';
 import { GroupChatDescription, GroupChatPublicity, GroupChatTitle, queryOrMutate } from '@neelkamath/omni-chat';
 import { httpApiConfig, operateGraphQlApi } from '../../api';
 import { Storage } from '../../Storage';
 import { ChatPageLayoutSlice } from '../../store/slices/ChatPageLayoutSlice';
 import { useDispatch } from 'react-redux';
 import PublicityRadioGroup from './PublicityRadioGroup';
+import goodTeamImage from '../../images/good-team.svg';
+import { UsergroupAddOutlined } from '@ant-design/icons';
 
 export default function CreateGroupChatSection(): ReactElement {
   return (
-    <Space style={{ padding: 16 }} direction='vertical'>
-      Create a group chat.
-      <CreateGroupChatForm />
+    <Space direction='vertical' style={{ padding: 16 }}>
+      <Title />
+      <Row gutter={16} justify='space-around' align='middle'>
+        <Col span={12}>
+          <GroupChatCreatorForm />
+        </Col>
+        <Col span={10}>
+          <Image preview={false} alt='Good team' src={goodTeamImage} />
+        </Col>
+      </Row>
     </Space>
+  );
+}
+
+function Title(): ReactElement {
+  return (
+    <Typography.Title level={2}>
+      <Space>
+        <UsergroupAddOutlined />
+        Create a Group Chat
+      </Space>
+    </Typography.Title>
   );
 }
 
@@ -21,7 +41,7 @@ interface CreateGroupChatFormData {
   readonly publicity: GroupChatPublicity;
 }
 
-function CreateGroupChatForm(): ReactElement {
+function GroupChatCreatorForm(): ReactElement {
   const [isLoading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const onFinish = async (data: CreateGroupChatFormData) => {

@@ -3,11 +3,13 @@ import { Button, Input, Space, Typography } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { SearchedPublicChatsSlice } from '../../store/slices/SearchedPublicChatsSlice';
 import GroupChatInvitation from './GroupChatInvitation';
+import { FileSearchOutlined } from '@ant-design/icons';
 
 export default function SearchPublicChatsSection(): ReactElement {
   const query = useSelector(SearchedPublicChatsSlice.selectQuery);
   return (
     <Space direction='vertical' style={{ padding: 16 }}>
+      <Title />
       <Typography.Text>Search public chats by their titles.</Typography.Text>
       <Space direction='vertical'>
         <SearchChatsForm />
@@ -15,6 +17,17 @@ export default function SearchPublicChatsSection(): ReactElement {
         {query !== undefined && <LoadMoreChatsButton />}
       </Space>
     </Space>
+  );
+}
+
+function Title(): ReactElement {
+  return (
+    <Typography.Title level={2}>
+      <Space>
+        <FileSearchOutlined />
+        Search Public Chats
+      </Space>
+    </Typography.Title>
   );
 }
 
