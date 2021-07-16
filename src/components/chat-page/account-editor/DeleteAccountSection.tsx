@@ -64,8 +64,8 @@ async function operateDeleteAccount(): Promise<void> {
       12.5,
     );
   else if (response !== undefined) {
-    Storage.deleteTokenSet();
-    await logOut();
+    const setOnlineStatus = false;
+    await logOut(setOnlineStatus);
   }
 }
 

@@ -30,12 +30,7 @@ the URL to leave the chat page, and sign in again, the application would crash b
 been closed.
  */
 addEventListener('hashchange', () => {
-  if (location.hash === '#/chat') return;
-  for (const onClose in subscriptionClosers) {
-    if (subscriptionClosers[onClose] === undefined) return;
-    subscriptionClosers[onClose]!();
-    subscriptionClosers[onClose] = undefined;
-  }
+  if (location.hash !== '#/chat') shutDownSubscriptions();
 });
 
 export function verifySubscriptionCreation(onSubscriptionClose: OnSubscriptionClose): void {
@@ -56,15 +51,11 @@ export async function setUpSubscriptions(): Promise<void> {
 
 /** Shuts down any open GraphQL subscriptions. */
 export function shutDownSubscriptions(): void {
-  [
-    onAccountsSubscriptionClose,
-    onGroupChatsSubscriptionClose,
-    onMessagesSubscriptionClose,
-    onOnlineStatusesSubscriptionClose,
-    onTypingStatusesSubscriptionClose,
-  ].forEach((onClose) => {
-    if (onClose !== undefined) onClose();
-  });
+  for (const onClose in subscriptionClosers) {
+    if (subscriptionClosers[onClose] === undefined) continue;
+    subscriptionClosers[onClose]!();
+    subscriptionClosers[onClose] = undefined;
+  }
 }
 
 /*
