@@ -7,15 +7,15 @@ import { queryOrMutate } from '@neelkamath/omni-chat';
 export default function ResendEmailAddressVerificationCodeSection(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
-      <Col span={5} push={2}>
-        <Image preview={false} alt='Happy news' src={happyNewsImage} />
-      </Col>
-      <Col span={12} push={2}>
+      <Col span={12}>
         <Typography.Title level={2}>Resend Email Address Verification Code</Typography.Title>
         <Space direction='vertical'>
           Submit this form in case you lost your verification code email.
           <ResendEmailAddressVerificationCodeForm />
         </Space>
+      </Col>
+      <Col span={5} pull={2}>
+        <Image preview={false} alt='Happy news' src={happyNewsImage} />
       </Col>
     </Row>
   );

@@ -7,15 +7,15 @@ import { httpApiConfig, operateGraphQlApi } from '../../api';
 export default function ResetPasswordSection(): ReactElement {
   return (
     <Row gutter={16} justify='space-around' align='middle'>
-      <Col span={9}>
-        <Image preview={false} alt='Authentication' src={authenticationImage} />
-      </Col>
-      <Col span={12} push={1}>
+      <Col span={12}>
         <Typography.Title level={2}>Reset Password</Typography.Title>
         <Space direction='vertical'>
           If you received an email with a password reset code, submit this form to reset your password.
           <ResetPasswordForm />
         </Space>
+      </Col>
+      <Col span={9} pull={1}>
+        <Image preview={false} alt='Authentication' src={authenticationImage} />
       </Col>
     </Row>
   );
