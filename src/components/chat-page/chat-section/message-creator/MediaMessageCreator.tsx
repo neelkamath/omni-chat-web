@@ -3,7 +3,13 @@ import { ShowUploadListInterface } from 'antd/lib/upload/interface';
 import { UploadRequestOption } from 'rc-upload/lib/interface';
 import { message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import { postDocMessage, postImageMessage, UserNotInChatError } from '@neelkamath/omni-chat';
+import {
+  MustBeAdminError,
+  postDocMessage,
+  postImageMessage,
+  postVideoMessage,
+  UserNotInChatError,
+} from '@neelkamath/omni-chat';
 import { httpApiConfig } from '../../../../api';
 import { Storage } from '../../../../Storage';
 import Dragger from 'antd/lib/upload/Dragger';
@@ -13,7 +19,7 @@ export interface MediaMessageCreatorProps {
   readonly type: MediaMessageType;
 }
 
-export type MediaMessageType = 'IMAGE' | 'DOC';
+export type MediaMessageType = 'IMAGE' | 'DOC' | 'VIDEO';
 
 export default function MediaMessageCreator({ chatId, type }: MediaMessageCreatorProps): ReactElement {
   const [showUploadList, setShowUploadList] = useState<ShowUploadListInterface | boolean>({ showRemoveIcon: false });
@@ -21,9 +27,8 @@ export default function MediaMessageCreator({ chatId, type }: MediaMessageCreato
     await createMessage(option.file as File, type, chatId);
     setShowUploadList(false);
   };
-  const accept = type === 'IMAGE' ? 'image/png,image/jpeg' : undefined;
   return (
-    <Dragger showUploadList={showUploadList} customRequest={customRequest} multiple accept={accept}>
+    <Dragger showUploadList={showUploadList} customRequest={customRequest} multiple accept={getAccept(type)}>
       <p className='ant-upload-drag-icon'>
         <UploadOutlined />
       </p>
@@ -32,18 +37,31 @@ export default function MediaMessageCreator({ chatId, type }: MediaMessageCreato
   );
 }
 
+function getAccept(type: MediaMessageType): string | undefined {
+  switch (type) {
+    case 'DOC':
+      return undefined;
+    case 'IMAGE':
+      return 'image/png,image/jpeg';
+    case 'VIDEO':
+      return 'video/mp4';
+  }
+}
+
 function getText(type: MediaMessageType): string {
   switch (type) {
     case 'IMAGE':
       return 'images';
     case 'DOC':
       return 'documents';
+    case 'VIDEO':
+      return 'videos';
   }
 }
 
 async function createMessage(file: File, type: MediaMessageType, chatId: number): Promise<void> {
   if (file.size > 3 * 1_024 * 1_024)
-    message.error(`${file.name} couldn't upload because it was bigger than 3 MB.`, 7.5);
+    message.error(`${file.name} couldn't be sent because it was bigger than 3 MB.`, 7.5);
   else
     try {
       switch (type) {
@@ -52,8 +70,12 @@ async function createMessage(file: File, type: MediaMessageType, chatId: number)
           break;
         case 'IMAGE':
           await postImageMessage(httpApiConfig, Storage.readAccessToken()!, file, chatId);
+          break;
+        case 'VIDEO':
+          await postVideoMessage(httpApiConfig, Storage.readAccessToken()!, file, chatId);
       }
     } catch (error) {
       if (error instanceof UserNotInChatError) message.error("You're no longer in the chat.", 5);
+      else if (error instanceof MustBeAdminError) message.error('Only admins can send messages in broadcast chats.', 5);
     }
 }

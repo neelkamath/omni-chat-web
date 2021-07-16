@@ -16,6 +16,7 @@ import { AccountsSlice } from '../../../../store/slices/AccountsSlice';
 import Options from './Options';
 import { DateTime, Username } from '@neelkamath/omni-chat';
 import { DocMessagesSlice } from '../../../../store/slices/DocMessagesSlice';
+import { VideoMessagesSlice } from '../../../../store/slices/VideoMessagesSlice';
 
 export interface ChatMessageProps {
   readonly chatId: number;
@@ -90,9 +91,10 @@ function MessageContent({ message }: MessageContentProps): ReactElement {
       return <GroupChatInviteMessageContent inviteCode={(message as ChatsSlice.GroupChatInviteMessage).inviteCode} />;
     case 'DocMessage':
       return <DocMessageContent messageId={message.messageId} />;
+    case 'VideoMessage':
+      return <VideoMessageContent messageId={message.messageId} />;
     case 'ActionMessage':
     case 'AudioMessage':
-    case 'VideoMessage':
       return <>Not implemented.</>;
   }
 }
@@ -109,6 +111,23 @@ function ImageMessageContent({ messageId }: ImageMessageContentProps): ReactElem
   const url = useSelector((state: RootState) => ImageMessagesSlice.selectImage(state, messageId)).originalUrl;
   // FIXME: Set the width to be at most 50% instead of 50% because otherwise small images get enlarged excessively. Check what happens if you put a thin but tall image.
   return url === undefined ? <Spin size='small' /> : <Image src={url} width='33%' />;
+}
+
+interface VideoMessageContentProps {
+  readonly messageId: number;
+}
+
+function VideoMessageContent({ messageId }: VideoMessageContentProps): ReactElement {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(VideoMessagesSlice.fetch(messageId));
+  }, [dispatch, messageId]);
+  const url = useSelector((state: RootState) => VideoMessagesSlice.selectVideo(state, messageId));
+  /*
+  FIXME: Doesn't work in Safari. This should get fixed once we migrate to a CDN because Safari apparently requires the
+   server to support media range requests. Otherwise, try a third party player to see if that fixes it.
+   */
+  return url === undefined ? <Spin size='small' /> : <video controls src={url} width='33%' />;
 }
 
 interface DocMessageContentProps {

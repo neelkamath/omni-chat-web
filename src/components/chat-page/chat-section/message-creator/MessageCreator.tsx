@@ -1,6 +1,13 @@
 import React, { ReactElement, useState } from 'react';
 import { Col, Dropdown, Menu, Row, Space } from 'antd';
-import { EditOutlined, FileOutlined, MessageOutlined, PictureOutlined, TableOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  FileOutlined,
+  MessageOutlined,
+  PictureOutlined,
+  TableOutlined,
+  VideoCameraAddOutlined,
+} from '@ant-design/icons';
 import TextMessageCreator from './TextMessageCreator';
 import PollMessageCreator from './PollMessageCreator';
 import MediaMessageCreator from './MediaMessageCreator';
@@ -16,13 +23,16 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
       <Menu.Item key={1} onClick={() => setCreator(<TextMessageCreator chatId={chatId} />)}>
         <TextItem />
       </Menu.Item>
-      <Menu.Item key={2} onClick={() => setCreator(<MediaMessageCreator type='IMAGE' chatId={chatId} />)}>
+      <Menu.Item key={2} onClick={() => setCreator(<MediaMessageCreator chatId={chatId} type='IMAGE' />)}>
         <ImagesItem />
       </Menu.Item>
-      <Menu.Item key={3} onClick={() => setCreator(<MediaMessageCreator type='DOC' chatId={chatId} />)}>
+      <Menu.Item key={3} onClick={() => setCreator(<MediaMessageCreator chatId={chatId} type='DOC' />)}>
         <DocumentsItem />
       </Menu.Item>
-      <Menu.Item key={4} onClick={() => setCreator(<PollMessageCreator chatId={chatId} />)}>
+      <Menu.Item key={4} onClick={() => setCreator(<MediaMessageCreator chatId={chatId} type='VIDEO' />)}>
+        <VideosItem />
+      </Menu.Item>
+      <Menu.Item key={5} onClick={() => setCreator(<PollMessageCreator chatId={chatId} />)}>
         <PollItem />
       </Menu.Item>
     </Menu>
@@ -59,6 +69,14 @@ function DocumentsItem(): ReactElement {
   return (
     <Space>
       <FileOutlined /> Documents
+    </Space>
+  );
+}
+
+function VideosItem(): ReactElement {
+  return (
+    <Space>
+      <VideoCameraAddOutlined /> Videos
     </Space>
   );
 }
