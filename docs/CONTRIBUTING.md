@@ -19,7 +19,7 @@ Create the following [encrypted secrets](https://docs.github.com/en/actions/refe
 
 ## Development
 
-1. Either run the Omni Chat 0.24.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.24.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.24.0/docs/cloud.md).
+1. Either run the Omni Chat 0.25.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.25.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.25.0/docs/cloud.md).
 1. Run on http://localhost:1234: `npm run dev`
 
 ## Linting
@@ -31,7 +31,7 @@ Create the following [encrypted secrets](https://docs.github.com/en/actions/refe
 
 Here's how to test the production build:
 
-1. Either run the Omni Chat 0.24.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.24.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.24.0/docs/cloud.md).
+1. Either run the Omni Chat 0.25.0 API [locally](https://github.com/neelkamath/omni-chat/blob/v0.25.0/docs/docker-compose.md) or in the [cloud](https://github.com/neelkamath/omni-chat/blob/v0.25.0/docs/cloud.md).
 1. Save a production build to `dist/`: `npm run build`
 1. Serve the website which has been saved to `dist/`.
 

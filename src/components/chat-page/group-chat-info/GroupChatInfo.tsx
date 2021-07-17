@@ -16,6 +16,7 @@ import RemoveUsersSection from './RemoveUsersSection';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { ChatPageLayoutSlice } from '../../../store/slices/ChatPageLayoutSlice';
 import InviteSection from './InviteSection';
+import MakeAdminsSection from './MakeAdminsSection';
 
 export interface GroupChatSectionProps {
   readonly chatId: number;
@@ -61,18 +62,21 @@ function UsersAccordion({ chatId }: UsersAccordionProps): ReactElement {
   const isAdmin = useSelector((state: RootState) => ChatsSlice.selectIsAdmin(state, chatId, Storage.readUserId()!));
   return (
     <Collapse accordion ghost>
-      <Collapse.Panel key={1} header='Participants'>
+      <Collapse.Panel key={0} header='Participants'>
         <UsersSection chatId={chatId} />
       </Collapse.Panel>
       {isAdmin && (
-        <Collapse.Panel key={2} header='Add users'>
-          <AddUsersSection chatId={chatId} />
-        </Collapse.Panel>
-      )}
-      {isAdmin && (
-        <Collapse.Panel key={3} header='Remove users'>
-          <RemoveUsersSection chatId={chatId} />
-        </Collapse.Panel>
+        <>
+          <Collapse.Panel key={1} header='Add users'>
+            <AddUsersSection chatId={chatId} />
+          </Collapse.Panel>
+          <Collapse.Panel key={2} header='Remove users'>
+            <RemoveUsersSection chatId={chatId} />
+          </Collapse.Panel>
+          <Collapse.Panel key={3} header='Make admins'>
+            <MakeAdminsSection chatId={chatId} />
+          </Collapse.Panel>
+        </>
       )}
     </Collapse>
   );

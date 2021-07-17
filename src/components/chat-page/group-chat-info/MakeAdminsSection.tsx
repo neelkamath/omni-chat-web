@@ -10,11 +10,11 @@ import ActionableUserCard from '../ActionableUserCard';
 import AdminIndicator from './AdminIndicator';
 import NonAdminIndicator from './NonAdminIndicator';
 
-export interface RemoveUsersSectionProps {
+export interface MakeAdminsSectionProps {
   readonly chatId: number;
 }
 
-export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps): ReactElement {
+export default function MakeAdminsSection({ chatId }: MakeAdminsSectionProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(ChatsSlice.fetchChat(chatId));
@@ -24,8 +24,8 @@ export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps):
   const userId = Storage.readUserId()!;
   if (participants === undefined || adminIdList === undefined) return <Spin />;
   const onConfirm = async (selectedUserId: number) => {
-    message.info('Removing the user...', 3);
-    await operateRemoveGroupChatUsers(chatId, selectedUserId);
+    if (adminIdList.includes(selectedUserId)) message.info('That user is already an admin.', 5);
+    else await operateMakeGroupChatAdmins(chatId, selectedUserId);
   };
   const cards = participants
     .filter((participant) => participant !== userId)
@@ -34,51 +34,44 @@ export default function RemoveUsersSection({ chatId }: RemoveUsersSectionProps):
         extraRenderer={(userId) => (adminIdList.includes(userId) ? <AdminIndicator /> : <NonAdminIndicator />)}
         key={participant}
         userId={participant}
-        popconfirmation={{ title: 'Remove user', onConfirm }}
+        popconfirmation={{ title: 'Make admin', onConfirm }}
       />
     ));
   return (
     <Space direction='vertical'>
-      <Typography.Text strong>Remove Users</Typography.Text>
-      <Typography.Paragraph>
-        Removed users&apos; messages and votes on polls won&apos;t get deleted.
-      </Typography.Paragraph>
+      <Typography.Text strong>Make Admins</Typography.Text>
       {cards.length === 0 ? "You're the only participant." : cards}
     </Space>
   );
 }
 
-async function operateRemoveGroupChatUsers(chatId: number, userId: number): Promise<void> {
-  const response = await removeGroupChatUsers(chatId, [userId]);
-  if (response?.removeGroupChatUsers === null) message.success('User removed.', 3);
-  else if (response?.removeGroupChatUsers.__typename === 'MustBeAdmin')
+async function operateMakeGroupChatAdmins(chatId: number, userId: number): Promise<void> {
+  const response = await makeGroupChatAdmins(chatId, [userId]);
+  if (response?.makeGroupChatAdmins === null) message.success('The user is now an admin.', 3);
+  else if (response?.makeGroupChatAdmins.__typename === 'MustBeAdmin')
     message.error('You must be an admin to remove users.', 5);
-}
-
-interface CannotLeaveChat {
-  readonly __typename: 'CannotLeaveChat';
 }
 
 interface MustBeAdmin {
   readonly __typename: 'MustBeAdmin';
 }
 
-interface RemoveGroupChatUsersResult {
-  readonly removeGroupChatUsers: CannotLeaveChat | MustBeAdmin | null;
+interface MakeGroupChatAdminsResult {
+  readonly makeGroupChatAdmins: MustBeAdmin | null;
 }
 
-async function removeGroupChatUsers(
+async function makeGroupChatAdmins(
   chatId: number,
   userIdList: number[],
-): Promise<RemoveGroupChatUsersResult | undefined> {
+): Promise<MakeGroupChatAdminsResult | undefined> {
   return await operateGraphQlApi(
     async () =>
       await queryOrMutate(
         httpApiConfig,
         {
           query: `
-            mutation RemoveGroupChatUsers($chatId: Int!, $userIdList: [Int!]!) {
-              removeGroupChatUsers(chatId: $chatId, userIdList: $userIdList) {
+            mutation MakeGroupChatAdmins($chatId: Int!, $userIdList: [Int!]!) {
+              makeGroupChatAdmins(chatId: $chatId, userIdList: $userIdList) {
                 __typename
               }
             }

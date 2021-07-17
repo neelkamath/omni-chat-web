@@ -97,11 +97,11 @@ function LayoutContent(): ReactElement {
     case 'ACCOUNT_EDITOR':
       return <AccountEditor />;
     case 'CONTACTS_SECTION':
-      return <SearchUsersSection type='CONTACTS' />;
+      return <SearchUsersSection displayTitle type='CONTACTS' />;
     case 'BLOCKED_USERS_SECTION':
-      return <SearchUsersSection type='BLOCKED_USERS' />;
+      return <SearchUsersSection displayTitle type='BLOCKED_USERS' />;
     case 'SEARCH_USERS_SECTION':
-      return <SearchUsersSection type='USERS' />;
+      return <SearchUsersSection displayTitle type='USERS' />;
     case 'SUPPORT_SECTION':
       return <ChatPageSupportSection />;
     case 'DEVELOPERS_SECTION':

@@ -10,12 +10,14 @@ export interface SearchUsersSectionProps {
   readonly type: SearchedUsersSlice.SearchUsersType;
   readonly popconfirmation?: CardPopconfirmation;
   readonly extraRenderer?: CardExtra;
+  readonly displayTitle?: boolean;
 }
 
 export default function SearchUsersSection({
   type,
   popconfirmation,
   extraRenderer,
+  displayTitle = false,
 }: SearchUsersSectionProps): ReactElement {
   const dispatch = useDispatch();
   const query = useSelector(SearchedUsersSlice.selectQuery);
@@ -33,7 +35,7 @@ export default function SearchUsersSection({
   }, [popconfirmation, extraRenderer, query, type, isLoading]);
   return (
     <Space direction='vertical' style={{ padding: 16 }}>
-      <Title type={type} />
+      {displayTitle && <Title type={type} />}
       <Typography.Text>Search {getText(type)} by their name, username, or email address.</Typography.Text>
       <Space direction='vertical'>
         <SearchUsersForm type={type} />

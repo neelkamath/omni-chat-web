@@ -31,7 +31,7 @@ jobs:
           API_AUTHORITY=$API_AUTHORITY
           HTTP=https
           WS=wss
-          API_VERSION=0.24.0
+          API_VERSION=0.25.0
           SUPPORT_EMAIL_ADDRESS=$SUPPORT_EMAIL_ADDRESS
           EOF
       - run: npm run build
