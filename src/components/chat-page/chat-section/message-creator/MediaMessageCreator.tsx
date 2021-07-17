@@ -5,6 +5,7 @@ import { message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import {
   MustBeAdminError,
+  postAudioMessage,
   postDocMessage,
   postImageMessage,
   postVideoMessage,
@@ -19,7 +20,7 @@ export interface MediaMessageCreatorProps {
   readonly type: MediaMessageType;
 }
 
-export type MediaMessageType = 'IMAGE' | 'DOC' | 'VIDEO';
+export type MediaMessageType = 'IMAGE' | 'DOC' | 'VIDEO' | 'AUDIO';
 
 export default function MediaMessageCreator({ chatId, type }: MediaMessageCreatorProps): ReactElement {
   const [showUploadList, setShowUploadList] = useState<ShowUploadListInterface | boolean>({ showRemoveIcon: false });
@@ -45,6 +46,8 @@ function getAccept(type: MediaMessageType): string | undefined {
       return 'image/png,image/jpeg';
     case 'VIDEO':
       return 'video/mp4';
+    case 'AUDIO':
+      return 'audio/mpeg,audio/mp4';
   }
 }
 
@@ -56,6 +59,8 @@ function getText(type: MediaMessageType): string {
       return 'documents';
     case 'VIDEO':
       return 'videos';
+    case 'AUDIO':
+      return 'audios';
   }
 }
 
@@ -73,6 +78,9 @@ async function createMessage(file: File, type: MediaMessageType, chatId: number)
           break;
         case 'VIDEO':
           await postVideoMessage(httpApiConfig, Storage.readAccessToken()!, file, chatId);
+          break;
+        case 'AUDIO':
+          await postAudioMessage(httpApiConfig, Storage.readAccessToken()!, file, chatId);
       }
     } catch (error) {
       if (error instanceof UserNotInChatError) message.error("You're no longer in the chat.", 5);

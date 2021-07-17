@@ -1,6 +1,7 @@
 import React, { ReactElement, useState } from 'react';
 import { Col, Dropdown, Menu, Row, Space } from 'antd';
 import {
+  AudioOutlined,
   EditOutlined,
   FileOutlined,
   MessageOutlined,
@@ -32,7 +33,10 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
       <Menu.Item key={4} onClick={() => setCreator(<MediaMessageCreator chatId={chatId} type='VIDEO' />)}>
         <VideosItem />
       </Menu.Item>
-      <Menu.Item key={5} onClick={() => setCreator(<PollMessageCreator chatId={chatId} />)}>
+      <Menu.Item key={5} onClick={() => setCreator(<MediaMessageCreator chatId={chatId} type='AUDIO' />)}>
+        <AudiosItem />
+      </Menu.Item>
+      <Menu.Item key={6} onClick={() => setCreator(<PollMessageCreator chatId={chatId} />)}>
         <PollItem />
       </Menu.Item>
     </Menu>
@@ -77,6 +81,14 @@ function VideosItem(): ReactElement {
   return (
     <Space>
       <VideoCameraAddOutlined /> Videos
+    </Space>
+  );
+}
+
+function AudiosItem(): ReactElement {
+  return (
+    <Space>
+      <AudioOutlined /> Audios
     </Space>
   );
 }

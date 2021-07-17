@@ -10,42 +10,57 @@ import {
   PayloadAction,
 } from '@reduxjs/toolkit';
 import { httpApiConfig, operateRestApi } from '../../api';
-import { getDocMessage } from '@neelkamath/omni-chat';
+import { AudioFile, DocFile, getAudioMessage, getDocMessage, getVideoMessage, VideoFile } from '@neelkamath/omni-chat';
 import { Storage } from '../../Storage';
 import { RootState } from '../store';
 
-/** The URLs of doc messages. */
-export namespace DocMessagesSlice {
-  const sliceName = 'docMessages';
+/** The URLs of audio, video, and doc messages. */
+export namespace FileMessagesSlice {
+  const sliceName = 'fileMessages';
   const adapter: EntityAdapter<Entity> = createEntityAdapter({ selectId: ({ messageId }) => messageId });
 
-  export interface DocFile {
+  export interface FileMessage {
     /** `undefined` only if {@link url} is `undefined`. */
     readonly filename?: string;
     readonly url?: string;
   }
 
-  export interface Entity extends DocFile {
+  export interface Entity extends FileMessage {
     readonly messageId: number;
     readonly isLoading: boolean;
   }
 
+  export interface MessageMetadata {
+    readonly messageId: number;
+    readonly type: 'AUDIO' | 'VIDEO' | 'DOC';
+  }
+
   export const fetch = createAsyncThunk(
     `${sliceName}/fetch`,
-    async (messageId: number) => {
-      const doc = await operateRestApi(() => getDocMessage(httpApiConfig, Storage.readAccessToken(), messageId));
+    async ({ messageId, type }: MessageMetadata) => {
+      let file: VideoFile | AudioFile | DocFile | undefined;
+      switch (type) {
+        case 'VIDEO':
+          file = await operateRestApi(() => getVideoMessage(httpApiConfig, Storage.readAccessToken(), messageId));
+          break;
+        case 'AUDIO':
+          file = await operateRestApi(() => getAudioMessage(httpApiConfig, Storage.readAccessToken(), messageId));
+          break;
+        case 'DOC':
+          file = await operateRestApi(() => getDocMessage(httpApiConfig, Storage.readAccessToken(), messageId));
+      }
       return {
         messageId,
-        filename: doc?.filename,
-        url: doc === undefined ? undefined : URL.createObjectURL(doc.blob),
+        filename: file?.filename,
+        url: file === undefined ? undefined : URL.createObjectURL(file.blob),
         isLoading: false,
       };
     },
     {
-      condition: (messageId, { getState }) => {
-        const { docMessages } = getState() as { docMessages: EntityState<Entity> };
-        const doc = docMessages.entities[messageId];
-        return doc === undefined || !doc.isLoading;
+      condition: ({ messageId }, { getState }) => {
+        const { fileMessages } = getState() as { fileMessages: EntityState<Entity> };
+        const file = fileMessages.entities[messageId];
+        return file === undefined || !file.isLoading;
       },
     },
   );
@@ -64,10 +79,10 @@ export namespace DocMessagesSlice {
     extraReducers: (builder) => {
       builder
         .addCase(fetch.rejected, ({ entities }, { meta }) => {
-          entities[meta.arg]!.isLoading = false;
+          entities[meta.arg.messageId]!.isLoading = false;
         })
         .addCase(fetch.pending, (state, { meta }) => {
-          adapter.upsertOne(state, { messageId: meta.arg, isLoading: true });
+          adapter.upsertOne(state, { messageId: meta.arg.messageId, isLoading: true });
         })
         .addCase(fetch.fulfilled, adapter.upsertOne);
     },
@@ -77,9 +92,11 @@ export namespace DocMessagesSlice {
 
   export const { deleteMessage } = slice.actions;
 
-  /** Returns `true` if either the doc hasn't been fetched or is being fetched, and `false` if it has been fetched. */
+  /**
+   * Returns `true` if either the message hasn't been fetched or is being fetched, and `false` if it has been fetched.
+   */
   export const selectIsLoading = createSelector(
-    (state: RootState) => state.docMessages.entities,
+    (state: RootState) => state.fileMessages.entities,
     (_: RootState, messageId: number) => messageId,
     (entities: Dictionary<Entity>, messageId: number) => entities[messageId]?.isLoading !== false,
   );
@@ -89,9 +106,9 @@ export namespace DocMessagesSlice {
    * @see selectIsLoading
    */
   export const selectFile = createSelector(
-    (state: RootState) => state.docMessages.entities,
+    (state: RootState) => state.fileMessages.entities,
     (_: RootState, messageId: number) => messageId,
-    (entities: Dictionary<Entity>, messageId: number): DocFile => {
+    (entities: Dictionary<Entity>, messageId: number): FileMessage => {
       const entity = entities[messageId];
       return { filename: entity?.filename, url: entity?.url };
     },

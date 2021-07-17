@@ -10,8 +10,7 @@ import { ChatPageLayoutSlice } from './slices/ChatPageLayoutSlice';
 import { ImageMessagesSlice } from './slices/ImageMessagesSlice';
 import { SearchedPublicChatsSlice } from './slices/SearchedPublicChatsSlice';
 import { AccountsSlice } from './slices/AccountsSlice';
-import { DocMessagesSlice } from './slices/DocMessagesSlice';
-import { VideoMessagesSlice } from './slices/VideoMessagesSlice';
+import { FileMessagesSlice } from './slices/FileMessagesSlice';
 
 /**
  * - `'IDLE'` indicates that either the entities have never been fetched or an error occurred during the last fetch.
@@ -32,9 +31,8 @@ const store = configureStore({
     typingStatuses: TypingStatusesSlice.reducer,
     chatPageLayout: ChatPageLayoutSlice.reducer,
     imageMessages: ImageMessagesSlice.reducer,
-    docMessages: DocMessagesSlice.reducer,
+    fileMessages: FileMessagesSlice.reducer,
     searchedPublicChats: SearchedPublicChatsSlice.reducer,
-    videoMessages: VideoMessagesSlice.reducer,
   },
 });
 
