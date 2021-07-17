@@ -13,11 +13,12 @@ import PollMessageContent from './PollMessageContent';
 import GroupChatInviteMessageContent from './GroupChatInviteMessageContent';
 import { AccountsSlice } from '../../../../store/slices/AccountsSlice';
 import Options from './Options';
-import { DateTime, Username } from '@neelkamath/omni-chat';
+import { Username } from '@neelkamath/omni-chat';
 import VideoMessageContent from './VideoMessageContent';
 import DocMessageContent from './DocMessageContent';
 import ImageMessageContent from './ImageMessageContent';
 import AudioMessageContent from './AudioMessageContent';
+import getLocaleDateString from '../../../../getLocaleDateString';
 
 export interface ChatMessageProps {
   readonly chatId: number;
@@ -44,22 +45,11 @@ export default function ChatMessage({ chatId, message }: ChatMessageProps): Reac
         avatar={<CustomImage icon={<UserOutlined />} url={url} />}
         author={<Author username={username} isForwarded={message.isForwarded} />}
         content={<MessageContent message={message} />}
-        datetime={getDateTime(message.sent)}
+        datetime={getLocaleDateString(message.sent)}
       />
       <Options chatId={chatId} message={message} />
     </Row>
   );
-}
-
-function getDateTime(dateTime: DateTime): string {
-  const locale = undefined; // Set the locale to <undefined> to use the user's default locale.
-  return new Date(dateTime).toLocaleDateString(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  });
 }
 
 interface AuthorProps {

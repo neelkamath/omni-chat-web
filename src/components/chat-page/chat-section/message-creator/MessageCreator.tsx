@@ -6,12 +6,14 @@ import {
   FileOutlined,
   MessageOutlined,
   PictureOutlined,
+  SoundOutlined,
   TableOutlined,
   VideoCameraAddOutlined,
 } from '@ant-design/icons';
 import TextMessageCreator from './TextMessageCreator';
 import PollMessageCreator from './PollMessageCreator';
-import MediaMessageCreator from './MediaMessageCreator';
+import FileMessageCreator from './MediaMessageCreator';
+import AudioRecorderMessageCreator from './AudioRecorderMessageCreator';
 
 export interface MessageCreatorProps {
   readonly chatId: number;
@@ -24,19 +26,22 @@ export default function MessageCreator({ chatId }: MessageCreatorProps): ReactEl
       <Menu.Item key={1} onClick={() => setCreator(<TextMessageCreator chatId={chatId} />)}>
         <TextItem />
       </Menu.Item>
-      <Menu.Item key={2} onClick={() => setCreator(<MediaMessageCreator chatId={chatId} type='IMAGE' />)}>
+      <Menu.Item key={2} onClick={() => setCreator(<FileMessageCreator chatId={chatId} type='IMAGE' />)}>
         <ImagesItem />
       </Menu.Item>
-      <Menu.Item key={3} onClick={() => setCreator(<MediaMessageCreator chatId={chatId} type='DOC' />)}>
+      <Menu.Item key={3} onClick={() => setCreator(<FileMessageCreator chatId={chatId} type='DOC' />)}>
         <DocumentsItem />
       </Menu.Item>
-      <Menu.Item key={4} onClick={() => setCreator(<MediaMessageCreator chatId={chatId} type='VIDEO' />)}>
+      <Menu.Item key={4} onClick={() => setCreator(<FileMessageCreator chatId={chatId} type='VIDEO' />)}>
         <VideosItem />
       </Menu.Item>
-      <Menu.Item key={5} onClick={() => setCreator(<MediaMessageCreator chatId={chatId} type='AUDIO' />)}>
+      <Menu.Item key={5} onClick={() => setCreator(<AudioRecorderMessageCreator chatId={chatId} />)}>
+        <AudioRecorderItem />
+      </Menu.Item>
+      <Menu.Item key={6} onClick={() => setCreator(<FileMessageCreator chatId={chatId} type='AUDIO' />)}>
         <AudiosItem />
       </Menu.Item>
-      <Menu.Item key={6} onClick={() => setCreator(<PollMessageCreator chatId={chatId} />)}>
+      <Menu.Item key={7} onClick={() => setCreator(<PollMessageCreator chatId={chatId} />)}>
         <PollItem />
       </Menu.Item>
     </Menu>
@@ -89,6 +94,14 @@ function AudiosItem(): ReactElement {
   return (
     <Space>
       <AudioOutlined /> Audios
+    </Space>
+  );
+}
+
+function AudioRecorderItem(): ReactElement {
+  return (
+    <Space>
+      <SoundOutlined /> Record
     </Space>
   );
 }
