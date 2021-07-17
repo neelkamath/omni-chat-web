@@ -11,6 +11,10 @@ export interface AudioRecorderMessageCreatorProps {
   readonly chatId: number;
 }
 
+/*
+FIXME: I think audio messages created this way won't work in Safari even once we use a CDN because we'll need to process
+ it using FFMPEG to standardize the MP3 encoding.
+ */
 export default function AudioRecorderMessageCreator({ chatId }: AudioRecorderMessageCreatorProps): ReactElement {
   const [time, setTime] = useState(0);
   const [text, setText] = useState<'Start Recording' | 'Stop Recording' | 'Re-record'>('Start Recording');
