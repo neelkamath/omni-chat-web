@@ -12,7 +12,7 @@ export interface DocMessageContentProps {
 export default function DocMessageContent({ messageId }: DocMessageContentProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(FileMessagesSlice.fetch({ messageId, type: 'DOC' }));
+    dispatch(FileMessagesSlice.fetchMessage({ messageId, type: 'DOC' }));
   }, [dispatch, messageId]);
   const file = useSelector((state: RootState) => FileMessagesSlice.selectFile(state, messageId));
   if (file.url === undefined) return <Spin />;

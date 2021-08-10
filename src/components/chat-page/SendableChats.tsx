@@ -29,7 +29,7 @@ export default function SendableChats({ chatId, type, messageId }: SendableChats
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(ChatsSlice.fetchChats());
-    dispatch(ContactsSlice.fetch());
+    dispatch(ContactsSlice.fetchContacts());
   }, [dispatch]);
   const chats = useSelector(ChatsSlice.selectChats);
   const privateChatUsers = useSelector(ChatsSlice.selectPrivateChatUsers);

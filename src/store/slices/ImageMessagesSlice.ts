@@ -29,8 +29,8 @@ export namespace ImageMessagesSlice {
     readonly originalUrl?: string;
   }
 
-  export const fetch = createAsyncThunk(
-    `${sliceName}/fetch`,
+  export const fetchMessage = createAsyncThunk(
+    `${sliceName}/fetchMessage`,
     async (messageId: number) => {
       const thumbnail = await operateRestApi(() =>
         getImageMessage(httpApiConfig, Storage.readAccessToken(), messageId, 'THUMBNAIL'),
@@ -68,11 +68,11 @@ export namespace ImageMessagesSlice {
     reducers: { deleteMessage: reduceDeleteMessage },
     extraReducers: (builder) => {
       builder
-        .addCase(fetch.rejected, ({ entities }, { meta }) => {
+        .addCase(fetchMessage.rejected, ({ entities }, { meta }) => {
           entities[meta.arg]!.isLoading = false;
         })
-        .addCase(fetch.fulfilled, adapter.upsertOne)
-        .addCase(fetch.pending, (state, { meta }) => {
+        .addCase(fetchMessage.fulfilled, adapter.upsertOne)
+        .addCase(fetchMessage.pending, (state, { meta }) => {
           adapter.upsertOne(state, { messageId: meta.arg, isLoading: true });
         });
     },

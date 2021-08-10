@@ -34,7 +34,7 @@ function UpdateAccountForm(): ReactElement {
   const account = useSelector((state: RootState) => AccountsSlice.select(state, userId));
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(AccountsSlice.fetch(userId));
+    dispatch(AccountsSlice.fetchAccount(userId));
   }, [dispatch, userId]);
   if (account === undefined) return <Spin />;
   const onFinish = async (data: UpdateAccountFormData) => {

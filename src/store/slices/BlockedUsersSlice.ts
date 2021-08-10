@@ -12,8 +12,8 @@ export namespace BlockedUsersSlice {
     readonly status: FetchStatus;
   }
 
-  export const fetch = createAsyncThunk(
-    `${sliceName}/fetch`,
+  export const fetchBlockedUsers = createAsyncThunk(
+    `${sliceName}/fetchBlockedUsers`,
     async () => {
       const users = await readBlockedUsers();
       return users?.readBlockedUsers?.edges?.map(({ node }) => node);
@@ -78,14 +78,14 @@ export namespace BlockedUsersSlice {
     },
     extraReducers: (builder) => {
       builder
-        .addCase(fetch.fulfilled, (state, { payload }) => {
+        .addCase(fetchBlockedUsers.fulfilled, (state, { payload }) => {
           state.status = 'LOADED';
           if (payload !== undefined) adapter.upsertMany(state, payload);
         })
-        .addCase(fetch.rejected, (state) => {
+        .addCase(fetchBlockedUsers.rejected, (state) => {
           state.status = 'IDLE';
         })
-        .addCase(fetch.pending, (state) => {
+        .addCase(fetchBlockedUsers.pending, (state) => {
           state.status = 'LOADING';
         });
     },

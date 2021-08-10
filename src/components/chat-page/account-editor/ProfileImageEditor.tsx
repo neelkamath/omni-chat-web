@@ -32,7 +32,7 @@ function ProfileImage(): ReactElement {
   const userId = Storage.readUserId()!;
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(ImagesSlice.fetch({ id: userId, type: 'PROFILE_IMAGE' }));
+    dispatch(ImagesSlice.fetchImage({ id: userId, type: 'PROFILE_IMAGE' }));
   }, [dispatch, userId]);
   const url = useSelector((state: RootState) => ImagesSlice.selectImage(state, 'PROFILE_IMAGE', userId, 'ORIGINAL'));
   const error = useSelector((state: RootState) => ImagesSlice.selectError(state, 'PROFILE_IMAGE', userId));
@@ -63,7 +63,7 @@ async function operatePatchProfileImage(file: File): Promise<void> {
     await operateRestApi(() => patchProfileImage(httpApiConfig, Storage.readAccessToken()!, file));
     message.success('Profile image updated.', 3);
   } catch (error) {
-    if (error instanceof InvalidImageError) message.error("The image mustn't exceed 5 MB.", 5);
+    if (error instanceof InvalidImageError) message.error("The image mustn't exceed 3 MB.", 5);
     else throw error;
   }
 }

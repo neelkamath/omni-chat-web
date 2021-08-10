@@ -12,7 +12,7 @@ export interface GroupChatImageProps {
 export default function GroupChatImage({ chatId }: GroupChatImageProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(ImagesSlice.fetch({ id: chatId, type: 'GROUP_CHAT_IMAGE' }));
+    dispatch(ImagesSlice.fetchImage({ id: chatId, type: 'GROUP_CHAT_IMAGE' }));
   }, [dispatch, chatId]);
   /*
   A <NonexistentChatError> will occur when the chat has been deleted. It's the responsibility of the parent element to

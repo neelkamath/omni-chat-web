@@ -20,8 +20,7 @@ export default function ChatSection({ chatId }: ChatSectionProps): ReactElement 
   }, [dispatch, chatId]);
   const chat = useSelector((state: RootState) => ChatsSlice.selectChat(state, chatId));
   useEffect(() => {
-    if (chat?.__typename === 'PrivateChat') setSection(<ChatSegment chat={chat} />);
-    else if (chat?.__typename === 'GroupChat') setSection(<ChatSegment chat={chat} />);
+    if (chat !== undefined) setSection(<ChatSegment chat={chat} />);
   }, [chat]);
   return section;
 }
@@ -51,6 +50,7 @@ interface MessageCreatorSectionProps {
   readonly chat: ChatsSlice.Chat;
 }
 
+// TODO: Maybe use Redux to select the state instead of manually getting it from <chat>.
 function MessageCreatorSection({ chat }: MessageCreatorSectionProps): ReactElement {
   switch (chat.__typename) {
     case 'PrivateChat':

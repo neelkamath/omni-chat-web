@@ -116,7 +116,7 @@ async function onMessage(
       store.dispatch(AccountsSlice.update({ ...event, __typename: 'Account' }));
       break;
     case 'UpdatedProfileImage':
-      store.dispatch(ImagesSlice.fetch({ id: event.userId, type: 'PROFILE_IMAGE', shouldUpdateOnly: true }));
+      store.dispatch(ImagesSlice.fetchImage({ id: event.userId, type: 'PROFILE_IMAGE', shouldUpdateOnly: true }));
       break;
     case 'BlockedAccount':
       store.dispatch(BlockedUsersSlice.upsertOne(event));

@@ -58,7 +58,7 @@ interface UserCardProps {
 function UserCard({ userId, onClick, extraRenderer }: UserCardProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(AccountsSlice.fetch(userId));
+    dispatch(AccountsSlice.fetchAccount(userId));
   }, [dispatch, userId]);
   const username = useSelector((state: RootState) => AccountsSlice.select(state, userId))?.username;
   const name = username === undefined ? <Spin size='small' /> : <Typography.Text strong>{username}</Typography.Text>;
@@ -87,7 +87,7 @@ function ProfileImage({ userId }: ProfileImageProps): ReactElement {
    */
   const url = useSelector((state: RootState) => ImagesSlice.selectImage(state, 'PROFILE_IMAGE', userId, 'THUMBNAIL'));
   useEffect(() => {
-    dispatch(ImagesSlice.fetch({ id: userId, type: 'PROFILE_IMAGE' }));
+    dispatch(ImagesSlice.fetchImage({ id: userId, type: 'PROFILE_IMAGE' }));
   }, [dispatch, userId]);
   return <CustomImage icon={<UserOutlined />} url={url} />;
 }

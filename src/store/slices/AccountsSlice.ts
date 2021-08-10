@@ -21,8 +21,8 @@ export namespace AccountsSlice {
     readonly fetching: number[];
   }
 
-  export const fetch = createAsyncThunk(
-    `${sliceName}/fetch`,
+  export const fetchAccount = createAsyncThunk(
+    `${sliceName}/fetchAccount`,
     async (userId: number) => {
       const response = await readAccount(userId);
       return response?.readAccount.__typename === 'Account' ? response?.readAccount : undefined;
@@ -100,15 +100,15 @@ export namespace AccountsSlice {
     reducers: { update: adapter.upsertOne, removeOne: reduceRemoveOne },
     extraReducers: (builder) => {
       builder
-        .addCase(fetch.rejected, (state, { meta }) => {
+        .addCase(fetchAccount.rejected, (state, { meta }) => {
           state.fetching = state.fetching.filter((userId) => userId !== meta.arg);
         })
-        .addCase(fetch.fulfilled, (state, { payload, meta }) => {
+        .addCase(fetchAccount.fulfilled, (state, { payload, meta }) => {
           state.fetching = state.fetching.filter((userId) => userId !== meta.arg);
           if (payload === undefined) return;
           adapter.upsertOne(state, payload);
         })
-        .addCase(fetch.pending, (state, { meta }) => {
+        .addCase(fetchAccount.pending, (state, { meta }) => {
           state.fetching.push(meta.arg);
         });
     },

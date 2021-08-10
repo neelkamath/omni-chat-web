@@ -28,10 +28,10 @@ export interface ChatMessageProps {
 export default function ChatMessage({ chatId, message }: ChatMessageProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(AccountsSlice.fetch(Storage.readUserId()!));
+    dispatch(AccountsSlice.fetchAccount(Storage.readUserId()!));
   }, [dispatch]);
   useEffect(() => {
-    dispatch(ImagesSlice.fetch({ id: message.sender.userId, type: 'PROFILE_IMAGE' }));
+    dispatch(ImagesSlice.fetchImage({ id: message.sender.userId, type: 'PROFILE_IMAGE' }));
   }, [dispatch, message]);
   const url = useSelector((state: RootState) =>
     ImagesSlice.selectImage(state, 'PROFILE_IMAGE', message.sender.userId, 'THUMBNAIL'),

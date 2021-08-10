@@ -34,8 +34,8 @@ export namespace TypingStatusesSlice {
     return `${userId}_${chatId}`;
   }
 
-  export const fetch = createAsyncThunk(
-    `${sliceName}/fetch`,
+  export const fetchStatus = createAsyncThunk(
+    `${sliceName}/fetchStatus`,
     async () => {
       const response = await readTypingUsers();
       return response?.readTypingUsers.flatMap(({ chatId, users }) =>
@@ -109,16 +109,16 @@ export namespace TypingStatusesSlice {
     reducers: { upsertOne: reduceUpsertOne, removeUser: reduceRemoveUser },
     extraReducers: (builder) => {
       builder
-        .addCase(fetch.rejected, (state) => {
+        .addCase(fetchStatus.rejected, (state) => {
           state.status = 'IDLE';
         })
-        .addCase(fetch.fulfilled, (state, { payload }) => {
+        .addCase(fetchStatus.fulfilled, (state, { payload }) => {
           if (payload !== undefined) {
             adapter.upsertMany(state, payload);
             state.status = 'LOADED';
           } else state.status = 'IDLE';
         })
-        .addCase(fetch.pending, (state) => {
+        .addCase(fetchStatus.pending, (state) => {
           state.status = 'LOADING';
         });
     },

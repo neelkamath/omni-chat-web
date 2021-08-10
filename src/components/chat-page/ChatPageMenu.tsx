@@ -42,7 +42,7 @@ export default function ChatPageMenu(): ReactElement {
 function EditAccountCol(): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(ImagesSlice.fetch({ type: 'PROFILE_IMAGE', id: Storage.readUserId()! }));
+    dispatch(ImagesSlice.fetchImage({ type: 'PROFILE_IMAGE', id: Storage.readUserId()! }));
   }, [dispatch]);
   const url = useSelector((state: RootState) =>
     ImagesSlice.selectImage(state, 'PROFILE_IMAGE', Storage.readUserId()!, 'THUMBNAIL'),

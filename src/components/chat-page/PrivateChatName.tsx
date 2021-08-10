@@ -12,7 +12,7 @@ export interface PrivateChatNameProps {
 export default function PrivateChatName({ userId }: PrivateChatNameProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(AccountsSlice.fetch(userId));
+    dispatch(AccountsSlice.fetchAccount(userId));
   }, [userId, dispatch]);
   const username = useSelector((state: RootState) => AccountsSlice.select(state, userId))?.username;
   return <>{username ?? <Spin size='small' />}</>;

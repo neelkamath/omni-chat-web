@@ -48,7 +48,7 @@ function UsersRow(): ReactElement {
         <List>
           <List.Item>Search for your friends and family.</List.Item>
           <List.Item>Use on any device - no phone required.</List.Item>
-          <List.Item>See whether a user is online, or when they were last online.</List.Item>
+          <List.Item>See whether a user is online.</List.Item>
           <List.Item>Block and unblock users without them knowing.</List.Item>
         </List>
       </Col>
@@ -154,7 +154,6 @@ function PowerfulMessagesRow(): ReactElement {
           </List.Item>
           <List.Item>Forward messages.</List.Item>
           <List.Item>Search messages.</List.Item>
-          <List.Item>See when the message was sent, delivered, and read by each user.</List.Item>
           <List.Item>Delete messages.</List.Item>
           <List.Item>Bookmark important messages to easily view them later.</List.Item>
           <List.Item>

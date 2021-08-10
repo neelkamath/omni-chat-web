@@ -113,7 +113,7 @@ async function onMessage(
       }
       break;
     case 'UpdatedGroupChatImage':
-      store.dispatch(ImagesSlice.fetch({ id: event.chatId, type: 'GROUP_CHAT_IMAGE', shouldUpdateOnly: true }));
+      store.dispatch(ImagesSlice.fetchImage({ id: event.chatId, type: 'GROUP_CHAT_IMAGE', shouldUpdateOnly: true }));
       break;
     case 'DeletedPrivateChat':
       ChatsSlice.removeOne(event.chatId);

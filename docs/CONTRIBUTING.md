@@ -4,10 +4,10 @@
 
 Create the following [encrypted secrets](https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
 
-| Name                    | Explanation                                                                                                       | Example            |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------ |
-| `API_AUTHORITY`         | The URL Omni Chat Backend is running on.                                                                          | `example.com`      |
-| `SUPPORT_EMAIL_ADDRESS` | The email address which will be displayed to users when they require help such as when they want to report a bug. | `john@example.com` |
+|          Name           | Explanation                                                                                                                                     | Example            |
+| :---------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+|     `API_AUTHORITY`     | The [URL's authority](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_is_a_URL#authority) Omni Chat Backend is running on. | `example.com`      |
+| `SUPPORT_EMAIL_ADDRESS` | The email address which will be displayed to users when they require help such as when they want to report a bug.                               | `john@example.com` |
 
 ## Installation
 

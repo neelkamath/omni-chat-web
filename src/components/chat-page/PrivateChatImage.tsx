@@ -12,7 +12,7 @@ export interface PrivateChatImageProps {
 export default function PrivateChatImage({ userId }: PrivateChatImageProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(ImagesSlice.fetch({ id: userId, type: 'PROFILE_IMAGE' }));
+    dispatch(ImagesSlice.fetchImage({ id: userId, type: 'PROFILE_IMAGE' }));
   }, [dispatch, userId]);
   /*
   A <NonexistentUserIdError> will occur when the user deletes their account. It's the responsibility of the parent

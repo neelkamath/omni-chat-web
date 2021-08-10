@@ -23,7 +23,7 @@ export default function ChatPage(): ReactElement {
   useEffect(() => {
     const setOnlineStatus = false;
     if (Storage.readRefreshToken() === undefined) {
-      logOut();
+      logOut(setOnlineStatus);
       return;
     }
     refreshTokenSet().then(async (response) => {
@@ -32,14 +32,14 @@ export default function ChatPage(): ReactElement {
         return;
       }
       Storage.saveTokenSet(response.refreshTokenSet);
-      await setOnline(true);
-      await setUpSubscriptions();
+      await Promise.all([setOnline(true), setUpSubscriptions()]);
       addEventListener('online', () => {
         if (location.pathname === '/chat')
           message.warning('Refresh the page to view updates you missed while offline.', 5);
       });
       setPage(<ChatPageLayout />);
     });
+    // FIXME: Firefox doesn't display notification requests unless the user has interacted with the website.
     Notification.requestPermission();
   }, []);
   return page;

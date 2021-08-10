@@ -58,7 +58,7 @@ export namespace OnlineStatusesSlice {
     );
   }
 
-  export const fetch = createAsyncThunk(`${sliceName}/fetch`, operateReadOnlineStatus, {
+  export const fetchStatus = createAsyncThunk(`${sliceName}/fetchStatus`, operateReadOnlineStatus, {
     condition: (userId, { getState }) => {
       const { onlineStatuses } = getState() as { onlineStatuses: State };
       return !onlineStatuses.ids.includes(userId) && !onlineStatuses.fetching.includes(userId);
@@ -71,14 +71,14 @@ export namespace OnlineStatusesSlice {
     reducers: { upsertOne: adapter.upsertOne, removeOne: adapter.removeOne },
     extraReducers: (builder) => {
       builder
-        .addCase(fetch.fulfilled, (state, { payload, meta }) => {
+        .addCase(fetchStatus.fulfilled, (state, { payload, meta }) => {
           state.fetching = state.fetching.filter((userId) => userId !== meta.arg);
           if (payload !== undefined) adapter.upsertOne(state, payload);
         })
-        .addCase(fetch.pending, (state, { meta }) => {
+        .addCase(fetchStatus.pending, (state, { meta }) => {
           state.fetching.push(meta.arg);
         })
-        .addCase(fetch.rejected, (state, { meta }) => {
+        .addCase(fetchStatus.rejected, (state, { meta }) => {
           state.fetching = state.fetching.filter((userId) => userId !== meta.arg);
         });
     },

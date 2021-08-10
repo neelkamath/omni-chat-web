@@ -11,7 +11,7 @@ export interface ImageMessageContentProps {
 export default function ImageMessageContent({ messageId }: ImageMessageContentProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(ImageMessagesSlice.fetch(messageId));
+    dispatch(ImageMessagesSlice.fetchMessage(messageId));
   }, [dispatch, messageId]);
   const url = useSelector((state: RootState) => ImageMessagesSlice.selectImage(state, messageId)).originalUrl;
   // FIXME: Set the width to be at most 50% instead of 50% because otherwise small images get enlarged excessively. Check what happens if you put a thin but tall image.

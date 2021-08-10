@@ -28,7 +28,7 @@ function DeleteAccountForm(): ReactElement {
   const userId = Storage.readUserId()!;
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(AccountsSlice.fetch(userId));
+    dispatch(AccountsSlice.fetchAccount(userId));
   }, [dispatch, userId]);
   const username = useSelector((state: RootState) => AccountsSlice.select(state, userId))?.username;
   if (username === undefined) return <Spin />;

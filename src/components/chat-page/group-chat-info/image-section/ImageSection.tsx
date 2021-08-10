@@ -45,7 +45,7 @@ interface ChatImageProps {
 function ChatImage({ chatId }: ChatImageProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(ImagesSlice.fetch({ id: chatId, type: 'GROUP_CHAT_IMAGE' }));
+    dispatch(ImagesSlice.fetchImage({ id: chatId, type: 'GROUP_CHAT_IMAGE' }));
   }, [dispatch, chatId]);
   const url = useSelector((state: RootState) => ImagesSlice.selectImage(state, 'GROUP_CHAT_IMAGE', chatId, 'ORIGINAL'));
   const error = useSelector((state: RootState) => ImagesSlice.selectError(state, 'GROUP_CHAT_IMAGE', chatId));

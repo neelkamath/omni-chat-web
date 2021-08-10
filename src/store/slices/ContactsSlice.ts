@@ -12,8 +12,8 @@ export namespace ContactsSlice {
     readonly status: FetchStatus;
   }
 
-  export const fetch = createAsyncThunk(
-    `${sliceName}/fetch`,
+  export const fetchContacts = createAsyncThunk(
+    `${sliceName}/fetchContacts`,
     async () => {
       const response = await readContacts();
       return response?.readContacts.edges.map(({ node }) => node);
@@ -75,13 +75,13 @@ export namespace ContactsSlice {
     reducers: { removeOne: adapter.removeOne, upsertOne: adapter.upsertOne },
     extraReducers: (builder) => {
       builder
-        .addCase(fetch.pending, (state) => {
+        .addCase(fetchContacts.pending, (state) => {
           state.status = 'LOADING';
         })
-        .addCase(fetch.rejected, (state) => {
+        .addCase(fetchContacts.rejected, (state) => {
           state.status = 'IDLE';
         })
-        .addCase(fetch.fulfilled, (state, { payload }) => {
+        .addCase(fetchContacts.fulfilled, (state, { payload }) => {
           state.status = 'LOADED';
           if (payload !== undefined) adapter.upsertMany(state, payload);
         });

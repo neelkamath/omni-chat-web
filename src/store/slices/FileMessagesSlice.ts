@@ -35,8 +35,8 @@ export namespace FileMessagesSlice {
     readonly type: 'AUDIO' | 'VIDEO' | 'DOC';
   }
 
-  export const fetch = createAsyncThunk(
-    `${sliceName}/fetch`,
+  export const fetchMessage = createAsyncThunk(
+    `${sliceName}/fetchMessage`,
     async ({ messageId, type }: MessageMetadata) => {
       let file: VideoFile | AudioFile | DocFile | undefined;
       switch (type) {
@@ -78,13 +78,13 @@ export namespace FileMessagesSlice {
     reducers: { deleteMessage: reduceDeleteMessage },
     extraReducers: (builder) => {
       builder
-        .addCase(fetch.rejected, ({ entities }, { meta }) => {
+        .addCase(fetchMessage.rejected, ({ entities }, { meta }) => {
           entities[meta.arg.messageId]!.isLoading = false;
         })
-        .addCase(fetch.pending, (state, { meta }) => {
+        .addCase(fetchMessage.pending, (state, { meta }) => {
           adapter.upsertOne(state, { messageId: meta.arg.messageId, isLoading: true });
         })
-        .addCase(fetch.fulfilled, adapter.upsertOne);
+        .addCase(fetchMessage.fulfilled, adapter.upsertOne);
     },
   });
 

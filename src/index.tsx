@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './components/App';
 import setOnline from './setOnline';
 
+// TODO: Add illustrations to every chat page's section such as the contacts section.
 // FIXME: Deleting your account works but an error reporter pops up.
 // TODO: Ensure mic access is switched off when not recording audio.
 /*

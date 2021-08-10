@@ -42,8 +42,8 @@ interface ProfileSectionProps {
 function ProfileSection({ userId, hasChatButton }: ProfileSectionProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(ImagesSlice.fetch({ id: userId, type: 'PROFILE_IMAGE' }));
-    dispatch(AccountsSlice.fetch(userId));
+    dispatch(ImagesSlice.fetchImage({ id: userId, type: 'PROFILE_IMAGE' }));
+    dispatch(AccountsSlice.fetchAccount(userId));
   }, [dispatch, userId]);
   const url = useSelector((state: RootState) => ImagesSlice.selectImage(state, 'PROFILE_IMAGE', userId, 'ORIGINAL'));
   const user = useSelector((state: RootState) => AccountsSlice.select(state, userId));
@@ -115,7 +115,7 @@ interface ContactButtonProps {
 function ContactButton({ userId }: ContactButtonProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(ContactsSlice.fetch());
+    dispatch(ContactsSlice.fetchContacts());
   }, [dispatch]);
   const isButtonLoading = !useSelector(ContactsSlice.selectIsLoaded);
   const [isLoading, setLoading] = useState(false);
@@ -197,7 +197,7 @@ interface BlockButtonProps {
 function BlockButton({ userId }: BlockButtonProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(BlockedUsersSlice.fetch());
+    dispatch(BlockedUsersSlice.fetchBlockedUsers());
   }, [dispatch]);
   const isBlocked = useSelector((state: RootState) => BlockedUsersSlice.selectIsBlocked(state, userId));
   const isButtonLoading = !useSelector(BlockedUsersSlice.selectIsLoaded);

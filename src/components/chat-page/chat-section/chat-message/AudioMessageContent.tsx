@@ -11,7 +11,7 @@ export interface AudioMessageContentProps {
 export default function AudioMessageContent({ messageId }: AudioMessageContentProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(FileMessagesSlice.fetch({ messageId, type: 'AUDIO' }));
+    dispatch(FileMessagesSlice.fetchMessage({ messageId, type: 'AUDIO' }));
   }, [dispatch, messageId]);
   const { url, filename } = useSelector((state: RootState) => FileMessagesSlice.selectFile(state, messageId));
   if (url === undefined) return <Spin size='small' />;

@@ -84,8 +84,8 @@ export namespace ImagesSlice {
     return { thumbnail, original };
   }
 
-  export const fetch = createAsyncThunk(
-    `${sliceName}/fetch`,
+  export const fetchImage = createAsyncThunk(
+    `${sliceName}/fetchImage`,
     async ({ id, type }: FetchImageData) => {
       const { thumbnail, original } = await getImage({ id, type });
       const generateUrl = (data: ImageResponse) =>
@@ -122,14 +122,14 @@ export namespace ImagesSlice {
     reducers: { removeAccount: reduceRemoveAccount },
     extraReducers: (builder) => {
       builder
-        .addCase(fetch.rejected, ({ entities }, { meta, error }) => {
+        .addCase(fetchImage.rejected, ({ entities }, { meta, error }) => {
           const entity = entities[generateId(meta.arg.type, meta.arg.id)]!;
           entity.isLoading = false;
           if (error.name === NonexistentUserIdError.name) entity.error = new NonexistentUserIdError();
           else if (error.name === NonexistentChatError.name) entity.error = new NonexistentChatError();
         })
-        .addCase(fetch.fulfilled, adapter.upsertOne)
-        .addCase(fetch.pending, (state, { meta }) => {
+        .addCase(fetchImage.fulfilled, adapter.upsertOne)
+        .addCase(fetchImage.pending, (state, { meta }) => {
           const id = generateId(meta.arg.type, meta.arg.id);
           adapter.upsertOne(state, { id, type: meta.arg.type, isLoading: true });
         });

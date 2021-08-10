@@ -98,7 +98,7 @@ function LastChatMessage({ chatId }: LastChatMessageTextProps): ReactElement {
   const isLoading = !useSelector(ChatsSlice.selectIsLoaded);
   const lastMessage = useSelector((state: RootState) => ChatsSlice.selectLastMessage(state, chatId));
   useEffect(() => {
-    if (lastMessage?.sender.userId !== undefined) dispatch(AccountsSlice.fetch(lastMessage.sender.userId));
+    if (lastMessage?.sender.userId !== undefined) dispatch(AccountsSlice.fetchAccount(lastMessage.sender.userId));
   }, [dispatch, lastMessage]);
   const username = useSelector((state: RootState) => AccountsSlice.select(state, lastMessage?.sender.userId))?.username;
   if (isLoading || (lastMessage !== undefined && username === undefined)) return <Spin />;

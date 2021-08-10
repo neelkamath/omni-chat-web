@@ -11,7 +11,7 @@ export interface VideoMessageContentProps {
 export default function VideoMessageContent({ messageId }: VideoMessageContentProps): ReactElement {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(FileMessagesSlice.fetch({ messageId, type: 'VIDEO' }));
+    dispatch(FileMessagesSlice.fetchMessage({ messageId, type: 'VIDEO' }));
   }, [dispatch, messageId]);
   const { filename, url } = useSelector((state: RootState) => FileMessagesSlice.selectFile(state, messageId));
   /*
